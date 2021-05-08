@@ -1,0 +1,36 @@
+
+import(regtools)
+
+  importFrom("graphics", "abline", "matplot", "plot")
+  importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
+             "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
+             "var")
+  importFrom("utils", "combn")
+  importFrom("sandwich","vcovHC")
+
+S3method(predict,qeLogit)
+S3method(predict,qeLin)
+S3method(predict,qeKNN)
+S3method(predict,qeRF)
+S3method(predict,qeSVM)
+S3method(predict,qeSVMliquid)
+S3method(predict,qeGBoost)
+S3method(predict,qeNeural)
+S3method(predict,qePolyLin)
+S3method(predict,qePolyLog)
+S3method(predict,qeLASSO)
+S3method(plot,qeLASSO)
+S3method(plot,qeRF)
+S3method(predict,qePolyLASSO)
+S3method(predict,qeIso)
+S3method(predict,qePCA)
+S3method(predict,qeUMAP)
+S3method(predict,qeTS)
+S3method(predict,qeText)
+
+export(
+   qePCA,qeUMAP,
+   qeLogit,qeLin,qeKNN,qeRF,qeSVM,qeGBoost,qeNeural,qeLASSO,qeCompare,qeFT,
+   doPCA,qePolyLin,qePolyLog,ridgePoly,qePolyLASSO,qeSVMliquid,
+   getMNIST,
+   qeIso,qeTS,qeText,buildQEcall)
