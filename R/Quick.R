@@ -273,16 +273,18 @@ predict.qeKNN <- function(object,newx,newxK=1)
 
 #########################  qeRF()  #################################
 
-# random forests
+# random forests, from the package 'randomForest'
 
 # arguments:  see above, plus
 
-#     ntree: number of treesprobsto generate
+#     ntree: number of trees probsto generate
 #     minNodeSize: minimum number of data points in a node
+#     mtry: number of variables randomly tried at each split
 
 # value:  see above
  
 qeRF <- function(data,yName,nTree=500,minNodeSize=10,
+   mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
@@ -290,7 +292,8 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    require(randomForest)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
-   rfout <- randomForest(frml,data=data,ntree=nTree,nodesize=minNodeSize)
+   rfout <- randomForest(frml,data=data,
+      ntree=nTree,nodesize=minNodeSize,mtry=mtry)
    rfout$classNames <- xyc$classNames
    rfout$classif <- classif
    rfout$trainRow1 <- getRow1(data,yName)
@@ -319,6 +322,51 @@ predict.qeRF <- function(object,newx)
 plot.qeRF <- function(object) 
 {
    genericPlot(object)
+}
+
+#########################  qeRFgrf()  #################################
+
+# random forests, from the package 'grf'
+
+# arguments:  see above, plus
+
+#     ntree: number of treesprobsto generate
+#     minNodeSize: minimum number of data points in a node
+
+# value:  see above
+ 
+qeRFgrf <- function(data,yName,nTree=500,minNodeSize=10,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   classif <- is.factor(data[[yName]])
+   if (!is.null(holdout)) splitData(holdout,data)
+   require(randomForest)
+   xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
+   frml <- as.formula(paste(yName,'~ .'))
+   rfout <- randomForest(frml,data=data,ntree=nTree,nodesize=minNodeSize)
+   rfout$classNames <- xyc$classNames
+   rfout$classif <- classif
+   rfout$trainRow1 <- getRow1(data,yName)
+   class(rfout) <- c('qeRFgrf','regression_forest')
+   if (!is.null(holdout)) {
+      predictHoldout(rfout)
+      rfout$holdIdxs <- holdIdxs
+   }
+   rfout
+}
+
+predict.qeRFgrf <- function(object,newx)
+{
+   class(object) <- 'regression_forest'
+   newx <- setTrainFactors(object,newx)
+   classif <- object$classif
+   if (classif) {
+      probs <- predict(object,newx,type='prob')
+      res <- collectForReturn(object,probs)
+   } else {
+      res <- predict(object,newx,type='response')
+   }
+   res
 }
 
 #########################  qeSVM()  #################################
