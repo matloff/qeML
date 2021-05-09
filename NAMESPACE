@@ -1,5 +1,5 @@
 
-import(regtools)
+
 
   importFrom("graphics", "abline", "matplot", "plot")
   importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
@@ -31,6 +31,5 @@ S3method(predict,qeText)
 export(
    qePCA,qeUMAP,
    qeLogit,qeLin,qeKNN,qeRF,qeSVM,qeGBoost,qeNeural,qeLASSO,qeCompare,qeFT,
-   doPCA,qePolyLin,qePolyLog,ridgePoly,qePolyLASSO,qeSVMliquid,
-   getMNIST,
+   qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,
    qeIso,qeTS,qeText,buildQEcall)
