@@ -36,7 +36,6 @@
 \alias{plot.RF}
 \alias{plot.LASSO}
 
-<<<<<<< HEAD
 \title{Quick-and-Easy Machine Learning Wrappers}
 
 \description{
@@ -47,19 +46,7 @@ prediction of new cases.  Just one call needed to fit, no preliminary
 setup of model etc.  The simplicity also makes the series useful
 for teaching.  For advanced work, analysts may prefer to use 
 the methods directly, in order to utilize specialized options.  
-=======
-\title{Quick-Explore Regression/Machine Learning Wrappers}
 
-\description{
-Quick access to machine learning methods, with a very simple,
-uniform interface.  Intended for convenient initial 
-exploration of a dataset, both to gauge the predictive effectiveness of a 
-model and to do simple prediction of new cases.  Just one call needed 
-to fit, no preliminary setup of model etc.  The simplicity also 
-makes the series useful for teaching.  For advanced work, 
-analysts may prefer to use the methods directly, in order to utilize 
-specialized options.  
->>>>>>> 357c7bae209c4c2c10186818fc2a21af8a3d45d7
 }
 
 \usage{
@@ -139,14 +126,15 @@ qeUMAP(nComps,dataName,yName,qeName,opts=NULL,
   \item{seed}{Seed for random number generation.}
   \item{qeftn}{Quoted string, specifying the name of a qe-series
      machine learning method.}
-  \item{pars}{R list of hyperparameter ranges.  See \code{\link{fineTuning}}.}
+  \item{pars}{R list of hyperparameter ranges.  See 
+     \code{regtools::fineTuning}.}
   \item{nCombs}{Number of hyperparameter combinations to run.  
-     See \code{\link{fineTuning}}.}
-  \item{nTsts}{Size of test sets.  See \code{\link{fineTuning}}.}
+     See \code{regtools::fineTuning}.}
+  \item{nTsts}{Size of test sets.  See \code{regtools::fineTuning}.}
   \item{nXval}{Number of cross-validations to run.  
-     See \code{\link{fineTuning}}.}
+     See \code{regtools::fineTuning}.}
   \item{showProgress}{If TRUE, show results as they arise.  
-     See \code{\link{fineTuning}}.}
+     See \code{regtools::fineTuning}.}
 }
 
 \details{
@@ -210,7 +198,6 @@ original data, nothing can be done.)
 
 Some notes on specific functions:
 
-<<<<<<< HEAD
 \itemize{
 
    \item The function \code{qeLin} handles classification problems as
@@ -231,12 +218,12 @@ Some notes on specific functions:
    holdout sets are generated and used by all the functions.  Default
    values of hyperparameters of those functions can be set via
    \code{opts}.  Hyperparameter tuning for a given \code{qe*} function
-   can be done using \code{qeFT}, a wrapper to the package's
-   \code{fineTuning} function.  See also \code{replicMean}.
+   can be done using \code{qeFT}, a wrapper to the 
+   \code{regtools::fineTuning} function.  See also \code{replicMean}.
 
    \item Two different SVM implementations are offered:  \code{qeSVM}
    wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
-   uses the \pkga{liquidSVM} package.
+   uses the \pkg{liquidSVM} package.
 
    \item The functions \code{qeTS} and \code{qeText} handle time series
    and text applications, respectively.
@@ -249,22 +236,6 @@ Some notes on specific functions:
    
    \item The \code{qeIso} function is intended mainly for use as a
    smoothing method in calibration actions.  }
-=======
-Low-dimensional manifold fitting is facilitated by \code{qePCA} and
-\code{qeUMAP}.
-
-The \code{qeCompare} function does quick-and-easy cross-validated
-comparisons among the \code{qe*} functions.  The same holdout sets are
-generated and used by all the functions.  Default values of
-hyperparameters of those functions can be set via \code{opts}.
-
-Similarly, the \code{qeFT} function serves as a convenient interface to
-\code{finetuning}.  See also \code{replicMean}.
-
-The \code{qeIso} function is intended mainly for use as a smoothing
-method in calibration actions.
->>>>>>> 357c7bae209c4c2c10186818fc2a21af8a3d45d7
-
 }
 
 \value{
