@@ -336,6 +336,7 @@ plot.qeRF <- function(object)
 # value:  see above
  
 qeRFgrf <- function(data,yName,nTree=500,minNodeSize=10,
+   mtry=floor(sqrt(ncol(data)))+1,ll=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
