@@ -335,16 +335,22 @@ plot.qeRF <- function(object)
 
 # value:  see above
  
-qeRFgrf <- function(data,yName,nTree=500,minNodeSize=10,
+qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    mtry=floor(sqrt(ncol(data)))+1,ll=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   require(randomForest)
-   xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
-   frml <- as.formula(paste(yName,'~ .'))
-   rfout <- randomForest(frml,data=data,ntree=nTree,nodesize=minNodeSize)
+   require(grf)
+   xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
+   ## frml <- as.formula(paste(yName,'~ .'))
+   ## rfout <- randomForest(frml,data=data,ntree=nTree,nodesize=minNodeSize)
+   x <- as.matrix(xyc$x)
+   y <- xyc$y
+   if (!classif) {
+      rfout <- regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
+         mtry=mtry)
+   }
    rfout$classNames <- xyc$classNames
    rfout$classif <- classif
    rfout$trainRow1 <- getRow1(data,yName)
@@ -361,11 +367,16 @@ predict.qeRFgrf <- function(object,newx)
    class(object) <- 'regression_forest'
    newx <- setTrainFactors(object,newx)
    classif <- object$classif
+   if (!regtools::allNumeric(newx)) {
+      newx <- regtools::charsToFactors(newx)
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
+         factorsInfo=object$factorsInfo)
+   }
    if (classif) {
       probs <- predict(object,newx,type='prob')
       res <- collectForReturn(object,probs)
    } else {
-      res <- predict(object,newx,type='response')
+      res <- predict(object,newx)
    }
    res
 }
