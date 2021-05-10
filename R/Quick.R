@@ -339,21 +339,42 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    mtry=floor(sqrt(ncol(data)))+1,ll=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+print('under construction')
+
    classif <- is.factor(data[[yName]])
+
+   ycol <- which(names(data) == yName)
+   x <- data[,-ycol]
+
+   # change factors, if any, to dummies
+   if (!regtools::allNumeric(x)) {
+      x <- regtools::toAllNumeric(x)
+      factorsInfo <- attr(x,'factorsInfo')
+   } else factorsInfo <- NULL
+
    if (!is.null(holdout)) splitData(holdout,data)
+
+   # start the computation
    require(grf)
    xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
-   ## frml <- as.formula(paste(yName,'~ .'))
-   ## rfout <- randomForest(frml,data=data,ntree=nTree,nodesize=minNodeSize)
    x <- as.matrix(xyc$x)
    y <- xyc$y
    if (!classif) {
       rfout <- regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
          mtry=mtry)
+   } else {
+      lvls <- levels(y)
+      ydumms <- regtools::factorToDummies(y,yName,omitLast=(length(lvls)==2))
+      doGRF <- function(i) 
+         regression_forest(x,ydumms[,i],num.trees=nTree,min.node.size=minNodeSize,
+            mtry=mtry)
+      grfOut <- lapply(1:ncol(ydumms),doGRF)
+      rfout <- list(grfOut=grfOut)
    }
    rfout$classNames <- xyc$classNames
    rfout$classif <- classif
    rfout$trainRow1 <- getRow1(data,yName)
+   rfout$factorsInfo <- factorsInfo
    class(rfout) <- c('qeRFgrf','regression_forest')
    if (!is.null(holdout)) {
       predictHoldout(rfout)
