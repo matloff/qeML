@@ -69,9 +69,9 @@ qePolyLog(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeCompare(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
-qePCA(pcaProp,dataName,yName,qeName,opts=NULL,
+qePCA(dataName,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeUMAP(nComps,dataName,yName,qeName,opts=NULL,
+qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
    holdout=floor(min(1000,0.1*nrow(data))))
 \method{predict}{qeLogit}(object,newx)
 \method{predict}{qeLin}(object,newx)
@@ -135,6 +135,8 @@ qeUMAP(nComps,dataName,yName,qeName,opts=NULL,
      See \code{regtools::fineTuning}.}
   \item{showProgress}{If TRUE, show results as they arise.  
      See \code{regtools::fineTuning}.}
+  \item{nComps}{Number of UMAP components to extract.}
+  \item{nNeighbors}{Number of nearest neighbors to use in UMAP.}
 }
 
 \details{

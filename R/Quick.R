@@ -1092,7 +1092,7 @@ predict.qeIso <- function(object,newx)
 # the additional argument here is pcaProp, the proportion of variance desired
 # for the principal components
 
-qePCA <- function(pcaProp,dataName,yName,qeName,opts=NULL,
+qePCA <- function(dataName,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    # eventual return value
