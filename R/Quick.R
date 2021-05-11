@@ -336,7 +336,8 @@ plot.qeRF <- function(object)
 # value:  see above
  
 qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
-   mtry=floor(sqrt(ncol(data)))+1,ll=FALSE,
+   mtry=floor(sqrt(ncol(data)))+1,
+   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
 print('under construction')
@@ -360,14 +361,26 @@ print('under construction')
    x <- as.matrix(xyc$x)
    y <- xyc$y
    if (!classif) {
-      rfout <- regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
-         mtry=mtry)
+      rfout <- 
+         if (!ll) 
+            regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
+            mtry=mtry)
+         else 
+            ll_regression_forest(x,y,
+            num.trees=nTree,min.node.size=minNodeSize,mtry=mtry,
+            ll.split.lambda=lambda,ll.split.cutoff=splitCutoff)
    } else {
       lvls <- levels(y)
       ydumms <- regtools::factorToDummies(y,yName,omitLast=(length(lvls)==2))
       doGRF <- function(i) 
-         regression_forest(x,ydumms[,i],num.trees=nTree,min.node.size=minNodeSize,
+         if (!ll)
+            regression_forest(x,ydumms[,i],
+            num.trees=nTree,min.node.size=minNodeSize,
             mtry=mtry)
+         else 
+            ll_regression_forest(x,ydumms[,i],
+            num.trees=nTree,min.node.size=minNodeSize,mtry=mtry,
+            ll.split.lambda=lambda,ll.split.cutoff=splitCutoff)
       grfOuts <- lapply(1:ncol(ydumms),doGRF)
       names(grfOuts) <- colnames(ydumms)
       rfout <- list(grfOuts=grfOuts,classNames=lvls)
