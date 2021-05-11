@@ -368,8 +368,9 @@ print('under construction')
       doGRF <- function(i) 
          regression_forest(x,ydumms[,i],num.trees=nTree,min.node.size=minNodeSize,
             mtry=mtry)
-      grfOut <- lapply(1:ncol(ydumms),doGRF)
-      rfout <- list(grfOut=grfOut)
+      grfOuts <- lapply(1:ncol(ydumms),doGRF)
+      names(grfOuts) <- colnames(ydumms)
+      rfout <- list(grfOuts=grfOuts,classNames=lvls)
    }
    rfout$classNames <- xyc$classNames
    rfout$classif <- classif
@@ -383,41 +384,65 @@ print('under construction')
    rfout
 }
 
-predict.qeRFgrf <- function(object,newx)
+predict.qeRFgrf<- function(object,newx)
 {
-   class(object) <- 'regression_forest'
-   newx <- setTrainFactors(object,newx)
-   classif <- object$classif
-   if (!regtools::allNumeric(newx)) {
-      newx <- regtools::charsToFactors(newx)
-      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=object$factorsInfo)
-   }
-   if (classif) {
-      probs <- predict(object,newx,type='prob')
-      res <- collectForReturn(object,probs)
-   } else {
-      res <- predict(object,newx)
-   }
-   res
+  newx <- setTrainFactors(object,newx)
+  classif <- object$classif
+  if (!regtools::allNumeric(newx)) {
+     newx <- regtools::charsToFactors(newx)
+     newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
+        factorsInfo=object$factorsInfo)
+  }
+  if (classif) {
+     grfOuts <- object$grfOuts
+     # do OVA on the various classes
+     getProbs <- function(grfOut) {
+        tmp <- predict(grfOut,newx)
+        as.matrix(tmp)[,1]
+     }
+     probs <- sapply(grfOuts,getProbs)
+
+     # if newx has just one row, make it the proper matrix
+     if (is.vector(probs)) {
+        probs <- matrix(probs,nrow=1)
+     }
+     
+     # special case of 2 classes; did not run grf on the other class
+     if (ncol(probs) == 1) {
+        tmp <- 1 - probs[,1]
+        probs <- cbind(probs,tmp)
+        colnames(probs)[2] <- 'other'
+     }
+     sumprobs <- apply(probs,1,sum)  
+     probs <- (1/sumprobs) * probs
+     predClasses <- apply(probs,1,which.max) 
+     predClasses <- object$classNames[predClasses]
+     res <- list(predClasses=predClasses,probs=probs)
+     ## probs <- predict(object,newx,type='prob')
+     ## res <- collectForReturn(object,probs)
+  } else {
+     class(object) <- 'regression_forest'
+     res <- predict(object,newx)
+  }
+  res
 }
 
-#########################  qeSVM()  #################################
+######################### qeSVM()  #################################
 
-# SVM
+#SVM
 
-# arguments:  see above, plus
+#arguments:  see above, plus
 
-#     gamma: scale param, e.g. sd of radial basis ftn
-#     cost: the SVM "C" parameter penalizing nonseparable data
-#     kernel: the ones offered by e1071::svm(), i.e. 'linear',
-#        'polynomial', 'radial basis' and 'sigmoid'
-#     degree: only specifiable for polynomial kernel
+#    gamma: scale param, e.g. sd of radial basis ftn
+#    cost: the SVM "C" parameter penalizing nonseparable data
+#    kernel: the ones offered by e1071::svm(), i.e. 'linear',
+#       'polynomial', 'radial basis' and 'sigmoid'
+#    degree: only specifiable for polynomial kernel
 
-# value:  see above
- 
-qeSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
+#value:  see above
+
+qeSVM<- function(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
+  holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
    if (!classif) {print('for classification problems only'); return(NA)}
@@ -1134,12 +1159,10 @@ predict.qePCA <- function(object,newx)
 # the additional argument is nComps, the number of components in the
 # transformed X
 
-qeUMAP <- function(nComps,data,yName,qeName,opts=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE)
+qeUMAP <- function(data,yName,qeName,opts=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
+   nComps=NULL,nNeighbors=NULL)
 {
-   # stop('under construction')
-
-   # require(uwot)
    require(umap)
 
    # eventual return value
@@ -1157,7 +1180,8 @@ qeUMAP <- function(nComps,data,yName,qeName,opts=NULL,
    
    # add more flexibility later
    umdf <- umap.defaults
-   umdf$n_components <- nComps
+   if (!is.null(nComps)) umdf$n_components <- nComps
+   if (!is.null(nNeighbors)) umdf$n_neighbors <- nNeighbors
    tmp <- umap(x,config=umdf)
    UMAPnames <- paste0('U',1:ncol(tmp$layout))  # need for later use in factors
    colnames(tmp$layout) <- UMAPnames
