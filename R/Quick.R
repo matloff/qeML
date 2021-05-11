@@ -423,6 +423,7 @@ predict.qeRFgrf<- function(object,newx)
   } else {
      class(object) <- 'regression_forest'
      res <- predict(object,newx)
+     res <- as.matrix(res)[,1]
   }
   res
 }
