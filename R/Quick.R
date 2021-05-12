@@ -340,8 +340,6 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-print('under construction')
-
    classif <- is.factor(data[[yName]])
 
    ycol <- which(names(data) == yName)
