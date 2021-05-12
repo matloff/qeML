@@ -324,6 +324,32 @@ plot.qeRF <- function(object)
    genericPlot(object)
 }
 
+#########################  qeRFranger()  #################################
+ 
+qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
+   mtry=floor(sqrt(ncol(data)))+1,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+print('under construction')
+   classif <- is.factor(data[[yName]])
+   if (!is.null(holdout)) splitData(holdout,data)
+   require(ranger)
+   xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
+   frml <- as.formula(paste(yName,'~ .'))
+   rfrout <- ranger(frml,data=data,num.trees=nTree,mtry=mtry,
+      min.node.size=minNodeSize)
+   rfrout$classNames <- xyc$classNames
+   rfrout$classif <- classif
+   rfrout$trainRow1 <- getRow1(data,yName)
+   class(rfrout) <- c('qeRFranger','ranger')
+   if (!is.null(holdout)) {
+      predictHoldout(rfrout)
+      rfrout$holdIdxs <- holdIdxs
+   }
+   rfrout
+
+}
+
 #########################  qeRFgrf()  #################################
 
 # random forests, from the package 'grf'
