@@ -3,6 +3,7 @@
 \alias{qeLin}
 \alias{qeKNN}
 \alias{qeRF}
+\alias{qeRFgrf}
 \alias{qeSVM}
 \alias{qeSVMliquid}
 \alias{qeGBoost}
@@ -21,6 +22,7 @@
 \alias{predict.qeLin}
 \alias{predict.qeKNN}
 \alias{predict.qeRF}
+\alias{predict.qeRFgrf}
 \alias{predict.qeSVM}
 \alias{predict.qeSVMliquid}
 \alias{predict.qeGBoost}
@@ -54,6 +56,9 @@ qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 qeLin(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 qeKNN(data,yName,k,scaleX=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
 qeRF(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
+qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
+   holdout=floor(min(1000,0.1*nrow(data))),
+   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
@@ -77,6 +82,7 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
 \method{predict}{qeLin}(object,newx)
 \method{predict}{qeKNN}(object,newx,newxK=1)
 \method{predict}{qeRF}(object,newx)
+\method{predict}{qeRFgrf}(object,newx)
 \method{predict}{qeSVM}(object,newx,k=25)
 \method{predict}{qeGBoost}(object,newx)
 \method{predict}{qeNeural}(object,newx)
@@ -137,6 +143,10 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
      See \code{regtools::fineTuning}.}
   \item{nComps}{Number of UMAP components to extract.}
   \item{nNeighbors}{Number of nearest neighbors to use in UMAP.}
+  \item{ll}{If TRUE, use local linear forest.}
+  \item{lambda}{Ridge lambda for local linear forest.}
+  \item{splitCutoff}{For leaves smaller than this value, do not fit
+  linear model.  Just use the linear model fit to the entire dataset.}
 }
 
 \details{
@@ -226,6 +236,11 @@ Some notes on specific functions:
    \item Two different SVM implementations are offered:  \code{qeSVM}
    wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
    uses the \pkg{liquidSVM} package.
+
+   \item Two different random forests implementations are offered:
+   \code{qeRF} wraps \code{randomForest} in the package of the same
+   name, while \code{qeRFgrf} wraps \code{regression_forest} 
+   and \code{ll_regression_forest} in \pkg{grf}.
 
    \item The functions \code{qeTS} and \code{qeText} handle time series
    and text applications, respectively.
