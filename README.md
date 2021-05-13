@@ -35,6 +35,9 @@ specified, e.g.
 qeSVM(mlb,'Weight',gamma=0.8)
 ```
 
+(Only selected arguments are available.  Suggestions for additions are
+very welcome.)
+
 ## ML methods available 
 
 In addition to the SVM and gradient boosting examples above,
