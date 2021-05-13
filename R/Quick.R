@@ -330,7 +330,6 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-print('under construction')
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
    require(ranger)
@@ -348,6 +347,16 @@ print('under construction')
    }
    rfrout
 
+}
+
+predict.qeRFranger <- function(object,newx) 
+{
+   class(object) <- 'ranger'
+   preds <- predict(object,newx)$predictions
+   if (object$classif) {
+      preds <- list(predClasses=preds)
+   }
+   preds
 }
 
 #########################  qeRFgrf()  #################################

@@ -3,6 +3,7 @@
 \alias{qeLin}
 \alias{qeKNN}
 \alias{qeRF}
+\alias{qeRFranger}
 \alias{qeRFgrf}
 \alias{qeSVM}
 \alias{qeSVMliquid}
@@ -22,6 +23,7 @@
 \alias{predict.qeLin}
 \alias{predict.qeKNN}
 \alias{predict.qeRF}
+\alias{predict.qeRFranger}
 \alias{predict.qeRFgrf}
 \alias{predict.qeSVM}
 \alias{predict.qeSVMliquid}
@@ -46,8 +48,7 @@ interface.  Useful for convenient exploration of a dataset,
 both to gauge the predictive effectiveness of a model and to do simple
 prediction of new cases.  Just one call needed to fit, no preliminary
 setup of model etc.  The simplicity also makes the series useful
-for teaching.  For advanced work, analysts may prefer to use 
-the methods directly, in order to utilize specialized options.  
+for teaching.  
 
 }
 
@@ -56,6 +57,7 @@ qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 qeLin(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 qeKNN(data,yName,k,scaleX=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
 qeRF(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
+qeRFranger(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))),
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
@@ -82,6 +84,7 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
 \method{predict}{qeLin}(object,newx)
 \method{predict}{qeKNN}(object,newx,newxK=1)
 \method{predict}{qeRF}(object,newx)
+\method{predict}{qeRFranger}(object,newx)
 \method{predict}{qeRFgrf}(object,newx)
 \method{predict}{qeSVM}(object,newx,k=25)
 \method{predict}{qeGBoost}(object,newx)
@@ -237,9 +240,10 @@ Some notes on specific functions:
    wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
    uses the \pkg{liquidSVM} package.
 
-   \item Two different random forests implementations are offered:
-   \code{qeRF} wraps \code{randomForest} in the package of the same
-   name, while \code{qeRFgrf} wraps \code{regression_forest} 
+   \item Three different random forests implementations are offered:
+   \code{qeRF} wraps \code{randomForest} in the package of the same name; 
+   \code{qeRFranger} wraps \code{ranger} in the package of the same name; 
+   \code{qeRFgrf} wraps \code{regression_forest} 
    and \code{ll_regression_forest} in \pkg{grf}.
 
    \item The functions \code{qeTS} and \code{qeText} handle time series

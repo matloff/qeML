@@ -10,6 +10,7 @@ S3method(predict,qeLogit)
 S3method(predict,qeLin)
 S3method(predict,qeKNN)
 S3method(predict,qeRF)
+S3method(predict,qeRFranger)
 S3method(predict,qeRFgrf)
 S3method(predict,qeSVM)
 S3method(predict,qeSVMliquid)
@@ -28,7 +29,7 @@ S3method(predict,qeTS)
 S3method(predict,qeText)
 
 export(
-   qePCA,qeUMAP,qeRF,qeRFgrf,
+   qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeNeural,qeLASSO,qeCompare,qeFT,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,
    qeIso,qeTS,qeText,buildQEcall,
