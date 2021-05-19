@@ -435,7 +435,7 @@ predict.qeRFgrf<- function(object,newx)
   newx <- setTrainFactors(object,newx)
   classif <- object$classif
   if (!regtools::allNumeric(newx)) {
-     newx <- regtools::charsToFactors(newx)
+     ## newx <- regtools::charsToFactors(newx)
      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
         factorsInfo=object$factorsInfo)
   }
@@ -1183,7 +1183,7 @@ predict.qePCA <- function(object,newx)
 {
    class(object) <- class(object)[-1]
    if (!regtools::allNumeric(newx)) {
-      newx <- regtools::charsToFactors(newx)
+      # newx <- regtools::charsToFactors(newx)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=object$factorsInfo)
    }
@@ -1258,7 +1258,7 @@ predict.qeUMAP <- function(object,newx)
 {
    class(object) <- class(object)[-1]
    if (!regtools::allNumeric(newx)) {
-      newx <- regtools::charsToFactors(newx)
+      ## newx <- regtools::charsToFactors(newx)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=object$factorsInfo)
    }
