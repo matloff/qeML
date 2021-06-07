@@ -27,10 +27,12 @@ S3method(predict,qePCA)
 S3method(predict,qeUMAP)
 S3method(predict,qeTS)
 S3method(predict,qeText)
+S3method(predict,qeskRF)
 
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeNeural,qeLASSO,qeCompare,qeFT,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,
    qeIso,qeTS,qeText,buildQEcall,
+   qeskRF,
    checkNumericNames,prepend,makeAllNumeric,getXY)

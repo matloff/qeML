@@ -1410,13 +1410,14 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    if (regtools::hasFactors(x)) {
       x <- regtools::factorsToDummies(x)
       data <- cbind(x,y)
-      res$factorInfo <- attr(x,'factorInfo')
+      res$factorsInfo <- attr(x,'factorsInfo')
    }
    classif <- is.factor(y)
+   res$classif <- classif
    if (classif) {
+      res$classNames <- levels(y)
       y <- as.integer(y) - 1
       data[,ycol] <- y
-      res$classNames <- levels(y)
    }
    if (!is.null(holdout)) splitData(holdout,data)
    rfmod <- import('sklearn.ensemble')
@@ -1425,19 +1426,29 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
          n_estimators=as.integer(nTree),
          min_samples_leaf=as.integer(minNodeSize))
    } else {
-      rf <- rfmod$RandomForestRegressor(
+      rf <- rfmod$RandomForestClassifier(
          n_estimators=as.integer(nTree),
          min_samples_leaf=as.integer(minNodeSize))
    }
    rf$fit(r_to_py(x),r_to_py(y))
    rf$trainRow1 <- getRow1(data,yName)
-   class(rf) <- c('qeskRF',class(rf))
    if (!is.null(holdout)) {
       predictHoldout(rf)
       rf$holdIdxs <- holdIdxs
    }
-   rf
+   res$rf <- rf
+   class(res) <- 'qeskRF'
+   res
+}
 
+predict.qeskRF <- function(object,newx) 
+{
+   if(is.vector(newx)) newx <- setTrainFactors(object,newx)
+   if (hasFactors(newx))
+      newx <- factorsToDummies(newx,factorsInfo=object$factorsInfo)
+   rf <- object$rf
+   preds <- rf$predict(newx)
+   object$classNames[preds+1]
 }
 
 ###################  utilities for qe*()  #########################
