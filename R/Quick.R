@@ -1,5 +1,6 @@
 
 ################################################################## 
+##################  qe-series of ML wrappers  #################### 
 ################################################################## 
 
 # this qe*() series is inspired ggplot2::qplot; here 'qe' is for
@@ -67,9 +68,7 @@
 # frame that preserves the structure of the original data, then deleted
 # that saved row.
 
-##################################################################
 ####################  the qe*() functions  #######################
-##################################################################
 
 #######################  qeLogit()  ##############################
 
@@ -1386,6 +1385,41 @@ predict.qeText <- function(object,newDocs)
    predict(object$cmdout,newDocsOut)
 }
 
+#################################################################
+##################  qe-wrappers for sklearn  ####################
+#################################################################
+
+########################  qeskRF#################################
+
+# arguments:  see above, plus
+
+#     ntree: number of trees probsto generate
+#     minNodeSize: minimum number of data points in a node
+#     skObject:
+
+# value:  see above
+ 
+qeskRF <- function(data,yName,nTree=500,minNodeSize=10,skObject=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+stop('under construction')
+   require(reticulate)
+   res <- NULL
+   ycol <- which(names(data) == yName)
+   x <- data[,-ycol]
+   if (regools::hasFactors(x)) {
+      data[,-ycol] <- factorsToDummies(x)
+      res$factorInfo <- attr(x,'factorInfo')
+   }
+   classif <- is.factor(data[,ycol])
+   if (classif) {
+      y <- data[,ycol]
+      data[,ycol] <- as.integer(y) - 1
+      res$yLevels <- levels(y)
+   }
+   if (!is.null(holdout)) splitData(holdout,data)
+}
+
 ###################  utilities for qe*()  #########################
 
 # see note on factor features at top of this file
@@ -1416,9 +1450,17 @@ collectForReturn <- function(object,probs)
    list(predClasses=predClasses,probs=probs)
 }
 
-# common code for qeLogit(), qeLin() etc.; preprocesses the input,
-# returning new data frame xy, same x but y changing to dummies if
-# classif; if yName is null, check features only
+# common code for qeLogit(), qeLin() etc. 
+
+# preprocesses the input, returning new data frame xy, containing
+# possibly new x and/or y
+
+# x same unless xMustNumeric is TRUE, in which case x is processed by
+# factorsToDummies 
+
+# y changes to dummies if # classif 
+
+# if yName is null, check features only
 
 getXY <- function(data,yName,xMustNumeric=FALSE,classif,
    factorsInfo=NULL) 

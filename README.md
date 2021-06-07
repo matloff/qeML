@@ -4,6 +4,42 @@
 
 Norm Matloff, UC Davis, *matloff@cs.ucdavis.edu*
 
+# What this package is about
+
+* "Quick and Easy" ML
+
+    * simpler interface than **caret**, **mlr3** and **SuperML**
+
+    * easy for learners, convenient for experts
+
+* Large variety of ML algorithms
+
+    * k-NN, dec. trees, random forests, gradient boosting,
+      SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs
+
+    * several different SVM versions
+
+    * several different random forests versions
+
+    * local linear k-NN, random forests
+
+    * feature-weighted k-NN
+
+    * optional preprocessing by PCA, UMAP
+
+    * linear using Penrose inverse
+
+    * polynomial linear, logistic, ridge, LASSO
+
+    * isotonic regression
+
+    * p-hacking-resistant hyperparameter tuning
+
+    * automated cross-validation, algorithm compare
+
+    * time series, text apps; **imageClassR** package (under
+      construction) calls qe-series in this package
+
 ## Overview
 
 The letters 'qe' in the package title stand for "quick and easy,"
@@ -37,15 +73,6 @@ qeSVM(mlb,'Weight',gamma=0.8)
 
 (Only selected arguments are available.  Suggestions for additions are
 very welcome.)
-
-## ML methods available 
-
-In addition to the SVM and gradient boosting examples above,
-the package includes k-NN, random forests, neural networks,
-linear/logit, LASSO/ridge and others.
-
-There are wrappers for two different implementations of SVM, and three
-different implementations of random forests.
 
 ## Prediction
 
