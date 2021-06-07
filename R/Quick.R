@@ -1399,25 +1399,45 @@ predict.qeText <- function(object,newDocs)
 
 # value:  see above
  
-qeskRF <- function(data,yName,nTree=500,minNodeSize=10,skObject=NULL,
+qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-stop('under construction')
    require(reticulate)
    res <- NULL
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
-   if (regools::hasFactors(x)) {
-      data[,-ycol] <- factorsToDummies(x)
+   y <- data[,ycol]
+   if (regtools::hasFactors(x)) {
+      x <- regtools::factorsToDummies(x)
+      data <- cbind(x,y)
       res$factorInfo <- attr(x,'factorInfo')
    }
-   classif <- is.factor(data[,ycol])
+   classif <- is.factor(y)
    if (classif) {
-      y <- data[,ycol]
-      data[,ycol] <- as.integer(y) - 1
-      res$yLevels <- levels(y)
+      y <- as.integer(y) - 1
+      data[,ycol] <- y
+      res$classNames <- levels(y)
    }
    if (!is.null(holdout)) splitData(holdout,data)
+   rfmod <- import('sklearn.ensemble')
+   if (!classif) {
+      rf <- rfmod$RandomForestRegressor(
+         n_estimators=as.integer(nTree),
+         min_samples_leaf=as.integer(minNodeSize))
+   } else {
+      rf <- rfmod$RandomForestRegressor(
+         n_estimators=as.integer(nTree),
+         min_samples_leaf=as.integer(minNodeSize))
+   }
+   rf$fit(r_to_py(x),r_to_py(y))
+   rf$trainRow1 <- getRow1(data,yName)
+   class(rf) <- c('qeskRF',class(rf))
+   if (!is.null(holdout)) {
+      predictHoldout(rf)
+      rf$holdIdxs <- holdIdxs
+   }
+   rf
+
 }
 
 ###################  utilities for qe*()  #########################
