@@ -244,15 +244,18 @@ Some notes on specific functions:
    can be done using \code{qeFT}, a wrapper to the 
    \code{regtools::fineTuning} function.  See also \code{replicMean}.
 
-   \item Two different SVM implementations are offered:  \code{qeSVM}
+   \item Several SVM implementations are offered:  \code{qeSVM}
    wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
-   uses the \pkg{liquidSVM} package.
+   uses the \pkg{liquidSVM} package; \code{qeskSVM} wraps \code{svm.SVC}
+   in the Python \pkg{sklearn}.
 
-   \item Three different random forests implementations are offered:
+   \item Several random forests implementations are offered:
    \code{qeRF} wraps \code{randomForest} in the package of the same name; 
    \code{qeRFranger} wraps \code{ranger} in the package of the same name; 
-   \code{qeRFgrf} wraps \code{regression_forest} 
-   and \code{ll_regression_forest} in \pkg{grf}.
+   \code{qeRFgrf} wraps \code{regression_forest} and 
+   \code{ll_regression_forest} in \pkg{grf} (the latter does local
+   linear smoothing); \code{qeskRF} wraps \code{ensemble.RandomForestRegressor}
+   and \code{RandomForestClassifier} in the Python \pkg{sklearn}.
 
    \item The functions \code{qeTS} and \code{qeText} handle time series
    and text applications, respectively.
