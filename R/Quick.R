@@ -1409,6 +1409,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    y <- data[,ycol]
    classif <- is.factor(y)
    res$classif <- classif
+   if (classif) res$classNames <- levels(y)
    res$trainRow1 <- getRow1(data,yName)
 
 ###    if (regtools::hasFactors(x)) {
@@ -1462,7 +1463,7 @@ predict.qeskRF <- function(object,newx)
          factorsInfo=object$factorsInfo)
    rf <- object$rf
    preds <- rf$predict(newx)
-   if (object$classif) preds <- object$classNames[preds+1]
+   if (object$classif) preds <- list(predClasses=preds)
    preds
 }
 
