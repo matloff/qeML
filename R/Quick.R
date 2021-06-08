@@ -85,7 +85,7 @@ qeLogit <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    classif <- is.factor(data[[yName]])
    if (!classif) {print('for classification problems only'); return(NA)}
    if (!is.null(holdout)) splitData(holdout,data)
-   xyc <- getXY(data,yName,classif=TRUE) 
+   xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE) 
    xy <- xyc$xy
    x <- xyc$x
    yDumms <- xyc$yDumms
@@ -158,7 +158,7 @@ qeLin <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
    if (classif) {
-      xyc <- getXY(data,yName,classif=TRUE)
+      xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE)
       xy <- xyc$xy
       classNames <- xyc$classNames
       # check for numeric class names
@@ -225,7 +225,8 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
+   xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif,
+      makeYdumms=TRUE)
    x <- xyc$x
    xm <- as.matrix(x)
    factorsInfo <- xyc$factorsInfo
@@ -256,7 +257,7 @@ predict.qeKNN <- function(object,newx,newxK=1)
    class(object) <- 'kNN'
    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
    classif <- object$classif
-   xyc <- getXY(newx,NULL,TRUE,FALSE,object$factorsInfo)
+   xyc <- getXY(newx,NULL,TRUE,FALSE,object$factorsInfo,makeYdumms=TRUE)
    if (is.vector(newx)) {
       nr <- 1
    } else{
@@ -389,7 +390,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
 
    # start the computation
    require(grf)
-   xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
+   xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif,makeYdumms=TRUE)
    x <- as.matrix(xyc$x)
    y <- xyc$y
    if (!classif) {
@@ -610,7 +611,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    require(gbm)
    outlist <- list(classif=classif)
    if (classif) {   # classification case
-      xyc <- getXY(data,yName,classif=classif) 
+      xyc <- getXY(data,yName,classif=classif,makeYdumms=TRUE) 
       xy <- xyc$xy
       x <- xyc$x
       yDumms <- xyc$yDumms
@@ -1542,6 +1543,7 @@ getXY <- function(data,yName,xMustNumeric=FALSE,classif,
       classNames <- NULL
       xy <- NULL
    }
+   if (classif && !is.null(yName) && !makeYdumms) classNames <- levels(y)
    list(xy=xy,x=x,y=y,yDumms=yDumms,classNames=classNames,
       factorsInfo=factorsInfo)
 
