@@ -1447,7 +1447,6 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    rf$fit(r_to_py(x),r_to_py(y))
    res$rf <- rf
    class(res) <- 'qeskRF'
-   browser()
    if (!is.null(holdout)) {
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
