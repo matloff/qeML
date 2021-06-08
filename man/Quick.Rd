@@ -19,6 +19,8 @@
 \alias{qeFT}
 \alias{qeText}
 \alias{qeTS}
+\alias{qeskRF}
+\alias{qeskSVM}
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
 \alias{predict.qeKNN}
@@ -37,6 +39,8 @@
 \alias{predict.qeUMAP}
 \alias{predict.qeText}
 \alias{predict.qeTS}
+\alias{predict.qeskRF}
+\alias{predict.qeskSVM}
 \alias{plot.RF}
 \alias{plot.LASSO}
 
@@ -61,7 +65,11 @@ qeRFranger(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))),
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
+qeskRF(data,yName,nTree=500,minNodeSize=10,
+   holdout=floor(min(1000,0.1*nrow(data))))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
