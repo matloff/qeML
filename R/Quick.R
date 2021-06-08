@@ -1407,19 +1407,32 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
    y <- data[,ycol]
-   if (regtools::hasFactors(x)) {
-      x <- regtools::factorsToDummies(x)
-      data <- cbind(x,y)
-      res$factorsInfo <- attr(x,'factorsInfo')
-   }
    classif <- is.factor(y)
    res$classif <- classif
-   if (classif) {
-      res$classNames <- levels(y)
-      y <- as.integer(y) - 1
-      data[,ycol] <- y
-   }
-   if (!is.null(holdout)) splitData(holdout,data)
+   res$trainRow1 <- getRow1(data,yName)
+
+###    if (regtools::hasFactors(x)) {
+###       x <- regtools::factorsToDummies(x)
+###       data <- cbind(x,y)
+###       ycol <- ncol(data)
+###    }
+###    if (classif) {
+###       res$classNames <- levels(y)
+###       y <- as.integer(y) - 1
+###       data[,ycol] <- y
+###    }
+
+
+   if (!is.null(holdout))  splitData(holdout,data)
+
+   xy <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
+   x <- xy$x
+   y <- xy$y
+   data <- cbind(x,y)
+   data <- as.data.frame(data)
+   names(data)[ncol(data)] <- yName
+   res$factorsInfo <- attr(x,'factorsInfo')
+
    rfmod <- import('sklearn.ensemble')
    if (!classif) {
       rf <- rfmod$RandomForestRegressor(
@@ -1431,24 +1444,26 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
          min_samples_leaf=as.integer(minNodeSize))
    }
    rf$fit(r_to_py(x),r_to_py(y))
-   rf$trainRow1 <- getRow1(data,yName)
-   if (!is.null(holdout)) {
-      predictHoldout(rf)
-      rf$holdIdxs <- holdIdxs
-   }
    res$rf <- rf
    class(res) <- 'qeskRF'
+   browser()
+   if (!is.null(holdout)) {
+      predictHoldout(res)
+      res$holdIdxs <- holdIdxs
+   }
    res
 }
 
 predict.qeskRF <- function(object,newx) 
 {
    if(is.vector(newx)) newx <- setTrainFactors(object,newx)
-   if (hasFactors(newx))
-      newx <- factorsToDummies(newx,factorsInfo=object$factorsInfo)
+   if (regtools::hasFactors(newx))
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
+         factorsInfo=object$factorsInfo)
    rf <- object$rf
    preds <- rf$predict(newx)
-   object$classNames[preds+1]
+   if (object$classif) preds <- object$classNames[preds+1]
+   preds
 }
 
 ###################  utilities for qe*()  #########################
@@ -1486,15 +1501,15 @@ collectForReturn <- function(object,probs)
 # preprocesses the input, returning new data frame xy, containing
 # possibly new x and/or y
 
-# x same unless xMustNumeric is TRUE, in which case x is processed by
-# factorsToDummies 
+# x same unless xMustNumeric is TRUE and x contains factors, in which
+# case x is processed by factorsToDummies 
 
-# y changes to dummies if # classif 
+# y changes to dummies if classif and makeYdumms is set
 
 # if yName is null, check features only
 
 getXY <- function(data,yName,xMustNumeric=FALSE,classif,
-   factorsInfo=NULL) 
+   factorsInfo=NULL,makeYdumms=FALSE) 
 {
    if (is.vector(data) && is.null(yName)) data <- data.frame(data)
    if (!is.data.frame(data))
@@ -1517,7 +1532,7 @@ getXY <- function(data,yName,xMustNumeric=FALSE,classif,
       x <- regtools::factorsToDummies(x,omitLast=TRUE)
       factorsInfo <- attr(x,'factorsInfo')
    } else factorsInfo <- NULL
-   if (classif && !is.null(yName)) {
+   if (classif && !is.null(yName) && makeYdumms) {
       yDumms <- regtools::factorsToDummies(y,omitLast=FALSE,factorsInfo=NULL)
       classNames <- levels(y)
       colnames(yDumms) <- classNames
