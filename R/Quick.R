@@ -277,7 +277,7 @@ predict.qeKNN <- function(object,newx,newxK=1)
 
 # arguments:  see above, plus
 
-#     ntree: number of trees probsto generate
+#     ntree: number of trees to generate
 #     minNodeSize: minimum number of data points in a node
 #     mtry: number of variables randomly tried at each split
 
@@ -365,7 +365,7 @@ predict.qeRFranger <- function(object,newx)
 
 # arguments:  see above, plus
 
-#     ntree: number of treesprobsto generate
+#     ntree: number of trees to generate
 #     minNodeSize: minimum number of data points in a node
 
 # value:  see above
@@ -1394,7 +1394,7 @@ predict.qeText <- function(object,newDocs)
 
 # arguments:  see above, plus
 
-#     ntree: number of trees probsto generate
+#     ntree: number of trees to generate
 #     minNodeSize: minimum number of data points in a node
 #     skObject:
 
@@ -1404,7 +1404,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    require(reticulate)
-   res <- NULL
+   res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
    y <- data[,ycol]
@@ -1412,18 +1412,6 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    res$classif <- classif
    if (classif) res$classNames <- levels(y)
    res$trainRow1 <- getRow1(data,yName)
-
-###    if (regtools::hasFactors(x)) {
-###       x <- regtools::factorsToDummies(x)
-###       data <- cbind(x,y)
-###       ycol <- ncol(data)
-###    }
-###    if (classif) {
-###       res$classNames <- levels(y)
-###       y <- as.integer(y) - 1
-###       data[,ycol] <- y
-###    }
-
 
    if (!is.null(holdout))  splitData(holdout,data)
 
@@ -1459,10 +1447,70 @@ predict.qeskRF <- function(object,newx)
 {
    if(is.vector(newx)) newx <- setTrainFactors(object,newx)
    if (regtools::hasFactors(newx))
+      # need omitLast = TRUE to be consistent with getXY()
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=object$factorsInfo)
    rf <- object$rf
    preds <- rf$predict(newx)
+   if (object$classif) preds <- list(predClasses=preds)
+   preds
+}
+
+########################  qeskSVM#################################
+
+# arguments:  see above, plus
+
+#     ntree: number of trees to generate
+#     minNodeSize: minimum number of data points in a node
+#     skObject:
+
+# value:  see above
+ 
+qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   require(reticulate)
+   res <- NULL  # eventually the return value
+   ycol <- which(names(data) == yName)
+   x <- data[,-ycol]
+   y <- data[,ycol]
+   classif <- is.factor(y)
+   res$classif <- classif
+   if (classif) res$classNames <- levels(y)
+   res$trainRow1 <- getRow1(data,yName)
+
+   if (!is.null(holdout))  splitData(holdout,data)
+
+   xy <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
+   x <- xy$x
+   y <- xy$y
+   data <- cbind(x,y)
+   data <- as.data.frame(data)
+   names(data)[ncol(data)] <- yName
+   res$factorsInfo <- attr(x,'factorsInfo')
+
+   svmmod <- import('sklearn.svm')
+   svmobj <- 
+      svmmod$SVC(gamma=gamma,C=cost,kernel=kernel,degree=as.integer(degree))
+   svmobj$fit(r_to_py(x),r_to_py(y))
+   res$svmobj <- svmobj
+   class(res) <- 'qeskSVM'
+   if (!is.null(holdout)) {
+      predictHoldout(res)
+      res$holdIdxs <- holdIdxs
+   }
+   res
+}
+
+predict.qeskSVM <- function(object,newx) 
+{
+   if(is.vector(newx)) newx <- setTrainFactors(object,newx)
+   if (regtools::hasFactors(newx))
+      # need omitLast = TRUE to be consistent with getXY()
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
+         factorsInfo=object$factorsInfo)
+   svmobj <- object$svmobj
+   preds <- svmobj$predict(newx)
    if (object$classif) preds <- list(predClasses=preds)
    preds
 }
