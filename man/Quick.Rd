@@ -247,7 +247,8 @@ Some notes on specific functions:
    \item Several SVM implementations are offered:  \code{qeSVM}
    wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
    uses the \pkg{liquidSVM} package; \code{qeskSVM} wraps \code{svm.SVC}
-   in the Python \pkg{sklearn}.
+   in the Python \pkg{sklearn}.  (Both \code{qeSVM} and \code{qeskSVM}
+   use the \code{libsvm} C library.)
 
    \item Several random forests implementations are offered:
    \code{qeRF} wraps \code{randomForest} in the package of the same name; 
