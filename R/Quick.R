@@ -689,6 +689,103 @@ plot.qeGBoost <- function(object)
    gbm.perf(object$gbmOuts)
 }
 
+#########################  qeAdaBoost()  #################################
+
+# Ada Boost
+
+# arguments:  see above, plus
+
+#     treeDepth: depth of tree to create
+#     nRounds: number of boosting rounds to use 
+#     rpartControl: see man page for 'rpart.control' (min node size etc.)
+
+# value:  see above
+ 
+qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   if (!is.factor(data[[yName]])) stop('for classification problems only')
+   if (!is.null(holdout)) splitData(holdout,data)
+   require(JOUSBoost)
+   outlist <- list()
+
+   # factors to dummies, both for x and y
+   xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE) 
+   xy <- xyc$xy
+   x <- xyc$x
+   yDumms <- xyc$yDumms
+   y <- xyc$y
+   classNames <- xyc$classNames
+   nClass <- length(classNames)
+   ncxy <- ncol(xy)
+   nx <- ncol(x)
+   nydumms <- ncxy - nx
+   empirClassProbs <- colMeans(yDumms)
+   outlist <- c(outlist,list(x=x,y=y,classNames=classNames,
+      empirClassProbs=empirClassProbs))
+
+   # OVA, one AdaBoost op per class
+   xMatrix <- as.matrix(x)
+   doAdaBoost <- function(colI) 
+   {
+      yi <- 2 * yDumms[,colI] - 1
+      adaboostout <- 
+         adaboost(xMatrix,yi,tree_depth=treeDepth,n_rounds=nRounds,
+         control=rpartControl)
+   }
+   outlist$abOuts <- lapply(1:nydumms,doAdaBoost)
+    
+   outlist$treeDepth <- treeDepth
+   outlist$nRounds <- nRounds
+   outlist$rpartControl <- rpartControl
+   outlist$trainRow1 <- getRow1(data,yName)
+   class(outlist) <- c('qeAdaBoost')
+   if (!is.null(holdout)) {
+      predictHoldout(outlist)
+      outlist$holdIdxs <- holdIdxs
+   }
+   outlist
+}
+
+# arguments:  see above
+# value:  object of class 'qeAdaBoost'; see above for components
+predict.qeAdaBoost <- function(object,newx,newNTree=NULL) 
+{
+stop('under construction')
+   newx <- setTrainFactors(object,newx)
+   gbmOuts <- object$gbmOuts
+   if (is.null(newNTree)) {
+      nTree <- object$nTree
+   } else nTree <- newNTree
+   if (object$classif) {
+      # get probabilities for each class
+      g <- function(gbmOutsElt) 
+         predict(gbmOutsElt,newx,n.trees=nTree,type='response') 
+      probs <- sapply(gbmOuts,g)
+      if (is.vector(probs)) probs <- matrix(probs,nrow=1)
+      classNames <- object$classNames
+      colnames(probs) <- classNames
+      # separate runs for the m classes will not necessrily sum to 1, so
+      # normalize
+      sumprobs <- apply(probs,1,sum)  
+      probs <- (1/sumprobs) * probs
+      predClasses <- apply(probs,1,which.max) 
+      predClasses <- classNames[predClasses]
+      res <- list(predClasses=predClasses,probs=probs)
+   } else {
+      res <- predict(object$gbmOuts,newx,n.trees=nTree)
+   }
+   class(res) <- 'qeAdaBoost'
+   res
+}
+
+# graph to explore best number of trees
+
+plot.qeGBoost <- function(object) 
+{
+   gbm.perf(object$gbmOuts)
+}
+
 #########################  qeNeural()  #################################
 
 # neural networks, using TensorFlow/Keras 
