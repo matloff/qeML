@@ -661,14 +661,16 @@ predict.qeGBoost <- function(object,newx,newNTree=NULL)
       nTree <- object$nTree
    } else nTree <- newNTree
    if (object$classif) {
-      # get probabilities for each class
+      # get probabilities for each class; 
+      # NOTE: we have a choice of 'link' and 'response', not much
+      # difference between the two; from man page, we are getting
+      # probabilities, OVA ones for us
       g <- function(gbmOutsElt) 
          predict(gbmOutsElt,newx,n.trees=nTree,type='response') 
       probs <- sapply(gbmOuts,g)
       if (is.vector(probs)) probs <- matrix(probs,nrow=1)
       classNames <- object$classNames
       colnames(probs) <- classNames
-      # separate runs for the m classes will not necessrily sum to 1, so
       # normalize
       sumprobs <- apply(probs,1,sum)  
       probs <- (1/sumprobs) * probs
@@ -704,6 +706,7 @@ plot.qeGBoost <- function(object)
 qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+stop('under construction')
    if (!is.factor(data[[yName]])) stop('for classification problems only')
    if (!is.null(holdout)) splitData(holdout,data)
    require(JOUSBoost)
@@ -740,6 +743,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    outlist$rpartControl <- rpartControl
    outlist$trainRow1 <- getRow1(data,yName)
    class(outlist) <- c('qeAdaBoost')
+   outlist$classif <- TRUE
    if (!is.null(holdout)) {
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
@@ -751,30 +755,29 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
 # value:  object of class 'qeAdaBoost'; see above for components
 predict.qeAdaBoost <- function(object,newx,newNTree=NULL) 
 {
-stop('under construction')
    newx <- setTrainFactors(object,newx)
-   gbmOuts <- object$gbmOuts
+   abOuts <- object$abOuts
    if (is.null(newNTree)) {
       nTree <- object$nTree
    } else nTree <- newNTree
-   if (object$classif) {
-      # get probabilities for each class
-      g <- function(gbmOutsElt) 
-         predict(gbmOutsElt,newx,n.trees=nTree,type='response') 
-      probs <- sapply(gbmOuts,g)
+      # get probabilities for each class; 
+      # NOTE: we have a choice of 'prob' and 'response'; the latter
+      # assumes a logit model, not so good, but the latter won't work
+      # well in the OVA context here
+      # the OVA process
+      g <- function(abOutsElt) 
+         predict(abOutsElt,newx,n_tree=nTree,type='prob') 
+      probs <- sapply(abOuts,g)
       if (is.vector(probs)) probs <- matrix(probs,nrow=1)
       classNames <- object$classNames
       colnames(probs) <- classNames
-      # separate runs for the m classes will not necessrily sum to 1, so
-      # normalize
+      # normalize, not really needed; see note above
+      probs <- (probs+1) / 2
       sumprobs <- apply(probs,1,sum)  
       probs <- (1/sumprobs) * probs
       predClasses <- apply(probs,1,which.max) 
       predClasses <- classNames[predClasses]
       res <- list(predClasses=predClasses,probs=probs)
-   } else {
-      res <- predict(object$gbmOuts,newx,n.trees=nTree)
-   }
    class(res) <- 'qeAdaBoost'
    res
 }
