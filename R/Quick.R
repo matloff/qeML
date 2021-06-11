@@ -1236,13 +1236,13 @@ predict.qeIso <- function(object,newx)
 # the additional argument here is pcaProp, the proportion of variance desired
 # for the principal components
 
-qePCA <- function(dataName,yName,qeName,opts=NULL,pcaProp,
+qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    # eventual return value
    res <- list()
    res$scaleX <- FALSE  # already scaled via prcomp()
-   data <- get(dataName)
+   if (is.character(data)) data <- get(dataName)
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol]
@@ -1262,7 +1262,7 @@ qePCA <- function(dataName,yName,qeName,opts=NULL,pcaProp,
 
    # now call the request
    # we've already scaled during PCA, so don't now 
-   cmd <- buildQEcall(qeName,dataName,yName,opts=opts,holdout=holdout)
+   cmd <- buildQEcall(qeName,'newData',yName,opts=opts,holdout=holdout)
    qeOut <- eval(parse(text=cmd))
 
    res$qeOut <- qeOut
