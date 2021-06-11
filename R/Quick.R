@@ -706,18 +706,20 @@ plot.qeGBoost <- function(object)
 qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-stop('under construction')
    if (!is.factor(data[[yName]])) stop('for classification problems only')
    if (!is.null(holdout)) splitData(holdout,data)
    require(JOUSBoost)
    outlist <- list()
 
    # factors to dummies, both for x and y
-   xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE) 
+   xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=TRUE,makeYdumms=TRUE) 
    xy <- xyc$xy
    x <- xyc$x
    yDumms <- xyc$yDumms
    y <- xyc$y
+   factorsInfo <- xyc$factorsInfo
+   outlist$factorsInfo <- factorsInfo
+   if (!is.null(factorsInfo)) attr(outlist,'factorsInfo') <- factorsInfo
    classNames <- xyc$classNames
    nClass <- length(classNames)
    ncxy <- ncol(xy)
@@ -756,6 +758,10 @@ stop('under construction')
 predict.qeAdaBoost <- function(object,newx,newNTree=NULL) 
 {
    newx <- setTrainFactors(object,newx)
+   factorsInfo <- object$factorsInfo
+   if (!is.null(factorsInfo))
+      xyc <- getXY(newx,NULL,TRUE,FALSE,factorsInfo)
+   newx <- xyc$x
    abOuts <- object$abOuts
    if (is.null(newNTree)) {
       nTree <- object$nTree
@@ -771,8 +777,7 @@ predict.qeAdaBoost <- function(object,newx,newNTree=NULL)
       if (is.vector(probs)) probs <- matrix(probs,nrow=1)
       classNames <- object$classNames
       colnames(probs) <- classNames
-      # normalize, not really needed; see note above
-      probs <- (probs+1) / 2
+      # normalize
       sumprobs <- apply(probs,1,sum)  
       probs <- (1/sumprobs) * probs
       predClasses <- apply(probs,1,which.max) 
