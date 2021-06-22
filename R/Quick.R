@@ -144,6 +144,28 @@ predict.qeLogit <- function(object,newx)
    list(predClasses=predClasses,probs=probs)
 }
 
+#######################  qeMultniomLogit()  ##############################
+
+### qeMultinomLogit <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
+### {
+###    require(mlogit)
+###    classif <- is.factor(data[[yName]])
+###    if (!classif) stop('for classification problems only')
+###    if (!is.null(holdout)) splitData(holdout,data)
+###    frml <- paste0(yName,' ~ .')
+###    frml <- as.formula(frml)
+###    mnlogout <- mlogit(frml,data)
+###    if (classif) mnlogout$classNames <- classNames
+###    mnlogout$classif <- classif
+###    mnlogout$trainRow1 <- trainRow1
+###    class(mnlogout) <- c('qeMultinomLogit',class(mnlogout))
+###    if (!is.null(holdout)) {
+###       predictHoldout(knnout)
+###       mnlogout$holdIdxs <- holdIdxs
+###    } else mnlogout$holdIdxs <- NULL
+###    mnlogout
+### }
+
 #######################  qeLin()  ################################
 
 # in regression case, simply wraps ordinary lm()
