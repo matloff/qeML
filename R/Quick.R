@@ -24,6 +24,9 @@
 #    yName:  column name for outcome variable; vector indicates
 #       regression, factor classification 
 #    possible algorithm-specific options
+#    allDefaults:  if TRUE, take all the defaults of the wrapped
+#       function, e.g. e1071::svm()
+#    holdout:  size of holdout set, if any
 
 # value:
 
@@ -488,8 +491,8 @@ predict.qeRFgrf<- function(object,newx)
 
 #value:  see above
 
-qeSVM<- function(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
-  holdout=floor(min(1000,0.1*nrow(data))))
+qeSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
+   allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
    if (!classif) {print('for classification problems only'); return(NA)}
@@ -497,9 +500,11 @@ qeSVM<- function(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
    require(e1071)
    # xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=TRUE)
    frml <- as.formula(paste(yName,'~ .'))
-   svmout <- e1071::svm(frml,data=data,
-      cost=cost,gamma=gamma,kernel=kernel,degree=degree,
-      decision.values=TRUE)
+   svmout <- 
+      if (allDefaults) e1071::svm(frml,data=data)
+      else e1071::svm(frml,data=data,
+         cost=cost,gamma=gamma,kernel=kernel,degree=degree,
+         decision.values=TRUE)
    ycol <- which(names(data) == yName)
    svmout$x <- data[,-ycol,drop=FALSE]
    y <- data[,ycol]
@@ -561,7 +566,7 @@ predict.qeSVM <- function(object,newx,k=NULL,scaleX=TRUE)
 # value:  see above
  
 qeSVMliquid <- function(data,yName,gamma=1.0,cost=1.0,
-   holdout=floor(min(1000,0.1*nrow(data))))
+   allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
    if (!classif) {print('for classification problems only'); return(NA)}
@@ -570,7 +575,9 @@ qeSVMliquid <- function(data,yName,gamma=1.0,cost=1.0,
    ycol <- which(names(data) == yName)
    x <- data[,-ycol,drop=FALSE]
    y <- data[,ycol]
-   svmout <- mcSVM(x,y,c_values=cost,gammas=gamma)  
+   svmout <- 
+      if (allDefaults) mcSVM(x,y)  
+      else mcSVM(x,y,c_values=cost,gammas=gamma)  
    # svmout is of S4 ref class, causing some issues, including the
    # cross-val, where can't use our usual predictHoldout()
    res <- list(classif=classif,yName=yName,svmout=svmout)
