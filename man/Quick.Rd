@@ -157,7 +157,9 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
   \item{ll}{If TRUE, use local linear forest.}
   \item{lambda}{Ridge lambda for local linear forest.}
   \item{splitCutoff}{For leaves smaller than this value, do not fit
-  linear model.  Just use the linear model fit to the entire dataset.}
+     linear model.  Just use the linear model fit to the entire dataset.}
+  \item{xShape}{Input X data shape, e.g. c(28,28) for 28x28 grayscale
+     images.  Must be non-NULL if \code{conv} is.}
 }
 
 \details{
