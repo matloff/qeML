@@ -36,5 +36,5 @@ export(
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
-   qeIso,qeTS,qeText,buildQEcall,
+   qeIso,qeTS,qeText,buildQEcall,splitData,
    checkNumericNames,prepend,makeAllNumeric,getXY)
