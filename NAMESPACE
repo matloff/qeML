@@ -37,4 +37,5 @@ export(
    qeNeural,qeLASSO,qeCompare,qeFT,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
    qeIso,qeTS,qeText,buildQEcall,splitData,
+   getRow1,predictHoldout,
    checkNumericNames,prepend,makeAllNumeric,getXY)

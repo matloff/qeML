@@ -1802,6 +1802,7 @@ predictHoldout <- defmacro(res,
       preds <- predict(res,tstx);
       res$holdoutPreds <- preds;
       if (res$classif) {
+         if (is.numeric(preds)) preds <- list(predClasses=preds)
          res$testAcc <- mean(preds$predClasses != tst[,ycol])
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
          res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
