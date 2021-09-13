@@ -32,7 +32,7 @@ S3method(predict,qeTS)
 S3method(predict,qeText)
 
 export(
-   qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,
+   qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
