@@ -1936,7 +1936,7 @@ predict.qeDT <- function(object,newx)
 
 plot.qeDT <- function(object) 
 {
-   genericPlot(object)
+   plot(object$ctout)
 }
 
 ######################  qeCompare()  #############################
