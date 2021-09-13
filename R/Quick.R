@@ -1887,6 +1887,64 @@ qeFT <- function(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
       showProgress=showProgress)
 }
 
+#########################  qeDT()  #################################
+
+# decision trees, wrapper to party::ctree(
+
+# arguments:  see above, plus
+
+#     mincriterion: 1-alpha, where alpha is the Type I error
+#        value for the test statistic
+#     minsplt: minimum number of data points in a node
+#     mtry: number of variables randomly tried at each split
+#     maxdepth: maximum number of levels to tree
+
+# value:  see above
+ 
+qeDT <- function(data,yName,
+   mincriterion=0.95,minsplit=20,mtry=0,maxdepth=0,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+stop('under construction')
+   classif <- is.factor(data[[yName]])
+   if (!is.null(holdout)) splitData(holdout,data)
+   require(party)
+   xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
+   frml <- as.formula(paste(yName,'~ .'))
+   ctrl <- ctree_control(mincriterion=mincriterion,minsplit=minsplit,
+      mtry=mtry,maxdepth=maxdepth)
+   ctout <- ctree(frml,data=data,controls=ctrl)
+   dtout <- list(ctout=ctout)
+   dtout$classNames <- xyc$classNames
+   dtout$classif <- classif
+   dtout$trainRow1 <- getRow1(data,yName)
+   class(dtout) <- c('qeDT','party')
+   if (!is.null(holdout)) {
+      predictHoldout(dtout)
+      dtout$holdIdxs <- holdIdxs
+   }
+   dtout
+}
+
+predict.qeDT <- function(object,newx)
+{
+   class(object) <- 'party'
+   newx <- setTrainFactors(object,newx)
+   classif <- object$classif
+   if (classif) {
+      probs <- predict(object,newx,type='prob')
+      res <- collectForReturn(object,probs)
+   } else {
+      res <- predict(object,newx,type='response')
+   }
+   res
+}
+
+plot.qeDT <- function(object) 
+{
+   genericPlot(object)
+}
+
 ######################  qeCompare()  #############################
 
 # compare several qe*(data,yName,qeFtnList,nReps)!
