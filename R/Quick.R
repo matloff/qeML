@@ -1905,7 +1905,6 @@ qeDT <- function(data,yName,
    mincriterion=0.95,minsplit=20,mtry=0,maxdepth=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-stop('under construction')
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
    require(party)
@@ -1928,16 +1927,11 @@ stop('under construction')
 
 predict.qeDT <- function(object,newx)
 {
-   class(object) <- 'party'
+   ctout <- object$ctout
    newx <- setTrainFactors(object,newx)
-   classif <- object$classif
-   if (classif) {
-      probs <- predict(object,newx,type='prob')
-      res <- collectForReturn(object,probs)
-   } else {
-      res <- predict(object,newx,type='response')
-   }
-   res
+   tmp <- predict(ctout,newx)
+   if (object$classif) list(predClasses=tmp)
+   else tmp
 }
 
 plot.qeDT <- function(object) 
