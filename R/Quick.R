@@ -1917,6 +1917,11 @@ qeDT <- function(data,yName,
    dtout$classNames <- xyc$classNames
    dtout$classif <- classif
    dtout$trainRow1 <- getRow1(data,yName)
+   # determine which nodes are terminal nodes, and which data points
+   # belong to each terminal nodes
+   whr <- ctout@where
+   dtout$termNodes <- sort(unique(whr))
+   dtout$termNodeMembers <- split(1:nrow(data),whr)
    class(dtout) <- c('qeDT','party')
    if (!is.null(holdout)) {
       predictHoldout(dtout)
@@ -1937,6 +1942,11 @@ predict.qeDT <- function(object,newx)
 plot.qeDT <- function(object) 
 {
    plot(object$ctout)
+}
+
+print.qeDT <- function(object) 
+{
+   print(object$ctout)
 }
 
 ######################  qeCompare()  #############################
