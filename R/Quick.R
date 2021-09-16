@@ -1917,11 +1917,15 @@ qeDT <- function(data,yName,
    dtout$classNames <- xyc$classNames
    dtout$classif <- classif
    dtout$trainRow1 <- getRow1(data,yName)
-   # determine which nodes are terminal nodes, and which data points
-   # belong to each terminal nodes
-   whr <- ctout@where
-   dtout$termNodes <- sort(unique(whr))
-   dtout$termNodeMembers <- split(1:nrow(data),whr)
+   # info on terminal nodes (tnodes) and all nodes
+   whr <- ctout@where  # tnode membership for each data point
+   dtout$termNodes <- sort(unique(whr))  # IDs of tnodes in tree
+   dtout$termNodeMembers <- 
+      split(1:nrow(data),whr)  # which data in which tnodes
+   dtout$nodeCounts <- 
+      sapply(dtout$termNodeMembers,length)  # count in each tnode
+   dtout$nTermNodes <- length(dtout$termNodes)  
+   dtout$nNodes <- max(dtout$termNodes)
    class(dtout) <- c('qeDT','party')
    if (!is.null(holdout)) {
       predictHoldout(dtout)
