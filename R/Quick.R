@@ -1922,7 +1922,7 @@ qeDT <- function(data,yName,
    dtout$termNodes <- sort(unique(whr))  # IDs of tnodes in tree
    dtout$termNodeMembers <- 
       split(1:nrow(data),whr)  # which data in which tnodes
-   dtout$nodeCounts <- 
+   dtout$termNodeCounts <- 
       sapply(dtout$termNodeMembers,length)  # count in each tnode
    dtout$nTermNodes <- length(dtout$termNodes)  
    dtout$nNodes <- max(dtout$termNodes)
