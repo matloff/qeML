@@ -1893,8 +1893,7 @@ qeFT <- function(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 
 # arguments:  see above, plus
 
-#     mincriterion: 1-alpha, where alpha is the Type I error
-#        value for the test statistic
+#     alpha: threshold for p-value
 #     minsplt: minimum number of data points in a node
 #     mtry: number of variables randomly tried at each split
 #     maxdepth: maximum number of levels to tree
@@ -1902,9 +1901,10 @@ qeFT <- function(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 # value:  see above
  
 qeDT <- function(data,yName,
-   mincriterion=0.95,minsplit=20,mtry=0,maxdepth=0,
+   alpha=0.05,minsplit=20,mtry=0,maxdepth=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   mincriterion <- 1 - alpha
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
    require(party)
