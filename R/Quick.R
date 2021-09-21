@@ -1895,13 +1895,14 @@ qeFT <- function(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 
 #     alpha: threshold for p-value
 #     minsplt: minimum number of data points in a node
+#     minbucket: minimum number of data points in a terminal node
 #     mtry: number of variables randomly tried at each split
 #     maxdepth: maximum number of levels to tree
 
 # value:  see above
  
 qeDT <- function(data,yName,
-   alpha=0.05,minsplit=20,mtry=0,maxdepth=0,
+   alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    mincriterion <- 1 - alpha
@@ -1911,7 +1912,7 @@ qeDT <- function(data,yName,
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
    ctrl <- ctree_control(mincriterion=mincriterion,minsplit=minsplit,
-      mtry=mtry,maxdepth=maxdepth)
+      mtry=mtry,maxdepth=maxdepth,minbucket=minbucket)
    ctout <- ctree(frml,data=data,controls=ctrl)
    dtout <- list(ctout=ctout)
    dtout$classNames <- xyc$classNames
