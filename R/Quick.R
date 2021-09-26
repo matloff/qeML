@@ -1852,7 +1852,7 @@ compareQE <- function(data,yName,qeFtnList,nReps,seed=9999)
 #    nXval: number of cross-val folds per parameter combination (see 
 #       fineTuning())
 
-qeFT <- function(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
+qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
 {
 
    theCall <- function(dtrn,dtst,cmbi)
@@ -1883,8 +1883,15 @@ qeFT <- function(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
       }
    }
 
-   fineTuning(data,pars,theCall,nCombs=nCombs,nTst=nTst,nXval=nXval,
+   z <- fineTuning(data,pars,theCall,nCombs=nCombs,nTst=nTst,nXval=nXval,
       showProgress=showProgress)
+   class(z) <- c('qeFT','tuner')
+   z
+}
+
+plot.qeFT <- function(object) 
+{
+   regtools:::plot.tuner(z)
 }
 
 #########################  qeDT()  #################################
