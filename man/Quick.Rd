@@ -366,6 +366,11 @@ qeCompare(mlb,'Weight',c('qeLin','qeKNN','qeRF'),25,
 # 2 qeKNN 14.34051
 # 3  qeRF 13.02334
 
+data(pef)
+# investigate values of k, 1 through 25, in predicting occupation using
+# k-NN; holdout set size is 1000, with 5 sets run for each k
+ftout <- qeFT(data=pef,yName='wageinc',qeftn='qeKNN',
+   pars=list(k=1:25),nTst=1000,nXval=5)
 
 }
 
