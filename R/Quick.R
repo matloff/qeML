@@ -1883,15 +1883,15 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
       }
    }
 
-   z <- fineTuning(data,pars,theCall,nCombs=nCombs,nTst=nTst,nXval=nXval,
-      showProgress=showProgress)
+   z <- regtools::fineTuning(data,pars,theCall,
+      nCombs=nCombs,nTst=nTst,nXval=nXval,showProgress=showProgress)
    class(z) <- c('qeFT','tuner')
    z
 }
 
 plot.qeFT <- function(object) 
 {
-   regtools:::plot.tuner(z)
+   regtools:::plot.tuner(object)
 }
 
 #########################  qeDT()  #################################
