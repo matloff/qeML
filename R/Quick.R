@@ -238,13 +238,16 @@ predict.qeLin <- function(object,newx) {
 #     scaleX: if TRUE, features will be centered and scaled; note that
 #        this means the features must be numeric
 #     smoothingFtn: as in kNN(); 'mean' or 'loclin'
+#     expandVars,expandVals:  e.g. expandVars element = 3 and
+#        expandVals = 0.2 means give variable 3 a weight of 0.2
+#        instead of 1.9 in the distance function
 
 # value:  see above
 
 # see note in kNN() man pg
  
 qeKNN <- function(data,yName,k=25,scaleX=TRUE,
-   smoothingFtn=mean,
+   smoothingFtn=mean,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    trainRow1 <- getRow1(data,yName)
@@ -264,7 +267,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    } 
 
    knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=scaleX,classif=classif,
-      smoothingFtn=smoothingFtn)
+      smoothingFtn=smoothingFtn,expandVars=expandVars,expandVals=expandVals)
    if (classif) knnout$classNames <- classNames
    knnout$classif <- classif
    knnout$factorsInfo <- factorsInfo
@@ -352,7 +355,7 @@ plot.qeRF <- function(object)
 #########################  qeRFranger()  #################################
  
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
-   mtry=floor(sqrt(ncol(data)))+1,
+   mtry=floor(sqrt(ncol(data)))+1,split.select.weights=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
@@ -361,6 +364,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
    rfrout <- ranger(frml,data=data,num.trees=nTree,mtry=mtry,
+      split.select.weights=split.select.weights,
       min.node.size=minNodeSize)
    rfrout$classNames <- xyc$classNames
    rfrout$classif <- classif
@@ -374,9 +378,12 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
 
 }
 
+qerfranger <- qeRFranger
+
 predict.qeRFranger <- function(object,newx) 
 {
    class(object) <- 'ranger'
+   if (is.null(object$importance.mode)) object$importance.mode <- 'none'
    preds <- predict(object,newx)$predictions
    if (object$classif) {
       preds <- list(predClasses=preds)
