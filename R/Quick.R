@@ -353,9 +353,16 @@ plot.qeRF <- function(object)
 }
 
 #########################  qeRFranger()  #################################
+
+# if wish to specify a set of features to be less likely to be involved
+# in node splitting, specify their names in 'deweightNames', and specify a
+# value v in 'deweightVal'; the vector wts, in order of the feature names
+# in 'data', will initially be set to v for the features to be
+# deweighted, and 1 for the other features; then v will be normalized to
+# sum to 1, and used as split.select.weights in the call to ranger()
  
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
-   mtry=floor(sqrt(ncol(data)))+1,split.select.weights=NULL,
+   mtry=floor(sqrt(ncol(data)))+1,deweightNames=NULL,deweightVal=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
@@ -363,6 +370,17 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    require(ranger)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
+   if (!is.null(deweightNames)) {
+      dataNames <- names(data)
+      yCol <- which(dataNames == yName)
+      xNames <- dataNames[-yCol]
+      numX <- length(xNames)
+      wts <- rep(1,numX)
+      names(wts) <- xNames
+      wts[deweightNames] <- deweightVal
+      wts <- wts / sum(wts)
+      split.select.weights <- wts
+   } else split.select.weights <- NULL
    rfrout <- ranger(frml,data=data,num.trees=nTree,mtry=mtry,
       split.select.weights=split.select.weights,
       min.node.size=minNodeSize)
