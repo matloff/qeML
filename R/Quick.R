@@ -240,7 +240,7 @@ predict.qeLin <- function(object,newx) {
 #     smoothingFtn: as in kNN(); 'mean' or 'loclin'
 #     expandVars,expandVals:  e.g. expandVars element = 3 and
 #        expandVals = 0.2 means give variable 3 a weight of 0.2
-#        instead of 1.9 in the distance function
+#        instead of 1.0 in the distance function
 
 # value:  see above
 
@@ -250,6 +250,8 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   if (!is.null(expandVars) || !is.null(expandVals))
+      stop('expandVars not yet implemented; use kNN() directly')
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
@@ -272,6 +274,8 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    knnout$classif <- classif
    knnout$factorsInfo <- factorsInfo
    knnout$trainRow1 <- trainRow1
+   knnout$expandVars <- expandVars
+   knnout$expandVals <- expandVals
    class(knnout) <- c('qeKNN','kNN')
    if (!is.null(holdout)) {
       predictHoldout(knnout)
@@ -293,6 +297,10 @@ predict.qeKNN <- function(object,newx,newxK=1)
       # newxK <- ncol(newx)  where did this come from?
    } 
    newx <- matrix(xyc$x,nrow=nr)
+   evars <- object$expandVars
+   ### if (!is.null(evars))  {
+   ###    newx <- multCols(newx, evars, object$expandVals)
+   ### }
    preds <- predict(object,newx,newxK)
    if (!object$classif) return(preds)
    if (is.vector(preds)) preds <- matrix(preds,nrow=1)
