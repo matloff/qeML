@@ -382,7 +382,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       split.select.weights <- wts
    } else split.select.weights <- NULL
    rfrout <- ranger(frml,data=data,num.trees=nTree,mtry=mtry,
-      split.select.weights=split.select.weights,
+      split.select.weights=split.select.weights,probability=TRUE,
       min.node.size=minNodeSize)
    rfrout$classNames <- xyc$classNames
    rfrout$classif <- classif
@@ -402,11 +402,16 @@ predict.qeRFranger <- function(object,newx)
 {
    class(object) <- 'ranger'
    if (is.null(object$importance.mode)) object$importance.mode <- 'none'
-   preds <- predict(object,newx)$predictions
-   if (object$classif) {
-      preds <- list(predClasses=preds)
-   }
-   preds
+   newx <- setTrainFactors(object, newx)
+   classif <- object$classif
+#     if (classif) {
+#         probs <- predict(object, newx, type = "prob")$predictions
+#         res <- collectForReturn(object, probs)
+#     }
+#     else {
+        res <- predict(object, newx, type = "response")$predictions
+#     }
+    res
 }
 
 #########################  qeRFgrf()  #################################
