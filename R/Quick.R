@@ -371,9 +371,24 @@ plot.qeRF <- function(object)
  
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightNames=NULL,deweightVal=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))))
+   holdout=floor(min(1000,0.1*nrow(data))),yYesName='')
 {
    classif <- is.factor(data[[yName]])
+   # in binary Y case, change to 0,1
+   ycol <- which(names(data) == yName)
+   yvec <- data[,ycol]
+   if (is.factor(yvec)) {
+      if (length(levels(yvec)) == 2) {
+         if (length(yYesName) > 0) {
+            whichYes <- which(yvec == yYesName)
+            yvec <- as.character(yvec)
+            yvec[whichYes] <- '1'
+            yvec[-whichYes] <- '0'
+            yvec <- as.factor(yvec)
+            data[,ycol] <- yvec
+         }
+      }
+   }
    if (!is.null(holdout)) splitData(holdout,data)
    require(ranger)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
