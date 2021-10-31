@@ -2086,6 +2086,7 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
+   require(pROC)
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    ys <- as.factor(holdY == yLevelName)
