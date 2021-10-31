@@ -410,6 +410,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    rfrout$classNames <- xyc$classNames
    rfrout$classif <- classif
    rfrout$trainRow1 <- getRow1(data,yName)
+   rfout$yYesName <- yYesName
    class(rfrout) <- c('qeRFranger','ranger')
    if (!is.null(holdout)) {
       predictHoldout(rfrout)
@@ -2069,6 +2070,30 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 }
 
+######################  qeROC()  #############################
+
+# wrapper for pROC::roc()
+
+# will plot ROC, print AUC
+
+# arguments:
+
+#    dataIn:  data frame that was input to a qe& ML function
+#    qeOut:  return object from qe* ML functions
+#    yName:  as in the qe* args
+#    yLevelName:  name of the class to be considered positive
+
+
+qeROC <- function(dataIn,qeOut,yName,yLevelName) 
+{
+   holdout <- dataIn[qeOut$holdIdxs,]
+   holdY <- holdout[[yName]]
+   ys <- as.factor(holdY == yLevelName)
+   probs <- qeOut$holdoutPreds$probs[,yLevelName]
+   probs <- probs/sum(probs)
+   roc(ys,probs,plot=T,aug=T)
+}
+
 #########################  misc.  ################################
 
 # lm() balks if a label begins with a digit; check to see if we have any
@@ -2103,5 +2128,4 @@ genericPlot <- function(object)
 
 whatSplit <- function(qeObj) 
 {
-
 }
