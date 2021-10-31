@@ -38,7 +38,7 @@ S3method(predict,qeText)
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
-   qeNeural,qeLASSO,qeCompare,qeFT,
+   qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
    qeIso,qeTS,qeText,buildQEcall,splitData,
    getRow1,predictHoldout,
