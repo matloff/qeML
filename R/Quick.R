@@ -2089,7 +2089,9 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    ys <- as.factor(holdY == yLevelName)
-   probs <- qeOut$holdoutPreds$probs[,yLevelName]
+   probs <- qeOut$holdoutPreds$probs
+   if (is.null(probs)) stop('no holdoutPreds$probs')
+   probs <- probs[,yLevelName]
    probs <- probs/sum(probs)
    roc(ys,probs,plot=T,aug=T)
 }
