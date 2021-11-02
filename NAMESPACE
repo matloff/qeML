@@ -1,10 +1,8 @@
 
-  importFrom("graphics", "abline", "matplot", "plot")
-  importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
+importFrom("graphics", "abline", "matplot", "plot")
+importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
              "var")
-  importFrom("utils", "combn")
-  importFrom("sandwich","vcovHC")
 
 S3method(predict,qeLogit)
 S3method(predict,qeLin)
