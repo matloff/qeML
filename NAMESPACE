@@ -1,10 +1,8 @@
 
-  importFrom("graphics", "abline", "matplot", "plot")
-  importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
+importFrom("graphics", "abline", "matplot", "plot")
+importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
              "var")
-  importFrom("utils", "combn")
-  importFrom("sandwich","vcovHC")
 
 S3method(predict,qeLogit)
 S3method(predict,qeLin)
@@ -38,7 +36,7 @@ S3method(predict,qeText)
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
-   qeNeural,qeLASSO,qeCompare,qeFT,
+   qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
    qeIso,qeTS,qeText,buildQEcall,splitData,
    getRow1,predictHoldout,
