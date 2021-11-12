@@ -563,58 +563,53 @@ predict.qeRFgrf<- function(object,newx)
 
 #value:  see above
 
-qeSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
-   allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
+qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
+    degree = 2, allDefaults = TRUE, holdout = floor(min(1000,
+        0.1 * nrow(data))))
 {
-   classif <- is.factor(data[[yName]])
-   if (!classif) {print('for classification problems only'); return(NA)}
-   if (!is.null(holdout)) splitData(holdout,data)
-   require(e1071)
-   # xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=TRUE)
-   frml <- as.formula(paste(yName,'~ .'))
-   svmout <- 
-      if (allDefaults) e1071::svm(frml,data=data)
-      else e1071::svm(frml,data=data,
-         cost=cost,gamma=gamma,kernel=kernel,degree=degree,
-         decision.values=TRUE)
-   ycol <- which(names(data) == yName)
-   svmout$x <- data[,-ycol,drop=FALSE]
-   y <- data[,ycol]
-   svmout$data <- data
-   svmout$yName <- yName
-   svmout$ycol <- ycol
-   svmout$classNames <- levels(y)
-   svmout$classif <- classif
-   svmout$formula <- frml
-   svmout$trainRow1 <- getRow1(data,yName)
-   class(svmout) <- c('qeSVM',class(svmout))
-   if (!is.null(holdout)) {
-      predictHoldout(svmout)
-      svmout$holdIdxs <- holdIdxs
-   }
-   svmout
+    classif <- is.factor(data[[yName]])
+    if (!classif) {
+        print("for classification problems only")
+        return(NA)
+    }
+    if (!is.null(holdout))
+        splitData(holdout, data)
+    require(e1071)
+    frml <- as.formula(paste(yName, "~ ."))
+    svmout <- if (allDefaults)
+        e1071::svm(frml, data = data, probability = TRUE)
+    else e1071::svm(frml, data = data, cost = cost, gamma = gamma,
+        kernel = kernel, degree = degree, decision.values = TRUE,
+        probability = TRUE)
+    ycol <- which(names(data) == yName)
+    svmout$x <- data[, -ycol, drop = FALSE]
+    y <- data[, ycol]
+    svmout$data <- data
+    svmout$yName <- yName
+    svmout$ycol <- ycol
+    svmout$classNames <- levels(y)
+    svmout$classif <- classif
+    svmout$formula <- frml
+    svmout$trainRow1 <- getRow1(data, yName)
+    class(svmout) <- c("qeSVM", class(svmout))
+    if (!is.null(holdout)) {
+        predictHoldout(svmout)
+        svmout$holdIdxs <- holdIdxs
+    }
+    svmout
 }
 
-predict.qeSVM <- function(object,newx,k=NULL,scaleX=TRUE)
+predict.qeSVM <- function (object, newx) 
 {
-   require(e1071)
-   class(object) <- class(object)[-1]
-   newx <- setTrainFactors(object,newx)
-   preds <- predict(object,newx,decision.values=TRUE)
-   dvals <- attr(preds,'decision.values')
-   colnames(dvals) <- colnames(object$decision.values)
-   res <- list(predClasses=preds,dvals=dvals)
-   classNames <- object$classNames
-   ycol <- object$ycol
-   x <- object$data[,-ycol]
-   y <- object$data[,ycol]
-   if (!is.null(k)) {
-      trnScores <- object$decision.values
-      newScores <- getDValsE1071(object,newx)
-      probs <- knnCalib(y,trnScores,newScores,k)
-      res$probs <- probs
-   }
-   res
+    require(e1071)
+    class(object) <- class(object)[-1]
+    newx <- setTrainFactors(object, newx)
+    preds <- predict(object, newx, decision.values = TRUE,probability=TRUE)
+    probs <- attr(preds,'probabilities')
+    attributes(preds) <- NULL
+    predClasses <- object$classNames[preds]
+    res <- list(predClasses = predClasses, probs = probs)
+    res
 }
 
 # plot.qeSVM <- function(object,formula) 
