@@ -1145,34 +1145,23 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    ycol <- which(names(data) == yName)
-   y <- data[,ycol]
-   x <- data[,-ycol,drop=FALSE]
+   xy <- data[,c(setdiff(1:ncol(data),ycol),ycol)]
    classif <- is.factor(data[[yName]])
    if (!classif) stop('for classification problems')
-   origY <- y
-   y <- regtools::factorTo012etc(y)
-   earlierLevels <- attr(y,'earlierLevels')
-   dataSave <- data
-   data <- cbind(x,y)
-   names(data)[ncol(data)] <- yName
 
    if (!is.null(holdout)) {
       splitData(holdout,data)
-      tst[ncol(tst)] <- origY[idxs]
    }
 
    require(polyreg)
-   qeout <- polyFit(data,deg,use='glm')
-   qeout$x <- x
-   qeout$y <- y
-   qeout$classif <- classif
-   qeout$earlierLevels <- attr(y,'earlierLevels')
+   if (!checkPkgVersion('polyreg','0.7'))
+      stop('polyreg must be of version >= 1.7')
+      
+   qeout <- polyFit(xy,deg,use='glm')
    qeout$trainRow1 <- getRow1(data,yName)
+   qeout$classif <- classif
    class(qeout) <- c('qePolyLog',class(qeout))
    if (!is.null(holdout)) {
-      # need original ycol
-      data <- dataSave
-      data[,ycol] <- y
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
@@ -1182,31 +1171,11 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
 predict.qePolyLog <- function(object,newx)
 {
    class(object) <- 'polyFit'
-   predCode <- predict(object,newx)
-   # map back to original Y names; polyreg starts at 0
-   tmp <- object$earlierLevels[predCode+1]
-   probs <- attr(predCode,'prob')
-   if (is.vector(probs)) {
-      # scenarios:
-      # (a) newx is a single new case to be predicted
-      # (b) there are just 2 classes, treated ast "1" by polyreg
-      if (nrow(newx) == 1)
-         probs <- matrix(probs,nrow=1)
-      else probs <- cbind(probs,1-probs)
-   }
-   earlierLevels <- object$earlierLevels
-   if (length(earlierLevels) >  2) {
-      colnames(probs) <- object$earlierLevels
-      sumprobs <- apply(probs,1,sum)  
-      probs <- (1/sumprobs) * probs
-   }
-   else {
-      colnames(probs) <- object$earlierLevels
-   }
-   list(predClasses=tmp, probs=probs)
+   predClasses <- predict(object,newx)
+   probs <- attr(predClasses,'prob')
+   attributes(predClasses) <- NULL 
+   list(predClasses=predClasses, probs=probs)
 }
-
-ppl <- predict.qePolyLog
 
 #########################  qeLASSO()  #################################
 
@@ -2126,4 +2095,19 @@ genericPlot <- function(object)
 
 whatSplit <- function(qeObj) 
 {
+}
+
+# check whether an installed package is of version at least that
+# specified in 'atleast'; latter of form x.y for now, not x.y.x, i.e.
+# only the number and subnumber will be checked; e.g. '1.3.5' >= '1.3'
+checkPkgVersion <- function(pkgname,atleast) 
+{
+   pkgVersion <- as.character(packageVersion(pkgname))
+   nums <- strsplit(pkgVersion,'.',fixed=T)
+   nums <- nums[1:2]
+   pkgVersion <- paste(nums,collapse='.')
+   pkgVersion >= atleast
+
+
+
 }
