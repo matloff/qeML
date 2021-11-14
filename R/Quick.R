@@ -2103,7 +2103,7 @@ whatSplit <- function(qeObj)
 checkPkgVersion <- function(pkgname,atleast) 
 {
    pkgVersion <- as.character(packageVersion(pkgname))
-   nums <- strsplit(pkgVersion,'.',fixed=T)
+   nums <- strsplit(pkgVersion,'.',fixed=T)[[1]]
    nums <- nums[1:2]
    pkgVersion <- paste(nums,collapse='.')
    pkgVersion >= atleast
