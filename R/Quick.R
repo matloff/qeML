@@ -1204,7 +1204,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
       # for i-th lambda value, place beta-hat in column i+1
       qeout$betaHatVecs <- as.matrix(qeout$glmnet.fit$beta)
       # when, if ever, did each variable enter?
-      tmp <- apply(betaHatVecs,1,function(rw) which(rw != 0)[1])
+      tmp <- apply(qeout$betaHatVecs,1,function(rw) which(rw != 0)[1])
       qeout$whenEntered <- sort(tmp)
    } else {
       qeout$betaHatVecs <- NA
