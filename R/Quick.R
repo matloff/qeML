@@ -1179,9 +1179,6 @@ predict.qePolyLog <- function(object,newx)
 
 #########################  qeLASSO()  #################################
 
-# for now, "X" must be numeric; if "Y" is a factor, we have a
-# classification problem, otherwise regression
-
 qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 {
    require(glmnet)
@@ -1200,6 +1197,19 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    qeout$classif <- classif
    qeout$factorsInfo <- factorsInfo
    if (classif) qeout$classNames <- levels(y)
+   # index of the "best" lambda
+   qeout$lambda.whichmin <- 
+      which(qeout$lambda == qeout$lambda.min)
+   if (!classif) {
+      # for i-th lambda value, place beta-hat in column i+1
+      qeout$betaHatVecs <- as.matrix(qeout$glmnet.fit$beta)
+      # when, if ever, did each variable enter?
+      tmp <- apply(betaHatVecs,1,function(rw) which(rw != 0)[1])
+      qeout$whenEntered <- sort(tmp)
+   } else {
+      qeout$betaHatVecs <- NA
+      qeout$whenEntered <- NA
+   }
    class(qeout) <- c('qeLASSO',class(qeout))
    if (!is.null(holdout)) {
       predictHoldout(qeout)
