@@ -211,6 +211,7 @@ qeLin <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    lmout
 }
 
+
 # arguments:  see above
 
 # value:  see above
@@ -1774,6 +1775,7 @@ splitData <- defmacro(holdout,data,
       cat('holdout set has ',nHold, 'rows\n');
       idxs <- sample(1:nrow(data),nHold);
       tst <- data[idxs,,drop=FALSE];
+      trn <- data[-idxs,,drop=FALSE];
       data <- data[-idxs,,drop=FALSE];
       holdIdxs <- idxs
    }
@@ -1823,6 +1825,14 @@ predictHoldout <- defmacro(res,
       # ycol <- which(names(data) == yName);
       ycol <- which(names(tst) == yName);
       tstx <- tst[,-ycol,drop=FALSE];
+      trnx <- trn[,-ycol,drop=FALSE];
+      newLvls <- regtools::checkNewLevels(trnx,tstx)
+      if (length(newLvls) > 0) {
+         tstx <- tstx[-newLvls,,drop=FALSE]
+         tst <- tst[-newLvls,,drop=FALSE]
+         warning(paste(length(newLvls),
+            'rows removed from test set, due to new factor levels'))
+      }
       preds <- predict(res,tstx);
       res$holdoutPreds <- preds;
       if (res$classif) {
