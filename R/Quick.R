@@ -1826,13 +1826,13 @@ predictHoldout <- defmacro(res,
       ycol <- which(names(tst) == yName);
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
-      newLvls <- regtools::checkNewLevels(trnx,tstx)
-      if (length(newLvls) > 0) {
-         tstx <- tstx[-newLvls,,drop=FALSE]
-         tst <- tst[-newLvls,,drop=FALSE]
-         warning(paste(length(newLvls),
-            'rows removed from test set, due to new factor levels'))
-      }
+#       newLvls <- regtools::checkNewLevels(trnx,tstx)
+#       if (length(newLvls) > 0) {
+#          tstx <- tstx[-newLvls,,drop=FALSE]
+#          tst <- tst[-newLvls,,drop=FALSE]
+#          warning(paste(length(newLvls),
+#             'rows removed from test set, due to new factor levels'))
+#       }
       preds <- predict(res,tstx);
       res$holdoutPreds <- preds;
       if (res$classif) {
