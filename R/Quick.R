@@ -2081,6 +2081,65 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    roc(ys,probs,plot=T,aug=T)
 }
 
+######################  qeKNNna()  #############################
+
+# kNN for data having lots of NAs; one possible application is
+# recommender systems
+
+### qeKNNna <- function(data,yName,k=25,minNonNA=5,
+###    holdout = floor(min(1000, 0.1 * nrow(data))))
+### {
+###     # housekeeping
+###     trainRow1 <- getRow1(data, yName)
+###     classif <- is.factor(data[[yName]])
+###     if (!is.null(holdout))
+###         splitData(holdout, data)
+###     xyc <- getXY(data, yName, xMustNumeric = TRUE, classif = classif,
+###         makeYdumms = TRUE)
+###     x <- xyc$x
+###     xm <- as.matrix(x)
+###     factorsInfo <- xyc$factorsInfo
+###     if (!is.null(factorsInfo))
+###         attr(xm, "factorsInfo") <- factorsInfo
+###     y <- xyc$y
+###     if (classif) {
+###         xy <- xyc$xy
+###         y <- xyc$yDumms
+###         classNames <- xyc$classNames
+###     }
+###     n <- nrow(data)
+### 
+###     # the computation
+###     isntNA <- function(a) !is.na(a)
+###     muhat <- rep(NA,n)
+###     for (i in 1:n) {
+###        xi <- xm[i,]
+###        # find the NA-adjusted distances to all other rows of xm
+###        xiIntact <- which(isntNA(xi))
+###        xiBoulevard <- xm[-i,xiIntact]
+###        # how many nonNAs do others have in common with xi?
+###        nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
+###        if (length(nonNAcounts) == 0) muhat[i] <- y[i]
+###        else {
+###           usable <- which(xiBoulevard[nonNAcounts >= minNonNA,]
+###           xiBoulevard <- xiBoulevard[usable,]
+###           dy <- NULL  # will be a matrix of distances from xi and Y vals
+###           # for each j among those having enough in common with xi,
+###           # find the distance from xi to the nonNAs of xi
+###           nrB <- nrow(xiBoulevard)
+###           for (j in 1:nrB) {
+###              xj <- xiBoulevard[j,]
+###              xjBlvdIntact <- which(isntNA(xiBoulevard[j,]))
+###              dstij <- 
+###                 sum(abs(xj[xjBlvdIntact] - xi[xjBlvdIntact])) /
+###                 length(xjBlvdI)
+###              dy <- rbind(dy,c(dstij,y[usable[j]]
+###           }
+###        }
+###     }
+### 
+### }
+
 #########################  misc.  ################################
 
 # lm() balks if a label begins with a digit; check to see if we have any
