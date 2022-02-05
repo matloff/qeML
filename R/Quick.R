@@ -1201,7 +1201,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    # index of the "best" lambda
    qeout$lambda.whichmin <- 
       which(qeout$lambda == qeout$lambda.min)
-   if (!classif) {
+   if (!classif) {  # classification case hard due to multiple glm()'s
       # for i-th lambda value, place beta-hat in column i+1
       qeout$betaHatVecs <- as.matrix(qeout$glmnet.fit$beta)
       # when, if ever, did each variable enter?
@@ -1211,6 +1211,13 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
       qeout$betaHatVecs <- NA
       qeout$whenEntered <- NA
    }
+
+   if (!classif) {
+      glmout <- qeout$glmnet.fit
+      bestIdx <- which.min(glmout$lambda)
+      qeout$bestBeta <- glmout$beta[,bestIdx]
+   }
+
    class(qeout) <- c('qeLASSO',class(qeout))
    if (!is.null(holdout)) {
       predictHoldout(qeout)
@@ -1218,6 +1225,8 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    }
    qeout
 }
+
+qelasso <- qeLASSO
 
 predict.qeLASSO <- function(object,newx) 
 {
