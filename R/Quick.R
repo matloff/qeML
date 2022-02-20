@@ -2126,23 +2126,22 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
        # find the NA-adjusted distances to all other rows of xm
        xiIntact <- which(isntNA(xi))
        if (length(xiIntact) == 0) {
+          warning(paste0('row ',i,': xiIntact=0'))
           muhat[i] <- y[i]
           next
        }
        xii <- xi[xiIntact]
        xiBoulevard <- xm[-i,xiIntact,drop=FALSE]
        # how many nonNAs do others have in common with xi?
-       if (length(xiBoulevard) == 0) {
+       if (sum(isntNA(xiBoulevard)) == 0) {
+          warning(paste0('row ',i,': xiBoulevard empty'))
           muhat[i] <- y[i]
           next
        }
        nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
-       if (length(nonNAcounts) == 0) {
-          muhat[i] <- y[i]
-          next
-       }
        usable <- which(nonNAcounts >= minNonNA)
        if (length(usable) == 0) {
+          warning(paste0('row ',i,': usable empty'))
           muhat[i] <- y[i]
           next
        }
