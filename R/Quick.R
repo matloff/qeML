@@ -2121,31 +2121,48 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
 ###     # the computation
 ###     isntNA <- function(a) !is.na(a)
 ###     muhat <- rep(NA,n)
-###     for (i in 1:n) {
+###     for (i in 1:n) {  # calculate muhat[i]
 ###        xi <- xm[i,]
 ###        # find the NA-adjusted distances to all other rows of xm
 ###        xiIntact <- which(isntNA(xi))
-###        xiBoulevard <- xm[-i,xiIntact]
+###        xii <- xi[xiIntact]
+###        xiBoulevard <- xm[-i,xiIntact,drop=FALSE]
 ###        # how many nonNAs do others have in common with xi?
-###        nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
-###        if (length(nonNAcounts) == 0) muhat[i] <- y[i]
-###        else {
-###           usable <- which(xiBoulevard[nonNAcounts >= minNonNA,]
-###           xiBoulevard <- xiBoulevard[usable,]
-###           dy <- NULL  # will be a matrix of distances from xi and Y vals
-###           # for each j among those having enough in common with xi,
-###           # find the distance from xi to the nonNAs of xi
-###           nrB <- nrow(xiBoulevard)
-###           for (j in 1:nrB) {
-###              xj <- xiBoulevard[j,]
-###              xjBlvdIntact <- which(isntNA(xiBoulevard[j,]))
-###              dstij <- 
-###                 sum(abs(xj[xjBlvdIntact] - xi[xjBlvdIntact])) /
-###                 length(xjBlvdI)
-###              dy <- rbind(dy,c(dstij,y[usable[j]]
-###           }
+###        if (length(xiBoulevard) == 0) {
+###           muhat[i] <- y[i]
+###           next
 ###        }
+###        
+###        nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
+###        if (length(nonNAcounts) == 0) {
+###           muhat[i] <- y[i]
+###           next
+###        }
+###        usable <- which(nonNAcounts >= minNonNA)
+###        if (length(usable) == 0) {
+###           muhat[i] <- y[i]
+###           next
+###        }
+###        xiBoulevard <- xiBoulevard[usable,]
+###        correspondingY <- y[-i][usable]
+###        dy <- NULL  # will be a matrix of distances from xi and Y vals
+###        # for each j among those having enough in common with xi,
+###        # find the distance from xi to the nonNAs of xj
+###        nrB <- nrow(xiBoulevard)
+###        for (j in 1:nrB) {
+###           xj <- xiBoulevard[j,]
+###           xjBlvdIntact <- which(isntNA(xj))
+###           dstij <- 
+###              sum(abs(xj[xjBlvdIntact] - xii[xjBlvdIntact])) /
+###              length(xjBlvdIntact)
+###           dy <- rbind(dy,c(dstij,correspondingY[j]))
+###        }
+###        print(dy)
+###        q <- min(k,nrow(dy))
+###        tmp <- order(dy[,1])[1:q]
+###        muhat[i] <- mean(dy[tmp,2])
 ###     }
+###     muhat
 ### 
 ### }
 
