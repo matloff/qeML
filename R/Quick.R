@@ -2096,7 +2096,7 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
 # recommender systems
 
 qeKNNna <- function(data,yName,k=25,minNonNA=5,
-   holdout = floor(min(1000, 0.1 * nrow(data))))
+   holdout = floor(min(1000, 0.1 * nrow(data))),printDists=FALSE)
 {
     # housekeeping
     trainRow1 <- getRow1(data, yName)
@@ -2159,6 +2159,7 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
              length(xjBlvdIntact)
           dy <- rbind(dy,c(dstij,correspondingY[j]))
        }
+       if (printDists) print(dy)
        q <- min(k,nrow(dy))
        tmp <- order(dy[,1])[1:q]
        muhat[i] <- mean(dy[tmp,2])
