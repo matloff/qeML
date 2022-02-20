@@ -2095,76 +2095,77 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
 # kNN for data having lots of NAs; one possible application is
 # recommender systems
 
-### qeKNNna <- function(data,yName,k=25,minNonNA=5,
-###    holdout = floor(min(1000, 0.1 * nrow(data))))
-### {
-###     # housekeeping
-###     trainRow1 <- getRow1(data, yName)
-###     classif <- is.factor(data[[yName]])
-###     if (!is.null(holdout))
-###         splitData(holdout, data)
-###     xyc <- getXY(data, yName, xMustNumeric = TRUE, classif = classif,
-###         makeYdumms = TRUE)
-###     x <- xyc$x
-###     xm <- as.matrix(x)
-###     factorsInfo <- xyc$factorsInfo
-###     if (!is.null(factorsInfo))
-###         attr(xm, "factorsInfo") <- factorsInfo
-###     y <- xyc$y
-###     if (classif) {
-###         xy <- xyc$xy
-###         y <- xyc$yDumms
-###         classNames <- xyc$classNames
-###     }
-###     n <- nrow(data)
-### 
-###     # the computation
-###     isntNA <- function(a) !is.na(a)
-###     muhat <- rep(NA,n)
-###     for (i in 1:n) {  # calculate muhat[i]
-###        xi <- xm[i,]
-###        # find the NA-adjusted distances to all other rows of xm
-###        xiIntact <- which(isntNA(xi))
-###        xii <- xi[xiIntact]
-###        xiBoulevard <- xm[-i,xiIntact,drop=FALSE]
-###        # how many nonNAs do others have in common with xi?
-###        if (length(xiBoulevard) == 0) {
-###           muhat[i] <- y[i]
-###           next
-###        }
-###        
-###        nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
-###        if (length(nonNAcounts) == 0) {
-###           muhat[i] <- y[i]
-###           next
-###        }
-###        usable <- which(nonNAcounts >= minNonNA)
-###        if (length(usable) == 0) {
-###           muhat[i] <- y[i]
-###           next
-###        }
-###        xiBoulevard <- xiBoulevard[usable,]
-###        correspondingY <- y[-i][usable]
-###        dy <- NULL  # will be a matrix of distances from xi and Y vals
-###        # for each j among those having enough in common with xi,
-###        # find the distance from xi to the nonNAs of xj
-###        nrB <- nrow(xiBoulevard)
-###        for (j in 1:nrB) {
-###           xj <- xiBoulevard[j,]
-###           xjBlvdIntact <- which(isntNA(xj))
-###           dstij <- 
-###              sum(abs(xj[xjBlvdIntact] - xii[xjBlvdIntact])) /
-###              length(xjBlvdIntact)
-###           dy <- rbind(dy,c(dstij,correspondingY[j]))
-###        }
-###        print(dy)
-###        q <- min(k,nrow(dy))
-###        tmp <- order(dy[,1])[1:q]
-###        muhat[i] <- mean(dy[tmp,2])
-###     }
-###     muhat
-### 
-### }
+qeKNNna <- function(data,yName,k=25,minNonNA=5,
+   holdout = floor(min(1000, 0.1 * nrow(data))))
+{
+    # housekeeping
+    trainRow1 <- getRow1(data, yName)
+    classif <- is.factor(data[[yName]])
+    if (!is.null(holdout))
+        splitData(holdout, data)
+    xyc <- getXY(data, yName, xMustNumeric = TRUE, classif = classif,
+        makeYdumms = TRUE)
+    x <- xyc$x
+    xm <- as.matrix(x)
+    factorsInfo <- xyc$factorsInfo
+    if (!is.null(factorsInfo))
+        attr(xm, "factorsInfo") <- factorsInfo
+    y <- xyc$y
+    if (classif) {
+        xy <- xyc$xy
+        y <- xyc$yDumms
+        classNames <- xyc$classNames
+    }
+    n <- nrow(data)
+
+    # the computation
+    isntNA <- function(a) !is.na(a)
+    muhat <- rep(NA,n)
+    for (i in 1:n) {  # calculate muhat[i]
+       xi <- xm[i,]
+       # find the NA-adjusted distances to all other rows of xm
+       xiIntact <- which(isntNA(xi))
+       if (length(xiIntact) == 0) {
+          muhat[i] <- y[i]
+          next
+       }
+       xii <- xi[xiIntact]
+       xiBoulevard <- xm[-i,xiIntact,drop=FALSE]
+       # how many nonNAs do others have in common with xi?
+       if (length(xiBoulevard) == 0) {
+          muhat[i] <- y[i]
+          next
+       }
+       nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
+       if (length(nonNAcounts) == 0) {
+          muhat[i] <- y[i]
+          next
+       }
+       usable <- which(nonNAcounts >= minNonNA)
+       if (length(usable) == 0) {
+          muhat[i] <- y[i]
+          next
+       }
+       xiBoulevard <- xiBoulevard[usable,,drop=FALSE]
+       correspondingY <- y[-i][usable]
+       dy <- NULL  # will be a matrix of distances from xi and Y vals
+       # for each j among those having enough in common with xi,
+       # find the distance from xi to the nonNAs of xj
+       nrB <- nrow(xiBoulevard)
+       for (j in 1:nrB) {
+          xj <- xiBoulevard[j,]
+          xjBlvdIntact <- which(isntNA(xj))
+          dstij <- 
+             sum(abs(xj[xjBlvdIntact] - xii[xjBlvdIntact])) /
+             length(xjBlvdIntact)
+          dy <- rbind(dy,c(dstij,correspondingY[j]))
+       }
+       q <- min(k,nrow(dy))
+       tmp <- order(dy[,1])[1:q]
+       muhat[i] <- mean(dy[tmp,2])
+    }
+    muhat
+}
 
 #########################  misc.  ################################
 
