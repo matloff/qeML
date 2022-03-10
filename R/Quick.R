@@ -2166,6 +2166,23 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
     muhat
 }
 
+# arguments:
+
+#    nodeCmd: character string, ftn call that would be made in a serial
+#       setting
+#    cls: cluster in the sense of 'parallel' package; if not of class
+#       'cluster', this is either a positive integer, indicating the
+#       desired number of cores, or a character vector, indicating the
+#       machines on which the cluster is to be formed
+#    data: name of a data frame; if non-null, the code will distribute
+#    the 
+
+
+# qeParallel <- function(nodeCmd,cls,data=NULL) 
+# {
+# 
+# }
+
 #########################  misc.  ################################
 
 # lm() balks if a label begins with a digit; check to see if we have any
