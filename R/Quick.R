@@ -2170,19 +2170,88 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
 # arguments:
 
 #    nodeCmd: character string, ftn call that would be made in a serial
-#       setting
+#       setting; must set holdout=NULL
 #    cls: cluster in the sense of 'parallel' package; if not of class
 #       'cluster', this is either a positive integer, indicating the
 #       desired number of cores, or a character vector, indicating the
 #       machines on which the cluster is to be formed
-#    data: name of a data frame; if non-null, the code will distribute
-#    the 
+#    dataName: name of a data frame; if non-null, the code will distribute
+#       the data across the cluster, under this name, which must be 
+#       consistent with the name used in nodeCmd
+#    yName: name of the column for Y, to be predicted
+#    holdout: as in other qe* functions
+
+# needless to say, the above structures are intended to avoid wasted
+# duplication; e.g. if cls already exists, don't recreate it (the data
+# would also be distributed a new, unnecessarily)
+
+qeParallel <- function(nodeCmd,cls,dataName,yName,holdout=NULL) 
+{
+   require(partools)
+   if (!inherits(cls,'cluster')) {
+      cls <- makeCluster(cls)
+      setclsinfo(cls)
+      doclscmd(cls,'library(qeML)')
+      newCLS <- TRUE
+   } else newCLS <- FALSE
+
+   data <- get(dataName)
+   if (!is.null(holdout)) {
+      splitData(holdout, data)  # trn, tst; data <- trn
+   }
+
+   if (newCLS) {
+      assign(dataName,data)
+      distribsplit(cls,dataName)
+   }
+
+   if (length(grep('holdout=NULL',nodeCmd)) == 0)
+      stop('qeFtn call must include holdout=NULL, no spaces')
+
+   clsOut <- doclscmd(cls,nodeCmd)
+   clsOut$cls <- cls
+   clsOut$classif <- clsOut[[1]]$classif
+   class(clsOut) <- 'qeParallel'
+
+   nClust <- length(cls)
+   if (!is.null(holdout)) {
+      # predict locally, not distrib; less efficient
+      ycol <- which(names(tst) == yName) 
+      tstx <- tst[, -ycol, drop = FALSE]
+      retVals <- clsOut[1:nClust]
+      if (!clsOut$classif) {
+         preds <- sapply(retVals,function(cElt) predict(cElt,tstx))
+         preds <- rowMeans(preds)
+         clsOut$testAcc <- mean(abs(tst[,ycol] - preds))
+      } else {
+         preds <- lapply(retVals,function(cElt) predict(cElt,tstx)$probs)
+         probsAvg <- Reduce('+',preds) / nClust
+         winners <- apply(probsAvg,1,which.max)
+         guesses <- colnames(probsAvg)[winners]
+         clsOut$testAcc <- mean(tst[,ycol] != guesses)
+      }
 
 
-# qeParallel <- function(nodeCmd,cls,data=NULL) 
-# {
-# 
-# }
+   }
+
+   clsOut
+
+}
+
+predict.qeParallel <- function(obj,newx) 
+{
+   nClust <- length(obj$cls)
+   retVals <- obj[1:nClust]
+   if (!obj$classif) {
+      preds <- sapply(retVals,function(cElt) predict(cElt,newx))
+      return(mean(preds))
+   }
+   # classif case
+   preds <- lapply(retVals,function(cElt) predict(cElt,newx)$probs)
+   probsAvg <- Reduce('+',preds) / nClust
+   winners <- apply(probsAvg,1,which.max)
+   colnames(probsAvg)[winners]
+}
 
 #########################  misc.  ################################
 
@@ -2231,6 +2300,5 @@ checkPkgVersion <- function(pkgname,atleast)
    pkgVersion <- paste(nums,collapse='.')
    pkgVersion >= atleast
 
-
-
 }
+
