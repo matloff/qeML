@@ -2169,16 +2169,16 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
 
 # arguments:
 
-#    nodeCmd: character string, ftn call that would be made in a serial
-#       setting; must set holdout=NULL
+#    data, yName: as in the typical qe*() functions
+#    qeFtnName: name of the qe*() function, e.g. 'qeRF'
 #    cls: cluster in the sense of 'parallel' package; if not of class
 #       'cluster', this is either a positive integer, indicating the
 #       desired number of cores, or a character vector, indicating the
 #       machines on which the cluster is to be formed
-#    dataName: name of a data frame; if non-null, the code will distribute
-#       the data across the cluster, under this name, which must be 
-#       consistent with the name used in nodeCmd
-#    yName: name of the column for Y, to be predicted
+#    dataName: name of the 'data' argument; code will be distributed
+#       across the cluster, under this name, unless 'cls' is of
+#       'cluster' class, in which case the data is assumed already 
+#       distributed
 #    libs: list of library needing to be loaded for the qe* ftn
 #    holdout: as in other qe* functions (no default here, as the data
 #       is not explicitly an argument)
@@ -2187,9 +2187,9 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
 # duplication; e.g. if cls already exists, don't recreate it (the data
 # would also be distributed a new, unnecessarily)
 
-qeParallel <- function(nodeCmd,cls,dataName,yName,libs=NULL,holdout=NULL) 
+qeParallel <- function(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
+   libs=NULL,holdout=NULL) 
 {
-   # require(partools)
    getSuggestedLib('partools')
 
    if (!inherits(cls,'cluster')) {
@@ -2199,18 +2199,27 @@ qeParallel <- function(nodeCmd,cls,dataName,yName,libs=NULL,holdout=NULL)
       newCLS <- TRUE
    } else newCLS <- FALSE
 
-   data <- get(dataName)
+   ### data <- get(dataName)
    if (!is.null(holdout)) {
       splitData(holdout, data)  # trn, tst; data <- trn
    }
 
    if (newCLS) {
-      assign(dataName,data)
+      ### assign(dataName,data)
       partools::distribsplit(cls,dataName)
    }
 
-   if (length(grep('holdout=NULL',nodeCmd)) == 0)
-      stop('qeFtn call must include holdout=NULL, no spaces')
+   ### if (length(grep('holdout=NULL',nodeCmd)) == 0)
+   ###    stop('qeFtn call must include holdout=NULL, no spaces')
+
+   nodeCmd <- paste0(qeFtnName,
+                     "(",
+                     dataName,
+                     ',"',
+                     yName,
+                     '",holdout=NULL')
+   if (!is.null(opts)) nodeCmd <- paste0(nodeCmd,',',opts)
+   nodeCmd <- paste0(nodeCmd,')')
 
    clsOut <- partools::doclscmd(cls,nodeCmd)
    clsOut$cls <- cls
