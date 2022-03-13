@@ -2179,19 +2179,23 @@ qeKNNna <- function(data,yName,k=25,minNonNA=5,
 #       the data across the cluster, under this name, which must be 
 #       consistent with the name used in nodeCmd
 #    yName: name of the column for Y, to be predicted
-#    holdout: as in other qe* functions
+#    libs: list of library needing to be loaded for the qe* ftn
+#    holdout: as in other qe* functions (no default here, as the data
+#       is not explicitly an argument)
 
 # needless to say, the above structures are intended to avoid wasted
 # duplication; e.g. if cls already exists, don't recreate it (the data
 # would also be distributed a new, unnecessarily)
 
-qeParallel <- function(nodeCmd,cls,dataName,yName,holdout=NULL) 
+qeParallel <- function(nodeCmd,cls,dataName,yName,libs=NULL,holdout=NULL) 
 {
-   require(partools)
+   # require(partools)
+   getSuggestedLib('partools')
+
    if (!inherits(cls,'cluster')) {
-      cls <- makeCluster(cls)
-      setclsinfo(cls)
-      doclscmd(cls,'library(qeML)')
+      cls <- parallel::makeCluster(cls)
+      partools::setclsinfo(cls)
+      partools::doclscmd(cls,'library(qeML)')
       newCLS <- TRUE
    } else newCLS <- FALSE
 
@@ -2202,19 +2206,24 @@ qeParallel <- function(nodeCmd,cls,dataName,yName,holdout=NULL)
 
    if (newCLS) {
       assign(dataName,data)
-      distribsplit(cls,dataName)
+      partools::distribsplit(cls,dataName)
    }
 
    if (length(grep('holdout=NULL',nodeCmd)) == 0)
       stop('qeFtn call must include holdout=NULL, no spaces')
 
-   clsOut <- doclscmd(cls,nodeCmd)
+   clsOut <- partools::doclscmd(cls,nodeCmd)
    clsOut$cls <- cls
    clsOut$classif <- clsOut[[1]]$classif
+   clsOut$libs <- libs
    class(clsOut) <- 'qeParallel'
 
    nClust <- length(cls)
    if (!is.null(holdout)) {
+
+      if (!is.null(libs)) 
+         for (lb in libs) getSuggestedLib(lb)
+
       # predict locally, not distrib; less efficient
       ycol <- which(names(tst) == yName) 
       tstx <- tst[, -ycol, drop = FALSE]
@@ -2238,8 +2247,13 @@ qeParallel <- function(nodeCmd,cls,dataName,yName,holdout=NULL)
 
 }
 
+qepar <- qeParallel
+
 predict.qeParallel <- function(obj,newx) 
 {
+   if (!is.null(obj$libs)) 
+      for (lb in obj$libs) getSuggestedLib(lb)
+
    nClust <- length(obj$cls)
    retVals <- obj[1:nClust]
    if (!obj$classif) {
@@ -2301,4 +2315,10 @@ checkPkgVersion <- function(pkgname,atleast)
    pkgVersion >= atleast
 
 }
+
+# wrapper to load pkg that was only Suggested for, not Imported by, qeML
+
+getSuggestedLib <- function(pkgName) 
+   if (!requireNamespace(pkgName,quietly=TRUE))
+      stop(paste0(pkgName, 'not loaded'))
 
