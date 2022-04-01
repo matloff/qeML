@@ -12,6 +12,8 @@ Norm Matloff, UC Davis, *matloff@cs.ucdavis.edu*
 
     * easy for learners, convenient for experts
 
+    * includes a tutorial on major ML methods
+
 * Large variety of ML algorithms
 
     * k-NN, dec. trees, random forests, gradient boosting,
