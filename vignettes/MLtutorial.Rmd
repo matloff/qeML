@@ -1,4 +1,17 @@
 
+
+---
+title: "MLtutorial"
+author: "Norm Matloff"
+vignette: >
+  %\VignetteIndexEntry{MLtutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+output: rmarkdown::html_vignette
+---
+
+
+
+
 #  The 10-Page Machine Learning Book
 
 (The title here alludes to Andriy Burkov's excellent work,
@@ -219,7 +232,7 @@ predictor variables, named V1 through V6 consisting of various bone
 measurements.  There are 3 classes, DH (Disk Hernia), Spondylolisthesis
 (SL), Normal (NO).  A single tree is shown.
 
-![alt text](RpartVert.png)
+![vertebrae data](RpartVert.png)
 
 At the root, if the predictor variable V6 in our new case to be
 predicted is < 16, we go left, otherwise right.  Say we go left.
@@ -265,7 +278,7 @@ This of course is the classical linear regression model, invented
 For motivation, here is a graph of mean weight vs. height for the 
 **mlb** data:
 
-![alt text](WtVsHt.png)
+!MLB data](WtVsHt.png)
 
 The means seem to lie near a straight line.  (Remember, though, that
 these are sample means.)  That suggests modeling m(t) is a linear
@@ -394,7 +407,7 @@ by observing which side of the line they fall on.  This is what SVM does
 
 Here is an example, using the Iris dataset built in to R:
 
-![alt text](SVM.png)
+![SVM](SVM.png)
 
 There are 3 classes, but we are just predicting setosa species (shown by + 
 symbols) vs. non-setosa (shown by boxes) here.  Below the solid line,
@@ -455,7 +468,7 @@ variables V1, V2 etc. for a new case to be predicted enter on the left,
 and the predictions come out the right; whichever of the 3 outputs
 is largest, that will be our predicted class.
 
-![alt text](VertebraeNN.png)
+![vertebrae](VertebraeNN.png)
 
 The first layer consists of V1 through V6.  The second layer, our
 only *hidden* layer here, has three neurons.  Entering on
@@ -492,7 +505,7 @@ n<sub>w</sub> dimensions, and we need to do so iteratively.
 A simplified version of the iteration process is as follows.  Consider
 the function f() graphed below:
 
-![alt text](ObjFtnPlusTangent.png)
+!learning rate](ObjFtnPlusTangent.png)
 
 There is an overall minimum at approximately x = 2.2.  This is termed
 the *global minimum*.  But there is also a *local
