@@ -2113,6 +2113,14 @@ qeKNNna <- function(data,yName,k=25,
    minNonNA=5,holdout = floor(min(1000, 0.1 * nrow(data))),
    printDists=FALSE)
 {
+
+    # error checks
+    if (minNonNA > ncol(data) - 1) stop('minNonNA > number of features')
+    if (k > nrow(data)) stop('k > number of data points')
+    ycol <- which(colnames(data) == yName)
+    if (!allNumeric(data[,-ycol])) 
+       stop('for now, numeric features only')
+
     # housekeeping, prelim tasks
     trainRow1 <- getRow1(data, yName)
     classif <- is.factor(data[[yName]])
@@ -2146,9 +2154,9 @@ qeKNNna <- function(data,yName,k=25,
           next
        }
        xii <- xi[xiIntact]
-       # portion of 'data' corresonding to intact elets of xi, not
-       # including xi itself
-       xiBoulevard <- xm[-i,xiIntact,drop=FALSE]
+       # portion of 'data' corresonding to intact elets of xi, 
+       # including xi itself (for convenience in row numbering)
+       xiBoulevard <- xm[,xiIntact,drop=FALSE]
        # boulevard empty?
        if (sum(isntNA(xiBoulevard)) == 0) {
           warning(paste0('row ',i,': xiBoulevard empty'))
@@ -2177,7 +2185,7 @@ qeKNNna <- function(data,yName,k=25,
           xjBlvdIntact <- which(isntNA(xj))
           dstij <- 
              sum(abs(xj[xjBlvdIntact] - xii[xjBlvdIntact])) /
-             length(xjBlvdIntact)
+                length(xjBlvdIntact)
           dy <- rbind(dy,c(dstij,correspondingY[j]))
        }
        if (printDists) print(dy)
@@ -2185,7 +2193,28 @@ qeKNNna <- function(data,yName,k=25,
        tmp <- order(dy[,1])[1:q]
        muhat[i] <- mean(dy[tmp,2])
     }
-    muhat
+    res <- list(muhat=muhat,trainx=data[,-ycol])
+    class(res) <- 'qeKNNna'
+    res
+}
+
+# the generic predict()
+
+# args:
+
+#    object: output of qeKNNna()
+#    newx: data frame in same format as the non-yName portion of 'data'
+#       in qeKNNna()
+#    number of nearest neighbors, generally small, even 1, since it
+#       makes use of values already smoothed by qeKNNna()
+
+predict.qeKNNna <- function(object,newx,kPred=1) 
+{
+
+   # note:  for now, much duplicate code between here on qeKNNna(); make
+   # a proper function for the duplicate code later
+
+
 }
 
 # arguments:
