@@ -783,7 +783,7 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 {
    require(lightgbm)
    classif <- is.factor(data[[yName]])
-if (classif) stop('classification cases not implemented yet')  
+   if (classif) stop('classification cases not implemented yet')  
    ycol <- which(names(data) == yName)
 
    x <- data[,-ycol]
@@ -817,16 +817,20 @@ if (classif) stop('classification cases not implemented yet')
    # regression case
    
    # for now, no params
-   cmd <- 'lgbout <- lgb.train(data=lgb.Dat,obj="regression")'
+   cmd <- 'lgbout <- lgb.train(data=lgbData,obj="regression")'
    eval(parse(text=cmd))
-   outlist$lgbmout <- lgbmout
+   outlist$lgbout <- lgbout
    
    outlist$nTree <- nTree
    outlist$trainRow1 <- data[1,-ycol]
    class(outlist) <- c('qelightGBoost')
 
    if (!is.null(holdout)) {
-      predictHoldout(outlist)
+      # predictHoldout(outlist)
+      preds <- predict(outlist$lgbout,tstx)
+      outlist$holdoutPreds <- preds
+      outlist$testAcc <- mean(abs(preds - tsty))
+      outlist$baseAcc <- mean(abs(tsty - mean(tsty)))
       outlist$holdIdxs <- holdIdxs
    }
    outlist
