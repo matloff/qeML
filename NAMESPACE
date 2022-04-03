@@ -33,6 +33,7 @@ S3method(predict,qePCA)
 S3method(predict,qeUMAP)
 S3method(predict,qeTS)
 S3method(predict,qeText)
+S3method(predict,qelightGBoost)
 
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
@@ -40,5 +41,5 @@ export(
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
    qeParallel,qeIso,qeTS,qeText,buildQEcall,splitData,
-   getRow1,predictHoldout,
+   getRow1,predictHoldout,qelightGBoost,
    checkNumericNames,prepend,makeAllNumeric,getXY)
