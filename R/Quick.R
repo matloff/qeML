@@ -766,6 +766,82 @@ plot.qeGBoost <- function(object)
    gbm.perf(object$gbmOuts)
 }
 
+#########################  qelightGBoost()  #################################
+
+# lightGBM 
+
+# arguments:  see above, plus
+
+#     nTree: number of trees
+#     minNodeSize: minimum number of data points per tree node
+#     learnRate: learning rate: 
+
+# value:  see above
+ 
+qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   require(lightgbm)
+   classif <- is.factor(data[[yName]])
+if (classif) stop('classification cases not implemented yet')  
+   ycol <- which(names(data) == yName)
+
+   x <- data[,-ycol]
+   y <- data[,ycol]
+   x.save <- x
+   if (!allNumeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo')
+   } else factorsInfo <- NULL
+
+   if (!is.null(holdout)) {
+      splitData(holdout,x)
+      trnx <- trn
+      tstx <- tst
+      trny <- y[-holdIdxs]
+      tsty <- y[holdIdxs]
+   } else {
+      trnx <- x
+      trny <- y
+      tstx <- NULL
+      tsty <- NULL
+   }
+   
+   # convert to lighGBM binned form 
+   trnxm <- as.matrix(trnx)
+   lgbData <- lgb.Dataset(data=trnxm,label=trny)
+
+   outlist <- 
+      list(classif=classif,factorsInfo=factorsInfo,trnx=trnx)
+
+   # regression case
+   
+   # for now, no params
+   cmd <- 'lgbout <- lgb.train(data=lgb.Dat,obj="regression")'
+   eval(parse(text=cmd))
+   outlist$lgbmout <- lgbmout
+   
+   outlist$nTree <- nTree
+   outlist$trainRow1 <- data[1,-ycol]
+   class(outlist) <- c('qelightGBoost')
+
+   if (!is.null(holdout)) {
+      predictHoldout(outlist)
+      outlist$holdIdxs <- holdIdxs
+   }
+   outlist
+}
+
+# arguments:  see above
+# value:  object of class 'qelightGBoost'; see above for components
+
+predict.qelightGBoost <- function(object,newx) 
+{
+   newx <- setTrainFactors(object,newx)
+   lgbmout <- object$lgbmout
+   predict(object,newx)
+}
+
 #########################  qeAdaBoost()  #################################
 
 # Ada Boost
