@@ -828,6 +828,7 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 
    if (!is.null(holdout)) {
       # predictHoldout(outlist)
+      if (inherits(tstx,'data.frame')) tstx <- as.matrix(tstx)
       preds <- predict(outlist$lgbout,tstx)
       outlist$holdoutPreds <- preds
       outlist$testAcc <- mean(abs(preds - tsty))
