@@ -21,6 +21,8 @@
 \alias{qeTS}
 \alias{qeskRF}
 \alias{qeskSVM}
+\alias{qeParallel}
+
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
 \alias{predict.qeKNN}
@@ -30,6 +32,7 @@
 \alias{predict.qeSVM}
 \alias{predict.qeSVMliquid}
 \alias{predict.qeGBoost}
+\alias{predict.qelightGBoost}
 \alias{predict.qeNeural}
 \alias{predict.qeLASSO}
 \alias{predict.qePolyLin}
@@ -41,6 +44,7 @@
 \alias{predict.qeTS}
 \alias{predict.qeskRF}
 \alias{predict.qeskSVM}
+\alias{predict.qeParallel}
 \alias{plot.RF}
 \alias{plot.LASSO}
 
@@ -73,6 +77,8 @@ qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
+qelightGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
+   holdout=floor(min(1000,0.1*nrow(data))))
 qeNeural(data,yName,hidden=c(100,100),nEpoch=30,
    acts=rep("relu",length(hidden)),learnRate=0.001,
    conv=NULL,xShape=NULL,
@@ -96,6 +102,7 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
 \method{predict}{qeRFgrf}(object,newx)
 \method{predict}{qeSVM}(object,newx,k=25)
 \method{predict}{qeGBoost}(object,newx)
+\method{predict}{qelightGBoost}(object,newx)
 \method{predict}{qeNeural}(object,newx)
 \method{predict}{qeLASSO}(object,newx)
 \method{predict}{qePoly}(object,newx)
@@ -259,6 +266,10 @@ Some notes on specific functions:
    \code{ll_regression_forest} in \pkg{grf} (the latter does local
    linear smoothing); \code{qeskRF} wraps \code{ensemble.RandomForestRegressor}
    and \code{RandomForestClassifier} in the Python \pkg{sklearn}.
+
+   \item Two implementations of gradient boosting are offered, with
+   \code{qeGBoost} using the \code{gbm} package, and with
+   \code{qelightGBoost} using \code{lightgbm}.
 
    \item The functions \code{qeTS} and \code{qeText} handle time series
    and text applications, respectively.
