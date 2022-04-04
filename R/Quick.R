@@ -1932,7 +1932,7 @@ predictHoldout <- defmacro(res,
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
          res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
       } else {
-         res$testAcc <- mean(abs(preds - tst[,ycol]))
+         res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
       }
    }
@@ -2298,6 +2298,8 @@ predict.qeKNNna <- function(object,newx,kPred=1)
 
 
 }
+
+#######################  qeParallel()  ##############################
 
 # arguments:
 
