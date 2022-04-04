@@ -2228,7 +2228,7 @@ qeKNNna <- function(data,yName,k=25,
     muhat <- rep(NA,n)  # ultimately, the output
     for (i in 1:n) {  # calculate muhat[i]
        xi <- xm[i,]
-       # find the NA-adjusted distances to all other rows of xm
+       # find the NA-adjusted distances to all rows of xm
        xiIntact <- which(isntNA(xi))
        if (length(xiIntact) == 0) {
           warning(paste0('row ',i,': all NAs'))
@@ -2278,6 +2278,72 @@ qeKNNna <- function(data,yName,k=25,
     res <- list(muhat=muhat,trainx=data[,-ycol])
     class(res) <- 'qeKNNna'
     res
+}
+
+# find the K-neighborhood of newX withinn xMatrix, handling NAs in the
+# qeKNNna manner:  form a "boulevard" of cols in xMatrix corresponding
+# to the non-NA elements of newX; find all the rows with at least
+# minNonNAs; find the weighted distancces of those rows to newX, and
+# take the average of the K-closest Y values
+
+# arguments:
+
+#   newX:  a single row, xm[i,] when called from qeKNNna(), a new case
+#      to be predicted otherwise
+
+#   xMatrix:  xm when called from qeKNNna, or the xm in the return
+#      value of that function
+
+#   K:  k when called from qeKNNna(), kPred when called from
+#      predict.qeKNNna()
+
+smoothKNNna <- function(newX,xMatrix,Y,k) 
+{
+       # find the NA-adjusted distances to all rows of xMatrix
+       newXIntact <- which(isntNA(newX))
+       if (length(newXIntact) == 0) {
+          warning(paste0('row ',i,': all NAs'))
+          muhat[i] <- y[i]
+          next
+       }
+       xii <- newX[newXIntact]
+       # portion of 'data' corresonding to intact elets of xi, 
+       # including xi itself (for convenience in row numbering)
+       xiBoulevard <- xMatrix[,newXIntact,drop=FALSE]
+       # boulevard empty?
+       if (sum(isntNA(xiBoulevard)) == 0) {
+          warning(paste0('row ',i,': xiBoulevard empty'))
+          muhat[i] <- y[i]
+          next
+       }
+       # how many nonNAs do others have in common with xi?
+       nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
+       usable <- which(nonNAcounts >= minNonNA)
+       # note: usable includes xi itself
+       if (length(usable) == 0) {
+          warning(paste0('row ',i,': usable empty'))
+          muhat[i] <- y[i]
+          next
+       }
+       # keep only the ones with at least minNonNA non-NAs in common
+       xiBoulevard <- xiBoulevard[usable,,drop=FALSE]
+       # and the corresponding Y values
+       correspondingY <- y[usable]
+       dy <- NULL  # will be a matrix of distances from xi and Y vals
+       # for each j among those having enough in common with xi,
+       # find the distance from xi to the nonNAs of xj
+       nrB <- nrow(xiBoulevard)
+       for (j in 1:nrB) {
+          xj <- xiBoulevard[j,]
+          xjBlvdIntact <- which(isntNA(xj))
+          dstij <- 
+             sum(abs(xj[xjBlvdIntact] - xii[xjBlvdIntact])) /
+                length(xjBlvdIntact)
+          dy <- rbind(dy,c(dstij,correspondingY[j]))
+       }
+       q <- min(K,nrow(dy))
+       tmp <- order(dy[,1])[1:q]
+       mean(dy[tmp,2])
 }
 
 # the generic predict()
