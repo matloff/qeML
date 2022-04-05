@@ -812,7 +812,8 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    lgbData <- lgb.Dataset(data=trnxm,label=trny)
 
    outlist <- 
-      list(classif=classif,factorsInfo=factorsInfo,trnx=trnx)
+      list(classif=classif,factorsInfo=factorsInfo,trnx=trnx,
+         trainRow1=getRow1(data,yName))
 
    # regression case
    
@@ -844,8 +845,9 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 predict.qelightGBoost <- function(object,newx) 
 {
    newx <- setTrainFactors(object,newx)
+   newx <- factorsToDummies(newx,omitLast=TRUE,factorsInfo=object$factorsInfo)
    lgbout <- object$lgbout
-   predict(object,newx)
+   predict(lgbout,newx)
 }
 
 #########################  qeAdaBoost()  #################################
