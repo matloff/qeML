@@ -844,7 +844,7 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 predict.qelightGBoost <- function(object,newx) 
 {
    newx <- setTrainFactors(object,newx)
-   lgbmout <- object$lgbmout
+   lgbout <- object$lgbout
    predict(object,newx)
 }
 
