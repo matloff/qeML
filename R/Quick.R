@@ -2203,6 +2203,7 @@ qeKNNna <- function(data,yName,k=25,
    printDists=FALSE)
 {
 
+stop('under construction')
     # error checks
     if (minNonNA > ncol(data) - 1) stop('minNonNA > number of features')
     if (k > nrow(data)) stop('k > number of data points')
@@ -2234,57 +2235,12 @@ qeKNNna <- function(data,yName,k=25,
     muhat <- rep(NA,n)  # ultimately, the output
     for (i in 1:n) {  # calculate muhat[i]
        muhat[i] <- smoothKNNna(xm[i,],xm,y,minNonNA,k)
-###        xi <- xm[i,]
-###        # find the NA-adjusted distances to all rows of xm
-###        xiIntact <- which(isntNA(xi))
-###        if (length(xiIntact) == 0) {
-###           warning(paste0('row ',i,': all NAs'))
-###           muhat[i] <- y[i]
-###           next
-###        }
-###        xii <- xi[xiIntact]
-###        # portion of 'data' corresonding to intact elets of xi, 
-###        # including xi itself (for convenience in row numbering)
-###        xiBoulevard <- xm[,xiIntact,drop=FALSE]
-###        # boulevard empty?
-###        if (sum(isntNA(xiBoulevard)) == 0) {
-###           warning(paste0('row ',i,': xiBoulevard empty'))
-###           muhat[i] <- y[i]
-###           next
-###        }
-###        # how many nonNAs do others have in common with xi?
-###        nonNAcounts <- apply(xiBoulevard,1,function(xrow) sum(isntNA(xrow)))
-###        usable <- which(nonNAcounts >= minNonNA)
-###        # note: usable includes xi itself
-###        if (length(usable) == 0) {
-###           warning(paste0('row ',i,': usable empty'))
-###           muhat[i] <- y[i]
-###           next
-###        }
-###        # keep only the ones with at least minNonNA non-NAs in common
-###        xiBoulevard <- xiBoulevard[usable,,drop=FALSE]
-###        # and the corresponding Y values
-###        correspondingY <- y[usable]
-###        dy <- NULL  # will be a matrix of distances from xi and Y vals
-###        # for each j among those having enough in common with xi,
-###        # find the distance from xi to the nonNAs of xj
-###        nrB <- nrow(xiBoulevard)
-###        for (j in 1:nrB) {
-###           xj <- xiBoulevard[j,]
-###           xjBlvdIntact <- which(isntNA(xj))
-###           dstij <- 
-###              sum(abs(xj[xjBlvdIntact] - xii[xjBlvdIntact])) /
-###                 length(xjBlvdIntact)
-###           dy <- rbind(dy,c(dstij,correspondingY[j]))
-###        }
-###        if (printDists) print(dy)
-###        q <- min(k,nrow(dy))
-###        tmp <- order(dy[,1])[1:q]
-###        muhat[i] <- mean(dy[tmp,2])
     }
-    res <- list(muhat=muhat,trainx=data[,-ycol],minNonNA=minNonNA)
-print('still need predictHoldout() code')
+    res <- 
+       list(muhat=muhat,trainx=data[,-ycol],minNonNA=minNonNA,
+          classif=classif,trainRow1=trainRow1)
     class(res) <- 'qeKNNna'
+    predictHoldout(res)
     res
 }
 
@@ -2355,6 +2311,10 @@ smoothKNNna <- function(newX,xMatrix,ymuhat,minNonNA,K)
                 length(xjBlvdIntact)
           dy <- rbind(dy,c(dstij,correspondingY[j]))
        }
+       # find nearest Y only among intacts
+       dy2NA <- which(is.na(dy[,2]))
+       dy <- dy[-dy2NA,]
+       correspondingY <- correspondingY[-dy2NA]
        q <- min(K,nrow(dy))
        tmp <- order(dy[,1])[1:q]
        mean(dy[tmp,2])
@@ -2365,17 +2325,25 @@ smoothKNNna <- function(newX,xMatrix,ymuhat,minNonNA,K)
 # args:
 
 #    object: output of qeKNNna()
-#    newx: data frame in same format as the non-yName portion of 'data'
-#       in qeKNNna()
+#    newx: 1-element data frame in same format as the non-
+#       yName portion of 'data' in qeKNNna()
 #    number of nearest neighbors, generally small, even 1, since it
 #       makes use of values already smoothed by qeKNNna()
 
 predict.qeKNNna <- function(object,newx,kPred=1) 
 {
 
-print('still need to convert from factors, etc.')
-   smoothKNNna(newx,object$trainx,object$muhat,object$minNonNA,kPred)
-
+   if (!regtools::allNumeric(newx)) 
+      newx <- factorToDummies(newx,omitLast=FALSE,
+         factorsInfo=object$factorsInfo)
+   classif <- object$classif
+   nr <- nrow(newx)
+   preds <- vector(length=nr)
+   for (i in 1:nr) {
+      preds[i] <- 
+         smoothKNNna(newx[i,],object$trainx,object$muhat,object$minNonNA,kPred)
+   }
+   preds
 }
 
 #######################  qeParallel()  ##############################
