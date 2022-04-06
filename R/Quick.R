@@ -1933,9 +1933,14 @@ predictHoldout <- defmacro(res,
          res$testAcc <- mean(preds$predClasses != tst[,ycol])
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
          res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
+         preds <- predict(res,trnx);
+         if (is.numeric(preds)) preds <- list(predClasses=preds)
+         res$trainAcc <- mean(preds$predClasses != trn[,ycol])
       } else {
          res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
+         predsTrn <- predict(res,trnx)
+         res$trainAcc <- mean(abs(predsTrn - trn[,ycol]),na.rm=TRUE)
       }
    }
 )
