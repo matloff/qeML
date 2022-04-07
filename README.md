@@ -1,6 +1,4 @@
-# The qeML package
-
-"Quick and easy" wrappers for machine learning packages in R.
+# The qeML package: "Quick and easy" wrappers for machine learning packages in R.
 
 Norm Matloff, UC Davis, *matloff@cs.ucdavis.edu*
 
@@ -12,37 +10,19 @@ Norm Matloff, UC Davis, *matloff@cs.ucdavis.edu*
 
     * easy for learners, convenient for experts
 
+* Special Feature for ML Learners
+
     * includes a tutorial on major ML methods
 
-* Large variety of ML algorithms
+* Special Features for ML Experts
 
-    * k-NN, dec. trees, random forests, gradient boosting,
-      SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs
+    * large variety of ML algorithms
 
-    * several different SVM versions
-
-    * several different random forests versions
-
-    * local linear k-NN, random forests
-
-    * feature-weighted k-NN
-
-    * optional preprocessing by PCA, UMAP
-
-    * linear using Penrose inverse
-
-    * polynomial linear, logistic, ridge, LASSO
-
-    * isotonic regression
-
-    * p-hacking-resistant hyperparameter tuning
-
-    * automated cross-validation, algorithm compare
-
-    * time series, text apps; **imageClassR** package (under
-      construction) calls qe-series in this package
+    * advanced plotting utilities, e.g. Double Descent
 
 ## Overview
+
+(Also see extensive Function List section below.)
 
 The letters 'qe' in the package title stand for "quick and easy,"
 alluding to the convenience goal of the package.  We bring together a
@@ -136,18 +116,92 @@ of the total variance.
 [1,] 31316
 ```
 
-## Application-specific functions (elementary)
+## Function list
 
-* **qeTS():**  Time series.
+* ML algorithms
 
-* **qeText()**  Text classification.
+    * **qeAdaBoost()**: Ada Boosting, wraps **Jousboost** pkg
 
-* **Image classification**  Our **imageClassR** package uses qe
-  functions for this.  (Under construction.)
+    * **qeDT()**: decision trees, wraps **party** pkg
 
-## Other functions
+    * **qeGBoost()**: gradient boosting, wraps **gbm** pkg
 
-* **qeFT():**  Grid search for hyperparameter tuning.
+    * **qeISO()**: isotonice regression
 
-* **qeCompare()**  Compare the accuracy various ML methods on the given dataset.
+    * **qeKNN()**: k-Nearest Neighbors, wraps **regtools** pkg; includes
+      predictor importance settings; allows linear interpolation within
+      a bin
+
+    * **qeKNNna()**: k-Nearest Neighbors for NA-ridden data, special
+      algorithm
+
+    * **qeLASSO()**: LASSO and ridge regression, wraps **glmment** pkg
+
+    * **qelightGBoost()**: gradient boosting, wraps **lightgbm** pkg
+
+    * **qeLin()**: wraps R's **lm()**; can be used for multiclass
+      classification, for speed
+
+    * **qeLogit()**: wraps R's **glm()**
+
+    * **qeNeural()**: wraps **keras** package, including CNN
+
+    * **qePolyLASSO()**: LASSO/ridge applied to polynomial regression;
+      wraps **glmnet**, **polyreg** pkgs
+
+    * **qePolyLin()**: polynomial regression on linear models;
+      uses Moore-Penrose inverse if overfitting; wraps **polyreg** pkg
+
+    * **qePolyLog()**: polynomial regression on logistic models;
+      wraps **polyreg** pkg
+
+    * **qeRF()**: random forests, wraps **randomforest** pkg
+
+    * **qeRFgrf**: random forests, wraps **grf** pkg; allows linear
+      interpolation within a bin
+
+    * **qeRFranger()**: random forests, wraps **ranger** pkg
+
+    * **qeskRF()**: random forests, wraps Python **Scilearn** pkg
+
+    * **qeskSVM()**: SVM, wraps Python **Scilearn** pkg
+
+    * **qeSVM()**: SVM, wraps **e1071** pkg
+
+    * **qeSVMliquid()**: SVM, wraps **liquid SVM** pkg
+
+    * k-NN, dec. trees, random forests, gradient boosting,
+      SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs
+
+* advanced operations
+
+    * **qeFT()**:  automted grid hyperparameter search, with
+    Bonferroni-Dunn corrected standard errors
+
+    * **qeDoubleD()**: computation and plotting for exploring Double Descent
+```
+
+* application-specific functions (elementary)
+
+    * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
+    
+    * **qeText()**  text classification
+
+    * **qeTS():**  time series
+    
+    * *Image classification*:  Our **imageClassR** package uses qe
+      functions for this.  (Under construction.)
+
+* utilities
+
+    * **qeCompare()**:  compare the accuracy various ML methods on a 
+      given dataset
+
+    * **qeParallel()**:  apply "Software Alchemy" to parallize
+      qe functions
+
+    * **qePCA()**:  apply PCA before running specified qe ML function
+
+    * **qeUMAP()**:  apply UMAP before running specified qe ML function
+
 
