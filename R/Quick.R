@@ -2311,7 +2311,6 @@ smoothKNNna <- function(newX,xMatrix,ymuhat,minNonNA,K)
           dy <- rbind(dy,c(dstij,correspondingY[j]))
        }
        # find nearest Y only among intacts
-       browser()
        dy2NA <- which(is.na(dy[,2]))
        if (length(dy2NA) > 0) {
           dy <- dy[-dy2NA,]
