@@ -9,17 +9,34 @@
 
 # arguments:
 
-#    data,yName:  as in other qe* functions
+#    qeFtnCall: quoted string; somewhere should include 'xPts[i]'
 #    xPts:  values on the X-axis showing where to run the code, e.g.
 #       degree of polynomial
 #    nReps: number of runs of the experiment
-#    qeName: name of qe* function to run
-#    qeArgs: R list showing the qe* ftn args to use INSTEAD of the
-#       default
 
 # will plot testAcc and trainAcc, in red and blue
 
-doubleD <- function(data,yName,xPts,nReps,qeName,qeArgs)
-{
+# example: 
 
+#    cmd <- 'qePolyLin(pef,"wageinc",deg=xPts[i]`)'
+#    z <- doubleD(cmd,c(1:4),100)
+
+doubleD <- function(qeFtnCall,xPts,nReps)
+{
+   warning('still experimental')
+   cmd <- paste0('tmp <- ',cmd,'; c(tmp$testAcc,tmp$trainAcc)')
+   res <- matrix(nrow=length(xPts),ncol=2)
+   tmp <- matrix(nrow=nReps,ncol=2)
+   colnames(res) <- c('testAcc','trainAcc')
+   for (i in 1:length(xPts)) {
+      # funny interaction error with replicMeans(); do "by hand"
+      ## tmp <- replicMeans(eval(parse(text=qeFtnCall)),nReps)
+      for (j in 1:nReps) {
+         tmpeval <- eval(parse(text=qeFtnCall))
+         tmp[j,] <- c(tmpeval$testAcc,tmpeval$trainAcc)
+      }
+      res[i,] <- colMeans(tmp)
+   }
+   res
 }
+
