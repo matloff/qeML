@@ -25,9 +25,10 @@ doubleD <- function(qeFtnCall,xPts,nReps)
 {
    warning('still experimental')
    cmd <- paste0('tmp <- ',cmd,'; c(tmp$testAcc,tmp$trainAcc)')
-   res <- matrix(nrow=length(xPts),ncol=2)
+   res <- matrix(nrow=length(xPts),ncol=3)
+   res[,1] <- xPts
    tmp <- matrix(nrow=nReps,ncol=2)
-   colnames(res) <- c('testAcc','trainAcc')
+   colnames(res) <- c('xPts','testAcc','trainAcc')
    for (i in 1:length(xPts)) {
       # funny interaction error with replicMeans(); do "by hand"
       ## tmp <- replicMeans(eval(parse(text=qeFtnCall)),nReps)
@@ -35,7 +36,7 @@ doubleD <- function(qeFtnCall,xPts,nReps)
          tmpeval <- eval(parse(text=qeFtnCall))
          tmp[j,] <- c(tmpeval$testAcc,tmpeval$trainAcc)
       }
-      res[i,] <- colMeans(tmp)
+      res[i,2:3] <- colMeans(tmp)
    }
    res
 }
