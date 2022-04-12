@@ -21,9 +21,10 @@
 #    cmd <- 'qePolyLin(pef,"wageinc",deg=xPts[i]`)'
 #    z <- doubleD(cmd,c(1:4),100)
 
-doubleD <- function(qeFtnCall,xPts,nReps)
+doubleD <- function(qeFtnCall,xPts,nReps,classif=FALSE)
 {
    warning('still experimental')
+   if (classif) stop('not set for classification problems yet')
    cmd <- paste0('tmp <- ',cmd,'; c(tmp$testAcc,tmp$trainAcc)')
    res <- matrix(nrow=length(xPts),ncol=3)
    res[,1] <- xPts
@@ -38,6 +39,17 @@ doubleD <- function(qeFtnCall,xPts,nReps)
       }
       res[i,2:3] <- colMeans(tmp)
    }
+   res <- list(outMatrix=res,qeFtnCall=qeFtnCall,xPts=xPts,nReps=nReps,
+      classif=classif)
+   class(res) <- 'doubleD'
    res
 }
 
+plot.doubleD <- function(obj,xLab='xPts') 
+{
+   z <- as.data.frame(obj$outMatrix)
+   yLab <- if (obj$classif) 'OPM' else 'MAPE'
+   plot(loess(testAcc ~ xPts,data=z),type='l',col='red',xlab=xLab)
+   lines(loess(trainAcc ~ xPts,data=z),col='blue')
+}
+   

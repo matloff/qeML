@@ -26,6 +26,7 @@ S3method(plot,qeLASSO)
 S3method(plot,qeRF)
 S3method(plot,qeDT)
 S3method(plot,qeFT)
+S3method(plot,doubleD)
 S3method(print,qeDT)
 S3method(predict,qePolyLASSO)
 S3method(predict,qeIso)
@@ -42,4 +43,5 @@ export(
    qePolyLin,qePolyLog,qePolyLASSO,qeSVMliquid,qeskSVM,
    qeParallel,qeIso,qeTS,qeText,buildQEcall,splitData,
    getRow1,predictHoldout,qelightGBoost,
-   checkNumericNames,prepend,makeAllNumeric,getXY)
+   checkNumericNames,prepend,makeAllNumeric,getXY,
+   doubleD)
