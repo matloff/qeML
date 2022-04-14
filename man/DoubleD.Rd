@@ -1,6 +1,6 @@
 \name{Double Descent}
 \alias{doubleD}
-\method{plot}{doubleD}(object,
+\alias{plot.doubleD}
 
 \title{Double Descent Phenomenon}
 
