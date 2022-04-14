@@ -2335,7 +2335,7 @@ predict.qeKNNna <- function(object,newx,kPred=1)
 {
 
    if (!regtools::allNumeric(newx)) 
-      newx <- factorToDummies(newx,omitLast=FALSE,
+      newx <- factorsToDummies(newx,omitLast=FALSE,
          factorsInfo=object$factorsInfo)
    classif <- object$classif
    nr <- nrow(newx)
