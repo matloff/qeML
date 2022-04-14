@@ -44,4 +44,4 @@ export(
    qeParallel,qeIso,qeTS,qeText,buildQEcall,splitData,
    getRow1,predictHoldout,qelightGBoost,
    checkNumericNames,prepend,makeAllNumeric,getXY,
-   doubleD)
+   doubleD,qeFOCI)
