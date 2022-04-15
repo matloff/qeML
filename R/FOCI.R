@@ -1,9 +1,10 @@
 
 # wrapper for the FOCI package
 
-qeFOCI <- function(data,yName) 
+qeFOCI <- function(data,yName,
+   numCores=parallel::detectCores(),parPlat="none")
 {
-   requireNamespace('FOCI')
+   require('FOCI')
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    if (!is.numeric(y)) stop('only numeric Y allowed')
@@ -17,6 +18,6 @@ qeFOCI <- function(data,yName)
       x <- x[,-ccx]
       warning('const cols removed')
    }
-   FOCI::foci(y,x)
+   FOCI::foci(y,x,numCores=numCores,parPlat=parPlat)
 }
 
