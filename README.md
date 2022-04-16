@@ -6,7 +6,7 @@ Norm Matloff, UC Davis, *matloff@cs.ucdavis.edu*
 
 * "Quick and Easy" ML
 
-    * simpler interface than **caret**, **mlr3** and **SuperML**
+    * much simpler interface than **caret**, **mlr3** and **SuperML**
 
     * easy for learners, convenient for experts
 
