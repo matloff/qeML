@@ -2244,7 +2244,7 @@ qeKNNna <- function(data,yName,k=25,
        list(muhat=muhat,trainx=data[,-ycol],minNonNA=minNonNA,
           classif=classif,trainRow1=trainRow1)
     class(res) <- 'qeKNNna'
-    predictHoldout(res)
+    if (!is.null(holdout)) predictHoldout(res)
     res
 }
 

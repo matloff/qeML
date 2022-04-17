@@ -37,6 +37,17 @@ that case are found, and their predicted values are averaged.
 
 }
 
+\examples{
+
+z <- qeKNNna(airquality,'Ozone',holdout=NULL)
+sum(is.na(airquality))  # 44 NAs, good test example
+# example of new case, insert an NA in 1st row
+aq2 <- airquality[2,-1]
+aq2$Wind <- NA
+predict(z,aq2)  # 32.68
+
+}
+
 \author{
 Norm Matloff
 }
