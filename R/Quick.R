@@ -2179,10 +2179,15 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    roc(ys,probs,plot=T,aug=T)
 }
 
+######################  qeToweranNA()  #############################
+
+# prediction for data having NAs; see 
+# https://github.com/matloff/toweranNA
+
 ######################  qeKNNna()  #############################
 
-# kNN for data having lots of NAs; one possible application is
-# recommender systems
+# kNN prediction for data having lots of NAs; one possible application
+# is recommender systems
 
 # arguments:
 
