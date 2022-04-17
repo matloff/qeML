@@ -34,6 +34,7 @@ S3method(predict,qePCA)
 S3method(predict,qeUMAP)
 S3method(predict,qeTS)
 S3method(predict,qeText)
+S3method(predict,qeKNNna)
 S3method(predict,qelightGBoost)
 
 export(
@@ -44,4 +45,4 @@ export(
    qeParallel,qeIso,qeTS,qeText,buildQEcall,splitData,
    getRow1,predictHoldout,qelightGBoost,
    checkNumericNames,prepend,makeAllNumeric,getXY,
-   doubleD,qeFOCI)
+   doubleD,qeFOCI,qeKNNna)
