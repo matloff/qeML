@@ -65,7 +65,7 @@ qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 qeLin(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 qeKNN(data,yName,k,scaleX=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
 qeRF(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
-qeRFranger(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
+qeRFranger(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))),   yYesName="") 
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))),
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
@@ -167,6 +167,8 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
      linear model.  Just use the linear model fit to the entire dataset.}
   \item{xShape}{Input X data shape, e.g. c(28,28) for 28x28 grayscale
      images.  Must be non-NULL if \code{conv} is.}
+  \item{yYesName}{For a binary classification problem, the value to
+     be considered "yes" in probability reports.}
 }
 
 \details{
