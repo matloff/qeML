@@ -412,7 +412,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    rfrout$classNames <- xyc$classNames
    rfrout$classif <- classif
    rfrout$trainRow1 <- getRow1(data,yName)
-   rfout$yYesName <- yYesName
+   rfrout$yYesName <- yYesName
    class(rfrout) <- c('qeRFranger','ranger')
    if (!is.null(holdout)) {
       predictHoldout(rfrout)
