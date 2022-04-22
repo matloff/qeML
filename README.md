@@ -1,8 +1,15 @@
 # The qeML package: "Quick and easy" wrappers for machine learning packages in R.
 
-Norm Matloff, UC Davis, *matloff@cs.ucdavis.edu*
+## "Easy for learners, powerful for experts"
+
+## Norm Matloff, UC Davis, 
+
+I am a professor of computer science, and a former professor of
+statistics, highly active in the areas of machine learning and
+statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 # What this package is about
+
 
 * "Quick and Easy" ML
 
@@ -173,7 +180,9 @@ of the total variance.
     * k-NN, dec. trees, random forests, gradient boosting,
       SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs
 
-* advanced operations
+* model-fitting
+
+    * **qeFOCI()**: fully nonparametric method for feature selection
 
     * **qeFT()**:  automted grid hyperparameter search, with
     Bonferroni-Dunn corrected standard errors
