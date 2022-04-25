@@ -1297,10 +1297,10 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
       qeout$whenEntered <- NA
    }
 
+   qeout$coefs <- coef(qeout)
    if (!classif) {
       glmout <- qeout$glmnet.fit
       bestIdx <- which.min(glmout$lambda)
-      qeout$bestBeta <- glmout$beta[,bestIdx]
    }
 
    class(qeout) <- c('qeLASSO',class(qeout))
