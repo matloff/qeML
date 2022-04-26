@@ -47,9 +47,8 @@
 
 \description{
 Quick access to machine learning methods, with a very simple
-interface.  Useful for convenient exploration of a dataset,
-both to gauge the predictive effectiveness of a model and to do simple
-prediction of new cases.  Just one call needed to fit, no preliminary
+interface.  "Works right out of the box!":
+Just one call needed to fit, no preliminary
 setup of model etc.  The simplicity also makes the series useful
 for teaching.  
 
@@ -198,56 +197,72 @@ then random forests:
       11 
 199.1714
 
+# many of the functions include algorithm-specific output
+> lassout <- qeLASSO(mlb,'Weight')
+holdout set has  101 rows
+> lassout$testAcc
+[1] 14.27337
+> lassout$coefs  # sparse result?
+10 x 1 sparse Matrix of class "dgCMatrix"
+                                    s1
+(Intercept)               -109.2909416
+Position.Catcher             0.4408752
+Position.First_Baseman       4.8308437
+Position.Outfielder          .        
+Position.Relief_Pitcher      .        
+Position.Second_Baseman     -0.7846501
+Position.Shortstop          -4.2291338
+Position.Starting_Pitcher    .        
+Height                       4.0039114
+Age                          0.5352793
+
 }
 
 The \code{holdout} argument triggers formation of a holdout set
 and the corresponding cross-validation evaluation of predictive power.
 Note that if a holdout is formed, the return value will consist of the
 fit on the training set, not on the full original dataset.
-Most of these functions are paired with a \code{predict} method.
-
-In most cases, the full basket of options in the wrapped function is not
-reflected.  Use of arguments not presented in the qe function requires
-direct use the relevant packages.
 
 The \code{qe*} functions do model fit.  Each of them has a
 \code{predict} method, and some also have a \code{plot} method.
-Arguments for \code{qe*} are at least: \code{data} and \code{yName};
-arguments for \code{predict} are at least: \code{object}, the return
-value from \code{qe*}, and \code{newx}, a data frame of points to be
-predicted.  In some cases, there are additional algorithm-specific
-parameters; default values are provided.
 
-An additional benefit is that the \code{predict} functions work
-correctly on new cases with R factors.  The proper levels are assigned
-to the new cases.  (Of course, if a new case has a level not in the
-original data, nothing can be done.)
+Arguments for \code{qe*} are at least: 
+
+\itemize{
+   \item \code{data} 
+   \item \code{yName} 
+   \item \code{holdout}
+}
+
+Typically there are also algorithm-specific hyperparameter arguments.
+
+Arguments for \code{predict} are at least:
+
+\itemize{
+   \item \code{object}, the return value from \code{qe*}
+   \item \code{newx}, a data frame of points to be predicted
+}
+
+For both the fitting function and the prediction function, there may be
+additional algorithm-specific parameters; default values are provided.
 
 Some notes on specific functions:
 
 \itemize{
 
-   \item The function \code{qeLin} handles classification problems as
-   multivariate-outcome linea models. If one's goal is prediction, it
-   can be much faster than \code{qeLogit}, often with comparable
-   accuracy.
+   \item The function \code{qeLin} handles not only the usual OLS models
+   but also classification problems as multivariate-outcome linear
+   models. If one's goal is prediction, it can be much faster than
+   \code{qeLogit}, often with comparable accuracy.
    
-   \item Several functions fit polynomial models.
-   The \code{qePolyLin} function does polynomial regression of the
-   indicated degree. In the above example degree 3 means all terms
-   through degree 3, e.g. \code{Height * Age^2}.  Dummy variables are
-   handled properly, e.g.  no powers of a dummy are generatd.  The
-   logistic polynomial regression version is \code{qePolyLog}, and there
-   is a LASSO version, \code{qePolyLASSO}.
+   \item Several functions fit polynomial models.  The \code{qePolyLin}
+   function does polynomial regression of the indicated degree. In the
+   above example degree 3 means all terms through degree 3, e.g.
+   \code{Height * Age^2}.  Dummy variables are handled properly, e.g.
+   no powers of a dummy are generatd.  The logistic polynomial
+   regression version is \code{qePolyLog}, and there is a LASSO version,
+   \code{qePolyLASSO}.
    
-   \item The \code{qeCompare} function does quick-and-easy
-   cross-validated comparisons among the \code{qe*} functions.  The same
-   holdout sets are generated and used by all the functions.  Default
-   values of hyperparameters of those functions can be set via
-   \code{opts}.  Hyperparameter tuning for a given \code{qe*} function
-   can be done using \code{qeFT}, a wrapper to the 
-   \code{regtools::fineTuning} function.  See also \code{replicMean}.
-
    \item Several SVM implementations are offered:  \code{qeSVM}
    wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
    uses the \pkg{liquidSVM} package; \code{qeskSVM} wraps \code{svm.SVC}
@@ -266,9 +281,6 @@ Some notes on specific functions:
    \code{qeGBoost} using the \code{gbm} package, and with
    \code{qelightGBoost} using \code{lightgbm}.
 
-   \item The functions \code{qeTS} and \code{qeText} handle time series
-   and text applications, respectively.
-
    \item Pre-mapping to lower-dimensional manifolds can be done via
    \code{qePCA} and \code{qeUMAP}.  For instance, the former will first
    extract the specified number of principal components, then fit the
@@ -277,6 +289,11 @@ Some notes on specific functions:
    
    \item The \code{qeIso} function is intended mainly for use as a
    smoothing method in calibration actions.  }
+
+In most cases, the full basket of options in the wrapped function is not
+reflected.  Use of arguments not presented in the qe function requires
+direct use the relevant packages.
+
 }
 
 \value{
