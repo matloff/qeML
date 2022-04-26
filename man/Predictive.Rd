@@ -1,4 +1,4 @@
-\name{qe-Series Wrappers}
+\name{qe-Series Predictive Functions}
 \alias{qeLogit}
 \alias{qeLin}
 \alias{qeKNN}
@@ -13,12 +13,9 @@
 \alias{qePolyLin}
 \alias{qePolyLog}
 \alias{qeIso}
-\alias{qeCompare}
+% \alias{qeCompare}
 \alias{qePCA}
 \alias{qeUMAP}
-\alias{qeFT}
-\alias{qeText}
-\alias{qeTS}
 \alias{qeskRF}
 \alias{qeskSVM}
 \alias{qeParallel}
@@ -40,8 +37,6 @@
 \alias{predict.qeIso}
 \alias{predict.qePCA}
 \alias{predict.qeUMAP}
-\alias{predict.qeText}
-\alias{predict.qeTS}
 \alias{predict.qeskRF}
 \alias{predict.qeskSVM}
 \alias{predict.qeParallel}
@@ -108,8 +103,6 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
 \method{predict}{qePoly}(object,newx)
 \method{predict}{qePCA}(object,newx)
 \method{predict}{qeUMAP}(object,newx)
-\method{predict}{qeText}(object,newx)
-\method{predict}{qeTS}(object,newx)
 \method{plot}{qeLASSO}(object,newx)
 \method{plot}{qeSVM}(object,newx,k=25)
 \method{plot}{qeRF}(object,newx)

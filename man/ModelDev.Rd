@@ -1,118 +1,26 @@
-\name{qe-Series Wrappers}
-\alias{qeLogit}
-\alias{qeLin}
-\alias{qeKNN}
-\alias{qeRF}
-\alias{qeRFranger}
-\alias{qeRFgrf}
-\alias{qeSVM}
-\alias{qeSVMliquid}
-\alias{qeGBoost}
-\alias{qeNeural}
-\alias{qeLASSO}
-\alias{qePolyLin}
-\alias{qePolyLog}
-\alias{qeIso}
+\name{FeatureModelSelect}
 \alias{qeCompare}
-\alias{qePCA}
-\alias{qeUMAP}
 \alias{qeFT}
 \alias{qeText}
 \alias{qeTS}
-\alias{qeskRF}
-\alias{qeskSVM}
-\alias{qeParallel}
 
-\alias{predict.qeLogit}
-\alias{predict.qeLin}
-\alias{predict.qeKNN}
-\alias{predict.qeRF}
-\alias{predict.qeRFranger}
-\alias{predict.qeRFgrf}
-\alias{predict.qeSVM}
-\alias{predict.qeSVMliquid}
-\alias{predict.qeGBoost}
-\alias{predict.qelightGBoost}
-\alias{predict.qeNeural}
-\alias{predict.qeLASSO}
-\alias{predict.qePolyLin}
-\alias{predict.qePolyLog}
-\alias{predict.qeIso}
-\alias{predict.qePCA}
-\alias{predict.qeUMAP}
 \alias{predict.qeText}
 \alias{predict.qeTS}
-\alias{predict.qeskRF}
-\alias{predict.qeskSVM}
-\alias{predict.qeParallel}
-\alias{plot.RF}
-\alias{plot.LASSO}
 
-\title{Quick-and-Easy Machine Learning Wrappers}
+\title{Feature Selection and Model Building}
 
 \description{
-Quick access to machine learning methods, with a very simple
-interface.  Useful for convenient exploration of a dataset,
-both to gauge the predictive effectiveness of a model and to do simple
-prediction of new cases.  Just one call needed to fit, no preliminary
-setup of model etc.  The simplicity also makes the series useful
-for teaching.  
-
+Utilties to help build models.
 }
 
 \usage{
-qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
-qeLin(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
-qeKNN(data,yName,k,scaleX=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
-qeRF(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
-qeRFranger(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))),   yYesName="") 
-qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
-   holdout=floor(min(1000,0.1*nrow(data))),
-   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
-qeskRF(data,yName,nTree=500,minNodeSize=10,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qelightGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeNeural(data,yName,hidden=c(100,100),nEpoch=30,
-   acts=rep("relu",length(hidden)),learnRate=0.001,
-   conv=NULL,xShape=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeLASSO(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
-qePolyLin(data,yName,deg=2,maxInteractDeg = deg,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qePolyLog(data,yName,deg=2,maxInteractDeg = deg,
-   holdout=floor(min(1000,0.1*nrow(data))))
 qeCompare(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
-qePCA(dataName,yName,qeName,opts=NULL,pcaProp,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
-   holdout=floor(min(1000,0.1*nrow(data))))
-\method{predict}{qeLogit}(object,newx)
-\method{predict}{qeLin}(object,newx)
-\method{predict}{qeKNN}(object,newx,newxK=1)
-\method{predict}{qeRF}(object,newx)
-\method{predict}{qeRFranger}(object,newx)
-\method{predict}{qeRFgrf}(object,newx)
-\method{predict}{qeSVM}(object,newx,k=25)
-\method{predict}{qeGBoost}(object,newx)
-\method{predict}{qelightGBoost}(object,newx)
-\method{predict}{qeNeural}(object,newx)
-\method{predict}{qeLASSO}(object,newx)
-\method{predict}{qePoly}(object,newx)
-\method{predict}{qePCA}(object,newx)
-\method{predict}{qeUMAP}(object,newx)
+qeText(data,kTop=50,stopWords=tm::stopwords("english"),
+   qeName,opts=NULL,holdout=floor(min(1000,0.1*nrow(data))))
+qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
 \method{predict}{qeText}(object,newx)
 \method{predict}{qeTS}(object,newx)
-\method{plot}{qeLASSO}(object,newx)
-\method{plot}{qeSVM}(object,newx,k=25)
-\method{plot}{qeRF}(object,newx)
 }
 
 \arguments{
