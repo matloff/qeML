@@ -13,6 +13,8 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 * "Quick and Easy" ML
 
+    * "Works right out of the box!"
+
     * much simpler interface than **caret**, **mlr3** and **SuperML**
 
     * easy for learners, convenient for experts
