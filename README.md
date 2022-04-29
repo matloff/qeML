@@ -1,4 +1,4 @@
-# The qeML package: "Quick and easy" wrappers for machine learning packages in R.
+# The qeML package: "Quick and easy" wrappers for machine learning in R
 
 ## "Easy for learners, powerful for experts"
 
@@ -15,9 +15,9 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
     * "Works right out of the box!"
 
-    * much simpler interface than **caret**, **mlr3** and **SuperML**
+    * much simpler interface than **tidymodels**, **caret**, **mlr3**, **superlearner**, **SuperML** etc.
 
-    * easy for learners, convenient for experts
+    * easy for learners, powerful/convenient for experts
 
 * Special Feature for ML Learners
 
@@ -25,7 +25,9 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 * Special Features for ML Experts
 
-    * large variety of ML algorithms
+    * variety of functions for dimension reduction and model development
+
+    * large variety of ML algorithms, including some unusual ones
 
     * advanced plotting utilities, e.g. Double Descent
 
