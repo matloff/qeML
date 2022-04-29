@@ -1,6 +1,10 @@
 
 # wrapper for the FOCI package
 
+# addition, NM, 4/28/2022: return not just the FOCI output but also the
+# modified version of 'data', consisting of only the columns suggested
+# by FOCI (and Y)
+
 qeFOCI <- function(data,yName,
    numCores=parallel::detectCores(),parPlat="none")
 {
@@ -18,6 +22,12 @@ qeFOCI <- function(data,yName,
       x <- x[,-ccx]
       warning('const cols removed')
    }
-   FOCI::foci(y,x,numCores=numCores,parPlat=parPlat)
+   FOCIout <- FOCI::foci(y,x,numCores=numCores,parPlat=parPlat)
+   selIdxs <- FOCIout$selectedVar$index
+   x <- x[,selIdxs]
+   newData <- as.data.frame(cbind(x,y))
+   names(newData)[ncol(newData)] <- yName
+   FOCIout$newData <- newData
+   FOCIout
 }
 
