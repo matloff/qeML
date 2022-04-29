@@ -102,7 +102,7 @@ about 16.7.
 
 One can skip this by setting the **holdout** argument to NULL.
 
-## Dimension reduction
+## Dimension reduction/Feature Selection
 
 One can preprocess the data, both when fitting the training data and
 later when predicting new cases.  For instance, consider the **pef**
@@ -245,15 +245,25 @@ be overly optimistic.
 
     * **qeFOCI()**: fully nonparametric method for feature selection
 
+    * **qeLASSO()**:  for fit and/or feature selection
+
+    * **qePCA()**:  find principal components, number specified by user,
+      then fit the resulting model, according to **qe*** function
+      specified by user
+
+    * **qeUMAP()**:  same as **qePCA()** but using UMAP
+
     * **qeFT()**:  automted grid hyperparameter search, with
     Bonferroni-Dunn corrected standard errors
 
-    * **qeDoubleD()**: computation and plotting for exploring Double Descent
-```
+    * **replicMeans()**: (from **regtools**, included in **qeML**)
+      averages output, e.g. **testAcc**, over many holdout sets
 
-* application-specific functions (elementary)
+    * **qeDoubleD()**: computation and plotting for exploring Double Descent
 
     * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
+
+* application-specific functions (elementary)
     
     * **qeText()**  text classification
 
