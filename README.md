@@ -64,9 +64,6 @@ specified, e.g.
 qeSVM(mlb,'Weight',gamma=0.8)
 ```
 
-(Only selected arguments are available.  Suggestions for additions are
-very welcome.)
-
 ## Prediction
 
 Each qe-series function is paired with a **predict** method, e.g.
@@ -106,14 +103,11 @@ One can skip this by setting the **holdout** argument to NULL.
 ## Dimension reduction
 
 One can preprocess the data, both when fitting the training data and
-later when predicting new cases, using either PCA or UMAP.  For
-instance, consider the **pef** dataset included with the package.  It
-consists of Census data on programmers and engineers in 2000.  We'll
-specify that we want as many principal components as will comprise 60%
-of the total variance.
+later when predicting new cases.  For instance, consider the **pef**
+dataset included with the package.  It consists of Census data on
+programmers and engineers in 2000.  
 
 ``` r
-> w <- qePCA('pef','wageinc','qeKNN',pcaProp=0.6,holdout=NULL)
 > head(pef)
        age     educ occ sex wageinc wkswrkd
 1 50.30082 zzzOther 102   2   75000      52
@@ -122,10 +116,69 @@ of the total variance.
 4 50.19951 zzzOther 100   1       0      52
 5 51.18112 zzzOther 100   2     160       1
 6 57.70413 zzzOther 100   1       0       0
+```
+
+First, let's try PCA.  The **qePCA()** function calculates the principal
+components, retains the major ones, then applies a specified ML method
+on the reduced dataset.  We'll specify that we want as many principal
+components as will comprise 60% of the total variance.
+
+``` r
+> w <- qePCA('pef','wageinc','qeKNN',pcaProp=0.6,holdout=NULL)
 > predict(w,pef[8,-5])
       [,1]
 [1,] 31316
 ```
+
+A much more powerful method of dimension reduction is FOCI (Feature
+Ordering by Conditional Independence).  We have a wrapper.
+
+Here we will use it on a 50K subset of the Million Songs dataset from
+the UCI Machine Language Data Repository.  The goal is to predict the
+year of release of the song, based on 90 different audio measurements.
+
+``` r
+> system.time(z <- qeFOCI(s50,'V1'))
+    user   system  elapsed
+1464.245   22.246  208.174
+```
+
+It can be time-consuming.  But it did reduce dimension:
+
+``` r
+> dim(s50)
+[1] 50000    91
+> dim(z$newData)
+[1] 50000     9
+```
+
+FOCI settled on a set of 9 of the original 90 predictors.
+
+Let's try predicting using random forests, say the **ranger** 
+version:
+
+``` r
+> w <- qeRFranger(z$newData,'V1')
+holdout set has  1000 rows
+Loading required package: ranger
+> w$testAcc
+[1] 6.661694
+> w$trainAcc
+[1] 3.39568
+> w$baseAcc
+[1] 8.169616
+
+```
+
+So, we seem to be able to predict release year of a song by about 6.7
+years on average.  If we were to simply use the overall average year as
+our prediction, on average we'd be off by about 8.2 years, so yes, the
+features do help.  Of course, we might try the same on the full 500K
+dataset, but used a subset here to save time.
+
+Note the tiny value of the training set accuracy, about 3.4 years!
+This is a great reminder of the fact that training set accuracy tends to
+be overly optimistic.
 
 ## Function list
 
