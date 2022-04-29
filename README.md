@@ -1,8 +1,8 @@
-# The qeML package: "Quick and easy" wrappers for machine learning in R
+# The qeML package: "Quick and easy" wrappers for machine learning
 
-## "Easy for learners, powerful for experts"
+### "Easy for learners, powerful for advanced users"
 
-## Norm Matloff, UC Davis, 
+### Norm Matloff, UC Davis,
 
 I am a professor of computer science, and a former professor of
 statistics, highly active in the areas of machine learning and
@@ -21,15 +21,17 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 * Special Feature for ML Learners
 
-    * includes a tutorial on major ML methods
+    * includes a **tutorial** on major ML methods
 
-* Special Features for ML Experts
+* Special Features for Those Experienced in  ML 
 
     * variety of functions for dimension reduction and model development
 
     * large variety of ML algorithms, including some unusual ones
 
     * advanced plotting utilities, e.g. Double Descent
+
+    * includes **tutorials** on special topics
 
 ## Overview
 
@@ -129,6 +131,8 @@ components as will comprise 60% of the total variance.
       [,1]
 [1,] 31316
 ```
+
+On average, our predictions were off about about $31K.
 
 A much more powerful method of dimension reduction is FOCI (Feature
 Ordering by Conditional Independence).  We have a wrapper.
@@ -237,7 +241,7 @@ be overly optimistic.
     * k-NN, dec. trees, random forests, gradient boosting,
       SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs
 
-* model-fitting
+* feature selection and model-fitting
 
     * **qeFOCI()**: fully nonparametric method for feature selection
 
