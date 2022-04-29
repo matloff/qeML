@@ -1298,6 +1298,12 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    }
 
    qeout$coefs <- coef(qeout)
+   coefMatrix <- as.matrix(z$coefs)
+   nonZeroIdxs <- which(coefMatrix != 0)
+   nonZeroNames <- names(coefmatrix[nonZeroIdxs,])[-1]  # exclude beta0
+   newdata <- data[,nonZeroNames]
+   qeout$newData <- newdata
+
    if (!classif) {
       glmout <- qeout$glmnet.fit
       bestIdx <- which.min(glmout$lambda)
