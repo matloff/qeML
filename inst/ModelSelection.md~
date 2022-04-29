@@ -82,17 +82,27 @@ few:
   that view official, though it is still a controversy.  See
   [this writeup in my **regtools** package](https://github.com/matloff/regtools/blob/master/inst/NoPVals.md).
 
-  It is long practice for many analysts to fit the full model, with all
+  It is classic practice for many analysts to fit the full model, with all
   p predictors, but then retain only the ones reported as "significant."
-  As a critic of p-values in general, I deplore this practice.
+  This for instance is available by calling **summary()** to the object
+  returned by **lm()**/**qeLin()**.
+
+  As a longtime critic of p-values in general, I deplore this practice.
   Nevertheless, they are "going in the right direction," in the sense
   that the smaller the p-value for the estimated &beta;<sub>i</sub>,
   the more useful the corresponging predictor may be in prediction.
 
   The problem is that ,**the classical 0.05 cutoff is not telling you
-  this.**  So, one might try a range of p-values, say 0.01, 0.05, 0.10,
-  ..., 0.50.  In each case, then predict the holdout set using the set
-  of retained predictors.
+  this.**  So, one might try a range of p-values.  One would first set
+  the threshhold at the smallest p-value, thus setting a 1-predictor
+  model, and test it on the holdout data.  Then one would set the
+  threshhold at the second-smallest p-value, thus a 2-predictor model,
+  then the third-smallest and so on.  Finally one would choose the model
+  with the best performance on the holdout set.
+
+  A variant would be to refit the model each time a predictor is added,
+  but otherwise use the same approach.  This is essentially *stepwise
+  regression*.
 
 ## A personal favorite
 
