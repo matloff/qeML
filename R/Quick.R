@@ -1298,10 +1298,13 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    }
 
    qeout$coefs <- coef(qeout)
-   coefMatrix <- as.matrix(z$coefs)
+   coefMatrix <- as.matrix(qeout$coefs)
    nonZeroIdxs <- which(coefMatrix != 0)
-   nonZeroNames <- names(coefmatrix[nonZeroIdxs,])[-1]  # exclude beta0
-   newdata <- data[,nonZeroNames]
+   nonZeroNames <- names(coefMatrix[nonZeroIdxs,])[-1]  # exclude beta0
+   newdata <- xm[,nonZeroNames]
+   newdata <- cbind(newdata,ym)
+   newdata <- as.data.frame(newdata)
+   names(newdata)[ncol(newdata)] <- names(data)[ycol]
    qeout$newData <- newdata
 
    if (!classif) {
