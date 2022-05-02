@@ -25,9 +25,9 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 * Special Features for Those Experienced in  ML 
 
-    * variety of functions for dimension reduction and model development
+    * variety of functions for feeature selection and model development
 
-    * large variety of ML algorithms, including some unusual ones
+    * large variety of ML algorithms, including some novel/unusual ones
 
     * advanced plotting utilities, e.g. Double Descent
 
@@ -71,13 +71,21 @@ qeSVM(mlb,'Weight',gamma=0.8)
 Each qe-series function is paired with a **predict** method, e.g.
 
 ``` r
-> z <- qeRF(mlb,'Position')
-> predict(z,mlb[8,-1])
+> mlb <- mlb[c('Position','Height','Weight','Age')]
+> predict(z,data.frame(Height=73,Weight=192,Age=28))
 $predClasses
-[1] "Catcher"
-...
-...
+[1] "Relief_Pitcher"
+
+$probs
+  Catcher First_Baseman Outfielder Relief_Pitcher Second_Baseman Shortstop
+1    0.05         0.078      0.178           0.51          0.034     0.026
+  Starting_Pitcher Third_Baseman
+1             0.11         0.014
+
 ```
+
+A player with these characteristics would be predicted to be a
+relief pitcher, with probability 0.51.
 
 ## Holdout sets
 
@@ -253,8 +261,8 @@ be overly optimistic.
 
     * **qeUMAP()**:  same as **qePCA()** but using UMAP
 
-    * **qeFT()**:  automted grid hyperparameter search, with
-    Bonferroni-Dunn corrected standard errors
+    * **qeFT()**:  automated grid hyperparameter search, *with
+    Bonferroni-Dunn corrected standard errors*
 
     * **replicMeans()**: (from **regtools**, included in **qeML**)
       averages output, e.g. **testAcc**, over many holdout sets
