@@ -8,7 +8,7 @@
 qeFOCI <- function(data,yName,
    numCores=parallel::detectCores(),parPlat="none")
 {
-   require('FOCI')
+   getSuggestedLib('FOCI')
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    if (!is.numeric(y)) stop('only numeric Y allowed')
