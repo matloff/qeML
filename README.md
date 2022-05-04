@@ -25,9 +25,9 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 * Special Features for Those Experienced in  ML 
 
-    * variety of functions for dimension reduction and model development
+    * variety of functions for feeature selection and model development
 
-    * large variety of ML algorithms, including some unusual ones
+    * large variety of ML algorithms, including some novel/unusual ones
 
     * advanced plotting utilities, e.g. Double Descent
 
@@ -43,18 +43,18 @@ variety of machine learning (ML) tools from standard R packages,
 providing wrappers with a simple, uniform interface.  Hence the term
 "quick and easy."
 
-For instance, consider the **mlb** data included in the package,
+For instance, consider the **mlb1** data included in the package,
 consisting of data on professional baseball players.  Say we wish to
 predict weight of a player.  For SVM, we would make the simple call
 
 ``` r
-qeSVM(mlb,'Weight')
+qeSVM(mlb1,'Weight')
 ```
 
 For gradient boosting, the call would be similar,
 
 ``` r
-qeGBoost(mlb,'Weight')
+qeGBoost(mlb1,'Weight')
 ```
 
 and so on.  It couldn't be easier!
@@ -63,21 +63,44 @@ Default values are used on the above calls, but nondefaults can be
 specified, e.g.
 
 ``` r
-qeSVM(mlb,'Weight',gamma=0.8)
+qeSVM(mlb1,'Weight',gamma=0.8)
 ```
 
 ## Prediction
 
 Each qe-series function is paired with a **predict** method, e.g.
+predict player weight:
 
 ``` r
-> z <- qeRF(mlb,'Position')
-> predict(z,mlb[8,-1])
-$predClasses
-[1] "Catcher"
-...
-...
+> data(mlb1)
+> z <- qeGBoost(mlb1,'Weight',holdout=NULL)
+> predict(z,data.frame(Position='Catcher',Height=73,Age=28))
+[1] 204.2406
 ```
+
+A catcher of height 73 and age 28 would be predicted to have weight
+about 204.
+
+Categorical variables can be predicted too.  Where possible,
+class probabilities are computed in addition to class:
+
+``` r
+> w <- qeGBoost(mlb1,'Position',holdout=NULL)
+> predict(w,data.frame(Height=73,Weight=185,Age=28))
+$predClasses
+[1] "Relief_Pitcher"
+
+$probs
+        Catcher First_Baseman Outfielder Relief_Pitcher Second_Baseman
+[1,] 0.02396515    0.03167778  0.2369061      0.2830575      0.1421796
+     Shortstop Starting_Pitcher Third_Baseman
+[1,] 0.0592867        0.1824601    0.04046717
+
+```
+
+A player of height 73, weight 185 and age 28
+would be predicted to be a
+relief pitcher, with probability 0.28.
 
 ## Holdout sets
 
@@ -85,22 +108,44 @@ By default, the qe functions reserve a holdout set on which to assess
 accuracy.  
 
 ``` r
-> z <- qeRF(mlb,'Weight')
+> z <- qeRF(mlb1,'Weight')
 holdout set has  101 rows
 Loading required package: randomForest
 randomForest 4.6-14
 Type rfNews() to see new features/changes/bug fixes.
 > z$testAcc
-[1] 13.32896
+[1] 14.45285
+> z$trainAcc
+[1] 8.23018
 > z$baseAcc
-[1] 16.68574
+[1] 17.22356
 ```
 
-The mean absolute prediction error was about 13.3; if one simply
-predicted every player using the overall mean weight, the MAPE would be
-about 16.7.
+The mean absolute prediction error on the holdout data was about 14.5
+pounds.  As is typical, it was much smaller on the training set, 8.2.
 
-One can skip this by setting the **holdout** argument to NULL.
+If one simply predicted every player using the overall mean weight, the
+MAPE would be about 17.2.
+
+One can skip holdout by setting the **holdout** argument to NULL.
+
+Of course, since the holdout set is random, the same is true for the
+accuracy numbers.  To gauge the predictedive power of a model over many
+holdout sets, one can use **replicMeans()**, which is
+available in qeML by automatic loading of the **regtools**
+package.  Say for 100 holdout sets:
+
+``` r
+> replicMeans(100,"qeRF(mlb1,'Weight')$testAcc")
+[1] 13.6354
+attr(,"stderr")
+[1] 0.1147791
+```
+
+So the true MAPE for this model on new data is estimated to be 13.6.
+The standard error is also output, to gauge whether 100 replicates is
+enough.
+
 
 ## Dimension reduction/Feature Selection
 
@@ -123,16 +168,21 @@ programmers and engineers in 2000.
 First, let's try PCA.  The **qePCA()** function calculates the principal
 components, retains the major ones, then applies a specified ML method
 on the reduced dataset.  We'll specify that we want as many principal
-components as will comprise 60% of the total variance.
+components as will comprise 60% of the total variance, and will use
+k-Nearest Neighbor analysis.
 
 ``` r
-> w <- qePCA('pef','wageinc','qeKNN',pcaProp=0.6,holdout=NULL)
-> predict(w,pef[8,-5])
-      [,1]
-[1,] 31316
+> data(pef)
+>  w <- qePCA(pef,'wageinc','qeKNN',pcaProp=0.6)
+holdout set has  1000 rows
+> w$testAcc
+[1] 24351.91
+> w$baseAcc
+[1] 31444.26
 ```
 
-On average, our predictions were off about about $31K.
+On average, our predictions were off about about $24K.  If we were to
+just predict using the overall mean income, MAPE would be about $31K.
 
 A much more powerful method of dimension reduction is FOCI (Feature
 Ordering by Conditional Independence).  We have a wrapper.
@@ -156,7 +206,7 @@ It can be time-consuming.  But it did reduce dimension:
 [1] 50000     9
 ```
 
-FOCI settled on a set of 9 of the original 90 predictors.
+FOCI settled on a set of 8 of the original 90 predictors.
 
 Let's try predicting using random forests, say the **ranger** 
 version:
@@ -180,7 +230,7 @@ our prediction, on average we'd be off by about 8.2 years, so yes, the
 features do help.  Of course, we might try the same on the full 500K
 dataset, but used a subset here to save time.
 
-Note the tiny value of the training set accuracy, about 3.4 years!
+Note again the tiny value of the training set accuracy, about 3.4 years!
 This is a great reminder of the fact that training set accuracy tends to
 be overly optimistic.
 
@@ -253,8 +303,8 @@ be overly optimistic.
 
     * **qeUMAP()**:  same as **qePCA()** but using UMAP
 
-    * **qeFT()**:  automted grid hyperparameter search, with
-    Bonferroni-Dunn corrected standard errors
+    * **qeFT()**:  automated grid hyperparameter search, *with
+    Bonferroni-Dunn corrected standard errors*
 
     * **replicMeans()**: (from **regtools**, included in **qeML**)
       averages output, e.g. **testAcc**, over many holdout sets
