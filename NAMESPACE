@@ -1,8 +1,10 @@
 
-importFrom("graphics", "abline", "matplot", "plot",'regtools')
+importFrom("graphics", "abline", "matplot", "plot")
 importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
              "var")
+importFrom('regtools','kNN', 'allNumeric', 'factorToDummies', 'charsToFactors',    'krsFit', 'predict.krsFit', 'penrosePoly', 'hasFactors', 'getDFclasses',
+    'checkNewLevels', 'confusion', 'fineTuning', 'plot.tuner')
 
 S3method(predict,qeLogit)
 S3method(predict,qeLin)
