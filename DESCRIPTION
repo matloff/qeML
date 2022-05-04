@@ -5,7 +5,7 @@ Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu",
    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")))
 Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
 Depends: R (>= 3.5.0),FNN,regtools (>= 0.8.0)
-Suggests: partykit,randomForest,ranger,grf,e1071,liquidSVM,gbm,JOUSBoost,
+Suggests: partykit,randomForest,ranger,grf,e1071,gbm,JOUSBoost,
    keras,neuralnet,polyreg,glmnet,Iso,gtools,umap,reticulate,party,pROC
 License: GPL (>= 2)
 Description: The letters 'qe' in the package title stand for "quick and
