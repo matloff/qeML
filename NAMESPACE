@@ -1,5 +1,5 @@
 
-importFrom("graphics", "abline", "matplot", "plot")
+importFrom("graphics", "abline", "matplot", "plot",'regtools')
 importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
              "var")
