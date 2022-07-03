@@ -252,8 +252,9 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   if (!is.null(expandVars) || !is.null(expandVals))
-      stop('expandVars not yet implemented; use kNN() directly')
+   # if (!is.null(expandVars) || !is.null(expandVals))
+   #    stop('expandVars not yet implemented; use kNN() directly')
+
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
@@ -268,10 +269,39 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       xy <- xyc$xy
       y <- xyc$yDumms
       classNames <- xyc$classNames
-   } 
+   }
 
+   # convert expandVars, expandVals according to possible creation of
+   # dummies
+   dta <- x[,expandVars,drop=FALSE]
+   dta <- rbind(expandVals,dta)
+   dta <- as.data.frame(dta)
+   tmp <- factorsToDummies(dta,omitLast=TRUE)
+   expandVars <- colnames(tmp)
+   expandVals <- tmp[1,]
+   # convert expandVars from names to column numbers (not efficient, but
+   # quick anyway)
+   for (i in 1:length(expandVars)) {
+      j <- which(expandVars[i] == colnames(x))
+      expandVars[i] <- j
+   }
+   expandVars <- as.numeric(expandVars)
+
+   # now, it appears that regtools::multCols() is lacking a drop=FALSE
+   # for the single-column case, let's do the expansion here, and not
+   # ask kNN() to do it
+   newMultCols <- function (x,cols,vals) {
+      partx <- x[,cols,drop=FALSE]
+      nvals <- length(vals)
+      x[,cols] <- partx %*% diag(vals,nrow=nvals,ncol=nvals)
+      x
+   }
+   xm <- newMultCols(xm,expandVars,expandVals)
+
+   ## knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=scaleX,classif=classif,
+   ##    smoothingFtn=smoothingFtn,expandVars=expandVars,expandVals=expandVals)
    knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=scaleX,classif=classif,
-      smoothingFtn=smoothingFtn,expandVars=expandVars,expandVals=expandVals)
+      smoothingFtn=smoothingFtn)
    if (classif) knnout$classNames <- classNames
    knnout$classif <- classif
    knnout$factorsInfo <- factorsInfo
