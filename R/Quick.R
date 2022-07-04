@@ -328,7 +328,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVals <- expandVals
    }
    class(knnout) <- c('qeKNN','kNN')
-   browser()
+browser()
    if (!is.null(holdout)) {
       predictHoldout(knnout)
       knnout$holdIdxs <- holdIdxs
@@ -345,13 +345,12 @@ newMultCols <- function (x,cols,vals) {
 
 predict.qeKNN <- function(object,newx,newxK=1)
 {
-browser()
    class(object) <- 'kNN'
    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
    classif <- object$classif
 
    if (!is.null(object$factorsInfo)) 
-      newx <- factorsToDummies(newx,object$factorsInfo)
+      newx <- factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
 
@@ -372,6 +371,9 @@ browser()
       newx <- multCols(newx,object$expandVars,object$expandVals)
 
    preds <- predict(object,newx,newxK)
+preds
+
+
    if (!object$classif) return(preds)
    probs <- preds
    predClasses <- round(probs) 
