@@ -277,10 +277,13 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       x <- data[,-ycol]
       y <- data[,ycol]
    }
+   # if holdout, x,y are now the training set
    
-   # if holdout, x,y now the training set
-   x <- factorsToDummies(x,omitLast=TRUE)
-   factorsInfo <- attr(x,'factorsInfo') 
+   if (!allNumeric(x)) {
+      x <- factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo') 
+   } else factorsInfo <- NULL
+
    xm <- as.matrix(x)
 
    if (scaleX) {
@@ -347,8 +350,8 @@ browser()
    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
    classif <- object$classif
 
-   if (length(object$factorsInfo) > 0) 
-      newx <- factorsToDummies(newx,factorsInfo)
+   if (!is.null(object$factorsInfo)) 
+      newx <- factorsToDummies(newx,object$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
 
