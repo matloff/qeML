@@ -375,6 +375,8 @@ preds
 
 
    if (!object$classif) return(preds)
+return(preds)
+
    probs <- preds
    predClasses <- round(probs) 
    yesYVal <- object$yesYVal
