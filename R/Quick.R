@@ -328,7 +328,6 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVals <- expandVals
    }
    class(knnout) <- c('qeKNN','kNN')
-browser()
    if (!is.null(holdout)) {
       predictHoldout(knnout)
       knnout$holdIdxs <- holdIdxs
