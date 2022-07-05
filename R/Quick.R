@@ -328,6 +328,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVals <- expandVals
    }
    class(knnout) <- c('qeKNN','kNN')
+browser()
    if (!is.null(holdout)) {
       predictHoldout(knnout)
       knnout$holdIdxs <- holdIdxs
@@ -2012,6 +2013,7 @@ predictHoldout <- defmacro(res,
             'rows removed from test set, due to new factor levels'))
       }
       preds <- predict(res,tstx);
+      listPreds <- is.list(preds)
       res$holdoutPreds <- preds;
       if (res$classif) {
          if (is.numeric(preds)) {
@@ -2025,7 +2027,7 @@ predictHoldout <- defmacro(res,
             preds <- list(predClasses=predClasses,probs=probs)
             if (!is.null(res$yesYVal)) predClasses <- predClasses01
          }
-         if (is.list(preds)) predClasses <- preds$predClasses
+         if (listPreds) predClasses <- preds$predClasses
          res$testAcc <- mean(predClasses != tst[,ycol])
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
          res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
