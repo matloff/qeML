@@ -328,7 +328,6 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVals <- expandVals
    }
    class(knnout) <- c('qeKNN','kNN')
-browser()
    if (!is.null(holdout)) {
       predictHoldout(knnout)
       knnout$holdIdxs <- holdIdxs
@@ -2002,11 +2001,9 @@ makeAllNumeric <- defmacro(x,data,
 
 predictHoldout <- defmacro(res,
    expr={
-      # ycol <- which(names(data) == yName);
       ycol <- which(names(tst) == yName);
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
-# start uncomment, NM, 4/27/22
       newLvls <- regtools:::checkNewLevels(trnx,tstx)
       if (length(newLvls) > 0) {
          tstx <- tstx[-newLvls,,drop=FALSE]
@@ -2014,17 +2011,27 @@ predictHoldout <- defmacro(res,
          warning(paste(length(newLvls),
             'rows removed from test set, due to new factor levels'))
       }
-# end uncomment, NM, 4/27/22
       preds <- predict(res,tstx);
       res$holdoutPreds <- preds;
       if (res$classif) {
-         if (is.numeric(preds)) preds <- list(predClasses=preds)
-         res$testAcc <- mean(preds$predClasses != tst[,ycol])
+         if (is.numeric(preds)) {
+            probs <- preds
+            predClasses <- round(probs)
+            predClasses01 <- predClasses
+            if (!is.null(res$yesYVal)) {
+               predClasses <- 
+                  ifelse(predClasses,res$yesYVal,res$noYVal)
+            } 
+            preds <- list(predClasses=predClasses,probs=probs)
+            if (!is.null(res$yesYVal)) predClasses <- predClasses01
+         }
+         if (is.list(preds)) predClasses <- preds$predClasses
+         res$testAcc <- mean(predClasses != tst[,ycol])
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
          res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
-         preds <- predict(res,trnx);
-         if (is.numeric(preds)) preds <- list(predClasses=preds)
-         res$trainAcc <- mean(preds$predClasses != trn[,ycol])
+         # if (is.numeric(preds)) preds <- list(probs=probs)
+         # fix trainAcc later
+         ### res$trainAcc <- mean(preds$predClasses != trn[,ycol])
       } else {
          res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
