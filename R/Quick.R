@@ -2004,6 +2004,7 @@ predictHoldout <- defmacro(res,
       ycol <- which(names(tst) == yName);
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
+      tsty <- tst[,ycol]
       newLvls <- regtools:::checkNewLevels(trnx,tstx)
       if (length(newLvls) > 0) {
          tstx <- tstx[-newLvls,,drop=FALSE]
@@ -2015,18 +2016,22 @@ predictHoldout <- defmacro(res,
       listPreds <- is.list(preds)
       res$holdoutPreds <- preds;
       if (res$classif) {
-         if (is.numeric(preds)) {
+         yesNo <- !is.null(res$yesYVal)
+         if (is.numeric(preds) && yesNo) {
+            yesNo01Class <- TRUE
             probs <- preds
             predClasses <- round(probs)
             predClasses01 <- predClasses
-            if (!is.null(res$yesYVal)) {
+            if (yesNo && is.numeric(tsty)) {
                predClasses <- 
                   ifelse(predClasses,res$yesYVal,res$noYVal)
-            } 
+            } else yesNo01Class <- FALSE
             preds <- list(predClasses=predClasses,probs=probs)
-            if (!is.null(res$yesYVal)) predClasses <- predClasses01
-         }
+            predClasses <- predClasses01
+            if (!is.numeric(
+         } 
          if (listPreds) predClasses <- preds$predClasses
+         if (is.numeric(data[,ycol] && yesNo
          res$testAcc <- mean(predClasses != tst[,ycol])
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
          res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
@@ -2034,6 +2039,7 @@ predictHoldout <- defmacro(res,
          # fix trainAcc later
          ### res$trainAcc <- mean(preds$predClasses != trn[,ycol])
       } else {
+         numericClassPreds <- FALSE
          res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
          predsTrn <- predict(res,trnx)
