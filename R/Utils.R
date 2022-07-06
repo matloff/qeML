@@ -45,14 +45,31 @@ makeAllNumeric <- defmacro(x,data,
    }
 ) 
 
-# do the predictions in the holdout set
+# does the predictions in the holdout set, also setting testAcc and
+# baseAcc, and checking for new levels of Y in the holdout set
+
+# ASSUMPTIONS:  
+
+#    this is for Y either in the regression setting or in the
+#    2-class classification setting;
+
+#    predict() will be called, returning preds
+
+#    in the regression setting, preds is numeric
+
+#    in the classification setting, it is assumed that
+
+#       preds is list(predicted class names,class probabilities) or
+
+#       preds is a vector of class probabilities; if so, it is
+#       assumed that yesYVal is defined
 
 # arguments:
 #    res: ultimate output of qe*()
 
 # global inputs (from the caller):
 
-#    tst: the holdout set
+#    trn, tst: training, holdout set
 #    data: arg in the qe*() function
 #    yName: arg in the qe*() function
 
@@ -78,40 +95,38 @@ predictHoldout <- defmacro(res,
          warning(paste(length(newLvls),
             'rows removed from test set, due to new factor levels'))
       }
+
       preds <- predict(res,tstx);
       listPreds <- is.list(preds)
-      res$holdoutPreds <- preds;
+      res$holdoutPreds <- preds
+
       if (res$classif) {
          yesNo <- !is.null(res$yesYVal)
-         if (is.numeric(preds) && yesNo) {
-            yesNo01Class <- TRUE
+         if (is.numeric(preds)) {
             probs <- preds
             predClasses <- round(probs)
-            predClasses01 <- predClasses
-            if (yesNo && is.numeric(tsty)) {
+            if (is.numeric(tsty)) {
                predClasses <- 
                   ifelse(predClasses,res$yesYVal,res$noYVal)
-            } else yesNo01Class <- FALSE
-            preds <- list(predClasses=predClasses,probs=probs)
-            predClasses <- predClasses01
-            if (!is.numeric(
+               if (is.numeric(tsty)) 
+                  tsty <- ifelse(tsty,res$yesYVal,res$noYVal)
+               preds <- list(predClasses=predClasses,probs=probs)
+            } 
          } 
          if (listPreds) predClasses <- preds$predClasses
-         if (is.numeric(data[,ycol] && yesNo
-         res$testAcc <- mean(predClasses != tst[,ycol])
+         # at this point, predClasses should be an R factor in either
+         # case re preds; same for tsty
+         res$testAcc <- mean(predClasses != tsty)
          res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
-         res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
-         # if (is.numeric(preds)) preds <- list(probs=probs)
-         # fix trainAcc later
-         ### res$trainAcc <- mean(preds$predClasses != trn[,ycol])
-      } else {
+         # res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
+      } else {  # regression case
          numericClassPreds <- FALSE
          res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
          predsTrn <- predict(res,trnx)
          res$trainAcc <- mean(abs(predsTrn - trn[,ycol]),na.rm=TRUE)
       }
-   }
+   }  # end of expr= for the macro
 )
 
 
