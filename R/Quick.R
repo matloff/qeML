@@ -179,7 +179,8 @@ predict.qeLogit <- function(object,newx)
 # arguments:  see above
 # value:  object of class 'qeLin' -- lm() output object, plus misc.
 
-qeLin <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
+qeLin <- function(data,yName,noBeta0=FALSE,
+   holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
@@ -194,7 +195,8 @@ qeLin <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
       xy <- data
       yNames <- yName
    }
-   cmd <- paste0('lmout <- lm(cbind(',yNames,') ~ .,data=xy)')
+   minus1 <- if (noBeta0) ' -1' else ''
+   cmd <- paste0('lmout <- lm(cbind(',yNames,') ~ .',minus1,',data=xy)')
    eval(parse(text=cmd))
    lmout$classif <- classif 
    lmout$trainRow1 <- getRow1(data,yName)
