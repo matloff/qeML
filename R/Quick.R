@@ -219,9 +219,9 @@ qeLin <- function(data,yName,noBeta0=FALSE,
 
 # value:  see above
 
-predict.qeLin <- function(object,newx) {
+predict.qeLin <- function(object,newx,useTrainRow1=TRUE) {
    class(object) <- class(object)[-1]
-   newx <- setTrainFactors(object,newx)
+   if (useTrainRow1) newx <- setTrainFactors(object,newx)
    preds <- predict(object,newx)
    if (!object$classif) return(preds)
    probs <- pmax(preds,0)
