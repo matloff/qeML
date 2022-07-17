@@ -95,22 +95,25 @@ qeLogit <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    yDumms <- xyc$yDumms
    y <- xyc$y
    classNames <- xyc$classNames
-   nClass <- length(classNames)
    ncxy <- ncol(xy)
    nx <- ncol(x)
    nydumms <- ncxy - nx
    empirClassProbs <- colMeans(yDumms)
    outlist <- 
       list(x=x,y=y,classNames=classNames,empirClassProbs=empirClassProbs)
+   # One-vs-All setup, with doGlm() applied to each subanalysis
    doGlm <- function(colI) 
    {
       tmpDF <- cbind(x,yDumms[,colI])
       names(tmpDF)[nx+1] <- 'yDumm'
       glmout <- glm(yDumm ~ .,data=tmpDF,family=binomial)
    }
-   outlist$glmOuts <- lapply(1:nydumms,doGlm)
+   nSubanalyses <- 
+      if (nydumms == 2) 1 else nydumms
+   outlist$glmOuts <- lapply(1:nSubanalyses,doGlm)
    outlist$classif <- classif
    outlist$trainRow1 <- getRow1(data,yName)
+   outlist$nClasses <- nydumms
    class(outlist) <- c('qeLogit')
    if (!is.null(holdout)) {
       predictHoldout(outlist)
@@ -134,12 +137,19 @@ predict.qeLogit <- function(object,newx)
    g <- function(glmOutsElt) predict(glmOutsElt,newx,type='response') 
    probs <- sapply(glmOuts,g)
    if (is.vector(probs)) probs <- matrix(probs,nrow=1)
+
+   # if > 2 classes, separate logits for the m classes will not
+   # necessrily sum to 1, so normalize
+
+   if (object$nClasses > 2) {
+      sumprobs <- apply(probs,1,sum)  
+      probs <- (1/sumprobs) * probs
+   } else {
+      probs <- cbind(probs[,1],1-probs[,1])
+      colnames(probs) <- object$classNames
+   }
    classNames <- object$classNames
    colnames(probs) <- classNames
-   # separate logits for the m classes will not necessrily sum to 1, so
-   # normalize
-   sumprobs <- apply(probs,1,sum)  
-   probs <- (1/sumprobs) * probs
    predClasses <- apply(probs,1,which.max) 
    predClasses <- classNames[predClasses]
    list(predClasses=predClasses,probs=probs)
