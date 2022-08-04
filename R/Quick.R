@@ -101,7 +101,8 @@ qeLogit <-
    nydumms <- ncxy - nx
    # check for 2-class case
    if (nydumms == 2 && !is.null(yesYVal))
-      yDumms[,1] <- as.integer(yDumms[,1] == yesYVal)
+      yesYCol <- which(colnames(yDumms) == yesYVal)
+      yDumms[,1] <- yDumms[yesYCol]
    empirClassProbs <- colMeans(yDumms)
    outlist <- 
       list(x=x,y=y,classNames=classNames,empirClassProbs=empirClassProbs)
