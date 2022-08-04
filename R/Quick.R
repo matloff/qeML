@@ -84,7 +84,8 @@
 
 #    list of glm() output objects, one per class, and some misc.
 
-qeLogit <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
+qeLogit <- 
+   function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
    classif <- is.factor(data[[yName]])
    if (!classif) {print('for classification problems only'); return(NA)}
@@ -98,6 +99,9 @@ qeLogit <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    ncxy <- ncol(xy)
    nx <- ncol(x)
    nydumms <- ncxy - nx
+   # check for 2-class case
+   if (nydumms == 2 && !is.null(yesYVal))
+      yDumms[,1] <- as.integer(yDumms[,1] == yesYVal)
    empirClassProbs <- colMeans(yDumms)
    outlist <- 
       list(x=x,y=y,classNames=classNames,empirClassProbs=empirClassProbs)
@@ -114,6 +118,7 @@ qeLogit <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    outlist$classif <- classif
    outlist$trainRow1 <- getRow1(data,yName)
    outlist$nClasses <- nydumms
+   outlist$yesYVal <- yesYVal
    class(outlist) <- c('qeLogit')
    if (!is.null(holdout)) {
       predictHoldout(outlist)
