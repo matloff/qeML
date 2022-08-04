@@ -453,14 +453,16 @@ plot.qeRF <- function(object)
 #########################  qeRFranger()  #################################
 
 # if wish to specify a set of features to be less likely to be involved
-# in node splitting, specify their names in 'deweightNames', and specify a
-# value v in 'deweightVal'; the vector wts, in order of the feature names
-# in 'data', will initially be set to v for the features to be
-# deweighted, and 1 for the other features; then v will be normalized to
-# sum to 1, and used as split.select.weights in the call to ranger()
- 
+# in node splitting, so specify in deweightPars, and R list.
+# For instance, list(age=0.2,gender=0.5)
+
+# All this goes into the ranger()'s 'split.select.weights' argument.
+# This is done by scaling the weights in deweightPars:  Initially, all
+# the weights are 1.0 except for those in deweightPars; then all is
+# scaled to sum to 1.0.
+
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
-   mtry=floor(sqrt(ncol(data)))+1,deweightNames=NULL,deweightVal=NULL,
+   mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),yYesName='')
 {
    classif <- is.factor(data[[yName]])
@@ -483,14 +485,16 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    require(ranger)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
-   if (!is.null(deweightNames)) {
+   if (!is.null(deweightPars)) {
       dataNames <- names(data)
       yCol <- which(dataNames == yName)
       xNames <- dataNames[-yCol]
       numX <- length(xNames)
       wts <- rep(1,numX)
       names(wts) <- xNames
-      wts[deweightNames] <- deweightVal
+      deweightNames <- names(deweightPars)
+      deweightVals <- unlist(deweightPars)
+      wts[deweightNames] <- deweightVals
       wts <- wts / sum(wts)
       split.select.weights <- wts
    } else split.select.weights <- NULL
