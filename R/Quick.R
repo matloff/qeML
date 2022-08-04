@@ -87,8 +87,16 @@
 qeLogit <- 
    function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
-   classif <- is.factor(data[[yName]])
+   data <- na.exclude(data)
+   dataY <- data[[yName]]
+   classif <- is.factor(dataY)
+   if (classif && length(levels(dataY)) == 2)
+      if (is.null(yesYVal)) 
+         stop('must specify yesYVal in 2-class problems')
    if (!classif) {print('for classification problems only'); return(NA)}
+   yLevels <- levels(dataY)
+   whichYes <- which(yLevels == yesYVal)
+   noYVal <- yLevels[3 - whichYes]
    if (!is.null(holdout)) splitData(holdout,data)
    xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE) 
    xy <- xyc$xy
@@ -100,9 +108,12 @@ qeLogit <-
    nx <- ncol(x)
    nydumms <- ncxy - nx
    # check for 2-class case
-   if (nydumms == 2 && !is.null(yesYVal))
-      yesYCol <- which(colnames(yDumms) == yesYVal)
-      yDumms[,1] <- yDumms[yesYCol]
+   if (nydumms == 2) {
+      ### yesYCol <- which(colnames(yDumms) == yesYVal)
+      ### yDumms[,1] <- yDumms[yesYCol]
+      trnDataY <- dataY[-holdIdxs]
+      yDumms[,1] <- as.integer(trnDataY == yesYVal)
+   }
    empirClassProbs <- colMeans(yDumms)
    outlist <- 
       list(x=x,y=y,classNames=classNames,empirClassProbs=empirClassProbs)
@@ -120,6 +131,7 @@ qeLogit <-
    outlist$trainRow1 <- getRow1(data,yName)
    outlist$nClasses <- nydumms
    outlist$yesYVal <- yesYVal
+   outlist$noYVal <- noYVal
    class(outlist) <- c('qeLogit')
    if (!is.null(holdout)) {
       predictHoldout(outlist)
@@ -150,14 +162,13 @@ predict.qeLogit <- function(object,newx)
    if (object$nClasses > 2) {
       sumprobs <- apply(probs,1,sum)  
       probs <- (1/sumprobs) * probs
+      classNames <- object$classNames
+      colnames(probs) <- classNames
+      predClasses <- apply(probs,1,which.max) 
+      predClasses <- classNames[predClasses]
    } else {
-      probs <- cbind(probs[,1],1-probs[,1])
-      colnames(probs) <- object$classNames
+      predClasses <- ifelse(probs >= 0.5,object$yesYVal,object$noYVal)
    }
-   classNames <- object$classNames
-   colnames(probs) <- classNames
-   predClasses <- apply(probs,1,which.max) 
-   predClasses <- classNames[predClasses]
    list(predClasses=predClasses,probs=probs)
 }
 
