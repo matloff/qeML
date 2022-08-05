@@ -95,8 +95,10 @@ qeLogit <-
          stop('must specify yesYVal in 2-class problems')
    if (!classif) {print('for classification problems only'); return(NA)}
    yLevels <- levels(dataY)
-   whichYes <- which(yLevels == yesYVal)
-   noYVal <- yLevels[3 - whichYes]
+   if(length(yLevels) == 2) {
+      whichYes <- which(yLevels == yesYVal)
+      noYVal <- yLevels[3 - whichYes]
+   }
    if (!is.null(holdout)) splitData(holdout,data)
    xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE) 
    xy <- xyc$xy
@@ -109,12 +111,14 @@ qeLogit <-
    nydumms <- ncxy - nx
    # check for 2-class case
    if (nydumms == 2) {
-      ### yesYCol <- which(colnames(yDumms) == yesYVal)
-      ### yDumms[,1] <- yDumms[yesYCol]
-      trnDataY <- dataY[-holdIdxs]
-      yDumms[,1] <- as.integer(trnDataY == yesYVal)
+      tmp <- dataY[-holdIdxs]  # an R factor
+      # tmp <- as.numeric(as.character(tmp))
+      tmp <- ifelse(tmp == yesYVal,1,0)
+      yDumms <- data.frame(y=tmp)
+      empirClassProbs <- mean(tmp)
+   } else {
+      empirClassProbs <- colMeans(yDumms)
    }
-   empirClassProbs <- colMeans(yDumms)
    outlist <- 
       list(x=x,y=y,classNames=classNames,empirClassProbs=empirClassProbs)
    # One-vs-All setup, with doGlm() applied to each subanalysis
@@ -131,7 +135,7 @@ qeLogit <-
    outlist$trainRow1 <- getRow1(data,yName)
    outlist$nClasses <- nydumms
    outlist$yesYVal <- yesYVal
-   outlist$noYVal <- noYVal
+   if (nydumms == 2) outlist$noYVal <- noYVal
    class(outlist) <- c('qeLogit')
    if (!is.null(holdout)) {
       predictHoldout(outlist)
