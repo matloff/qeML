@@ -111,8 +111,9 @@ qeLogit <-
    nydumms <- ncxy - nx
    # check for 2-class case
    if (nydumms == 2) {
-      tmp <- dataY[-holdIdxs]  # an R factor
-      # tmp <- as.numeric(as.character(tmp))
+      tmp <- 
+         if (!is.null(holdout)) dataY[-holdIdxs] else dataY
+      # tmp is an R factor
       tmp <- ifelse(tmp == yesYVal,1,0)
       yDumms <- data.frame(y=tmp)
       empirClassProbs <- mean(tmp)
