@@ -6,12 +6,16 @@
 # by FOCI (and Y)
 
 qeFOCI <- function(data,yName,
-   numCores=parallel::detectCores(),parPlat="none")
+   numCores=parallel::detectCores(),parPlat="none",yesYLevel=NULL)
 {
    getSuggestedLib('FOCI')
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
-   if (!is.numeric(y)) stop('only numeric Y allowed')
+   if (!is.numeric(y)) {
+      if (is.factor(y) && !is.null(yesYLevel)) {
+         y <- as.integer(y == yesYLevel)
+      } else stop('Y must be numeric, or factor with yesYLevel defined')
+   }
    x <- data[,-ycol]
    if (!allNumeric(x)) {
       x <- factorsToDummies(x,omitLast=TRUE)
