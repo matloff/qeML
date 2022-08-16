@@ -737,49 +737,50 @@ predict.qeSVM <- function (object, newx)
 #    plot(object,object$data,formula)
 # }
 
-#########################  qeSVMliquid()  #################################
-
-# uses liquidSVM package
-
-# arguments:  see above, plus
-
-#     gamma: scale param, e.g. sd of radial basis ftn
-#     cost: the SVM "C" parameter penalizing nonseparable data
-
-# value:  see above
- 
-qeSVMliquid <- function(data,yName,gamma=1.0,cost=1.0,
-   allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
-{
-   classif <- is.factor(data[[yName]])
-   if (!classif) {print('for classification problems only'); return(NA)}
-   if (!is.null(holdout)) splitData(holdout,data)
-   require(liquidSVM)
-   ycol <- which(names(data) == yName)
-   x <- data[,-ycol,drop=FALSE]
-   y <- data[,ycol]
-   svmout <- 
-      if (allDefaults) mcSVM(x,y)  
-      else mcSVM(x,y,c_values=cost,gammas=gamma)  
-   # svmout is of S4 ref class, causing some issues, including the
-   # cross-val, where can't use our usual predictHoldout()
-   res <- list(classif=classif,yName=yName,svmout=svmout)
-   if (!is.null(holdout)) {
-      preds <- predict(svmout,tst[,-ycol,drop=FALSE])     
-      res$holdoutPreds <- preds
-      res$testAcc <- mean(preds != tst[,ycol])
-      res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
-      res$holdIdxs <- holdIdxs
-   }
-   class(res) <- 'qeSVMliquid'
-   res
-}
-
-predict.qeSVMliquid <- function(object,newx)
-{
-   require(liquidSVM)
-   predict(object$svmout,newx)
-}
+## ## liquidSVM apparently no longer available
+## ## #########################  qeSVMliquid()  #################################
+## ## 
+## ## # uses liquidSVM package
+## ## 
+## ## # arguments:  see above, plus
+## ## 
+## ## #     gamma: scale param, e.g. sd of radial basis ftn
+## ## #     cost: the SVM "C" parameter penalizing nonseparable data
+## ## 
+## ## # value:  see above
+## ##  
+## ## qeSVMliquid <- function(data,yName,gamma=1.0,cost=1.0,
+## ##    allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
+## ## {
+## ##    classif <- is.factor(data[[yName]])
+## ##    if (!classif) {print('for classification problems only'); return(NA)}
+## ##    if (!is.null(holdout)) splitData(holdout,data)
+## ##    require(liquidSVM)
+## ##    ycol <- which(names(data) == yName)
+## ##    x <- data[,-ycol,drop=FALSE]
+## ##    y <- data[,ycol]
+## ##    svmout <- 
+## ##       if (allDefaults) mcSVM(x,y)  
+## ##       else mcSVM(x,y,c_values=cost,gammas=gamma)  
+## ##    # svmout is of S4 ref class, causing some issues, including the
+## ##    # cross-val, where can't use our usual predictHoldout()
+## ##    res <- list(classif=classif,yName=yName,svmout=svmout)
+## ##    if (!is.null(holdout)) {
+## ##       preds <- predict(svmout,tst[,-ycol,drop=FALSE])     
+## ##       res$holdoutPreds <- preds
+## ##       res$testAcc <- mean(preds != tst[,ycol])
+## ##       res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
+## ##       res$holdIdxs <- holdIdxs
+## ##    }
+## ##    class(res) <- 'qeSVMliquid'
+## ##    res
+## ## }
+## ## 
+## ## predict.qeSVMliquid <- function(object,newx)
+## ## {
+## ##    require(liquidSVM)
+## ##    predict(object$svmout,newx)
+## ## }
 
 #########################  qeGBoost()  #################################
 

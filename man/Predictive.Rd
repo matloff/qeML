@@ -6,7 +6,6 @@
 \alias{qeRFranger}
 \alias{qeRFgrf}
 \alias{qeSVM}
-\alias{qeSVMliquid}
 \alias{qeGBoost}
 \alias{qeNeural}
 \alias{qeLASSO}
@@ -27,7 +26,6 @@
 \alias{predict.qeRFranger}
 \alias{predict.qeRFgrf}
 \alias{predict.qeSVM}
-\alias{predict.qeSVMliquid}
 \alias{predict.qeGBoost}
 \alias{predict.qelightGBoost}
 \alias{predict.qeNeural}
@@ -263,11 +261,10 @@ Some notes on specific functions:
    regression version is \code{qePolyLog}, and there is a LASSO version,
    \code{qePolyLASSO}.
    
-   \item Several SVM implementations are offered:  \code{qeSVM}
-   wraps the SVM algorithm in the \pkg{e1071} package; \code{qeSVMliquid}
-   uses the \pkg{liquidSVM} package; \code{qeskSVM} wraps \code{svm.SVC}
-   in the Python \pkg{sklearn}.  (Both \code{qeSVM} and \code{qeskSVM}
-   use the \code{libsvm} C library.)
+   \item Several SVM implementations are offered:  \code{qeSVM} wraps
+   the SVM algorithm in the \pkg{e1071} package; \code{qeskSVM} wraps
+   \code{svm.SVC} in the Python \pkg{sklearn}.  (Both \code{qeSVM} and
+   \code{qeskSVM} use the \code{libsvm} C library.)
 
    \item Several random forests implementations are offered:
    \code{qeRF} wraps \code{randomForest} in the package of the same name; 
