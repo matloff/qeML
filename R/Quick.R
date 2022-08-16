@@ -437,7 +437,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
 {
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   require(randomForest)
+   requireNamespace(randomForest)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
    rfout <- randomForest(frml,data=data,
@@ -504,7 +504,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       }
    }
    if (!is.null(holdout)) splitData(holdout,data)
-   require(ranger)
+   requireNamespace(ranger)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
    if (!is.null(deweightPars)) {
@@ -1089,7 +1089,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
       hidden <- as.numeric(strsplit(hidden,',')[[1]])
 
    classif <- is.factor(data[[yName]])
-   require(keras)
+   requireNamespace(keras)
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1174,7 +1174,7 @@ qeNeuralNet <- function(data,yName,hidden=c(5),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
-   require(neuralnet)
+   requireNamespace(neuralnet)
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1254,7 +1254,7 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
    data <- as.data.frame(data)
    names(data)[ncol(data)] <- yName
 
-   require(polyreg)
+   requireNamespace(polyreg)
    qeout <- regtools::penrosePoly(d=data,yName=yName,deg=deg,maxInteractDeg)
    qeout$x <- x
    qeout$y <- y
@@ -1298,7 +1298,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol,drop=FALSE]
-   require(polyreg)
+   requireNamespace(polyreg)
    polyout <- getPoly(x,deg)
    requireNamespace(glmnet)
    glmx <- as.matrix(polyout$xdata)
@@ -1354,7 +1354,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
       splitData(holdout,data)
    }
 
-   require(polyreg)
+   requireNamespace(polyreg)
    if (!checkPkgVersion('polyreg','0.7'))
       stop('polyreg must be of version >= 1.7')
       
@@ -1382,7 +1382,7 @@ predict.qePolyLog <- function(object,newx)
 
 qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 {
-   require(glmnet)
+   requireNamespace(glmnet)
    ycol <- which(names(data) == yName)
    if (!is.null(holdout)) splitData(holdout,data)
    y <- data[,ycol]
@@ -1586,7 +1586,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
    nComps=NULL,nNeighbors=NULL)
 {
-   require(umap)
+   requireNamespace(umap)
 
    # eventual return value
    res <- list()
@@ -1779,7 +1779,7 @@ predict.qeText <- function(object,newDocs)
 qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   require(reticulate)
+   requireNamespace(reticulate)
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1845,7 +1845,7 @@ predict.qeskRF <- function(object,newx)
 qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   require(reticulate)
+   requireNamespace(reticulate)
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -2075,7 +2075,7 @@ qeDT <- function(data,yName,
    mincriterion <- 1 - alpha
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   require(party)
+   requireNamespace(party)
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
    ctrl <- ctree_control(mincriterion=mincriterion,minsplit=minsplit,
@@ -2196,7 +2196,7 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
-   require(pROC)
+   requireNamespace(pROC)
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    ys <- as.factor(holdY == yLevelName)
