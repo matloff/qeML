@@ -1,7 +1,7 @@
 
 # macros
 
-require(gtools)
+requireNamespace(gtools)
 
 # standard split into training, test sets
 

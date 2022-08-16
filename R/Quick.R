@@ -580,7 +580,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    if (!is.null(holdout)) splitData(holdout,data)
 
    # start the computation
-   require(grf)
+   requireNamespace(grf)
    xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif,makeYdumms=TRUE)
    x <- as.matrix(xyc$x)
    y <- xyc$y
@@ -690,7 +690,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     }
     if (!is.null(holdout))
         splitData(holdout, data)
-    require(e1071)
+    requireNamespace(e1071)
     frml <- as.formula(paste(yName, "~ ."))
     svmout <- if (allDefaults)
         e1071::svm(frml, data = data, probability = TRUE)
@@ -717,7 +717,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
 
 predict.qeSVM <- function (object, newx) 
 {
-    require(e1071)
+    requireNamespace(e1071)
     class(object) <- class(object)[-1]
     newx <- setTrainFactors(object, newx)
     preds <- predict(object, newx, decision.values = TRUE,probability=TRUE)
@@ -799,7 +799,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 {
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   require(gbm)
+   requireNamespace(gbm)
    outlist <- list(classif=classif)
    if (classif) {   # classification case
       xyc <- getXY(data,yName,classif=classif,makeYdumms=TRUE) 
@@ -897,7 +897,7 @@ plot.qeGBoost <- function(object)
 qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   require(lightgbm)
+   requireNamespace(lightgbm)
    classif <- is.factor(data[[yName]])
    if (classif) stop('classification cases not implemented yet')  
    ycol <- which(names(data) == yName)
@@ -983,7 +983,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
 {
    if (!is.factor(data[[yName]])) stop('for classification problems only')
    if (!is.null(holdout)) splitData(holdout,data)
-   require(JOUSBoost)
+   requireNamespace(JOUSBoost)
    outlist <- list()
 
    # factors to dummies, both for x and y
@@ -1300,7 +1300,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    x <- data[,-ycol,drop=FALSE]
    require(polyreg)
    polyout <- getPoly(x,deg)
-   require(glmnet)
+   requireNamespace(glmnet)
    glmx <- as.matrix(polyout$xdata)
    fam <- if (classif) 'multinomial' else 'gaussian'
    glmout <- cv.glmnet(glmx,y,alpha=alpha,family=fam)
@@ -1483,7 +1483,7 @@ qeIso <- function(data,yName,isoMethod='isoreg',
       isout <- isoreg(xs,ys)
       isout$regests <- isout$yf[rank(x)]
    } else if (isoMethod == 'pava') {
-      require(Iso)
+      requireNamespace(Iso)
    }
    if (!is.null(holdout)) {
       predictHoldout(isout)
