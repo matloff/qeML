@@ -1498,7 +1498,6 @@ qeIso <- function(data,yName,isoMethod='isoreg',
 
 predict.qeIso <- function(object,newx)
 {
-   require(gtools)
    # will need to know where newx is within the original x vector
    xs <- object$xs
    yf <- object$yf
