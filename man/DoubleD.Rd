@@ -46,29 +46,6 @@ generic \code{plot.doubleD}.  Mean test (red) and training (blue) accuracy
 will be plotted against \code{xPts}.
 }
 
-\examples{
-
-#   polynomial model, vary degree=1,2,3,4; pef dataset from this package;
-#   100 replications for each degree
-
-cmd <- 'qePolyLin(pef,"wageinc",deg=xPts[i]`)'
-z <- doubleD(cmd,c(1:4),100)
-plot(z)
-
-#   fixed model, vary n; here the data is modified from the crdt dataset
-#   in the ISLR pkg
-
-cmd <- 'qeLin(crd,"Balance",holdout=nrow(crd)-xPts[i])'
-z <- doubleD(cmd,seq(50,3,-1),250)
-plot(z)
-
-#   for any i, the model will be fit on n = xPts[i] data points, and then
-#   tested on the remaining data, the holdout
-
-
-
-}
-
 \author{
 Norm Matloff
 }
