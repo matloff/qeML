@@ -6,6 +6,8 @@ importFrom("stats", "binomial", "coef", "cor", "cov", "glm", "lm",
 importFrom('regtools','kNN', 'allNumeric', 'factorToDummies', 'charsToFactors',    'krsFit', 'penrosePoly', 'hasFactors', 'getDFclasses',
     'confusion', 'fineTuning')
 
+importFrom('grf',regression_forest,ll_regression_forest)
+
 import('FOCI','gtools','partools')
 
 S3method(predict,qeLogit)
