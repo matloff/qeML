@@ -590,7 +590,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
             grf::regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
             mtry=mtry)
          else 
-            grf::regression_forest(x,y,
+            grf::ll_regression_forest(x,y,
             num.trees=nTree,min.node.size=minNodeSize,mtry=mtry,
             ll.split.lambda=lambda,ll.split.cutoff=splitCutoff)
    } else {
