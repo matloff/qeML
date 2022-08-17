@@ -437,10 +437,10 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
 {
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   requireNamespace(randomForest)
+   requireNamespace('randomForest')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
-   rfout <- randomForest(frml,data=data,
+   rfout <- randomForest::randomForest(frml,data=data,
       ntree=nTree,nodesize=minNodeSize,mtry=mtry)
    rfout$classNames <- xyc$classNames
    rfout$classif <- classif
@@ -504,7 +504,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       }
    }
    if (!is.null(holdout)) splitData(holdout,data)
-   requireNamespace(ranger)
+   requireNamespace('ranger')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
    if (!is.null(deweightPars)) {
@@ -520,7 +520,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       wts <- wts / sum(wts)
       split.select.weights <- wts
    } else split.select.weights <- NULL
-   rfrout <- ranger(frml,data=data,num.trees=nTree,mtry=mtry,
+   rfrout <- ranger::ranger(frml,data=data,num.trees=nTree,mtry=mtry,
       split.select.weights=split.select.weights,probability=classif,
       min.node.size=minNodeSize)
    rfrout$classNames <- xyc$classNames
@@ -580,17 +580,17 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    if (!is.null(holdout)) splitData(holdout,data)
 
    # start the computation
-   requireNamespace(grf)
+   requireNamespace('grf')
    xyc <- getXY(data,yName,xMustNumeric=TRUE,classif=classif,makeYdumms=TRUE)
    x <- as.matrix(xyc$x)
    y <- xyc$y
    if (!classif) {
       rfout <- 
          if (!ll) 
-            regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
+            grf::regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
             mtry=mtry)
          else 
-            ll_regression_forest(x,y,
+            ll_grf::regression_forest(x,y,
             num.trees=nTree,min.node.size=minNodeSize,mtry=mtry,
             ll.split.lambda=lambda,ll.split.cutoff=splitCutoff)
    } else {
@@ -690,7 +690,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     }
     if (!is.null(holdout))
         splitData(holdout, data)
-    requireNamespace(e1071)
+    requireNamespace('e1071')
     frml <- as.formula(paste(yName, "~ ."))
     svmout <- if (allDefaults)
         e1071::svm(frml, data = data, probability = TRUE)
@@ -717,7 +717,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
 
 predict.qeSVM <- function (object, newx) 
 {
-    requireNamespace(e1071)
+    requireNamespace('e1071')
     class(object) <- class(object)[-1]
     newx <- setTrainFactors(object, newx)
     preds <- predict(object, newx, decision.values = TRUE,probability=TRUE)
@@ -799,7 +799,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 {
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   requireNamespace(gbm)
+   requireNamespace('gbm')
    outlist <- list(classif=classif)
    if (classif) {   # classification case
       xyc <- getXY(data,yName,classif=classif,makeYdumms=TRUE) 
@@ -819,7 +819,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       {
          tmpDF <- cbind(x,yDumms[,colI])
          names(tmpDF)[nx+1] <- 'yDumm'
-         gbmout <- gbm(yDumm ~ .,data=tmpDF,distribution='bernoulli',
+         gbmout <- gbm::gbm(yDumm ~ .,data=tmpDF,distribution='bernoulli',
             n.trees=nTree,n.minobsinnode=minNodeSize,shrinkage=learnRate)
       }
       outlist$gbmOuts <- lapply(1:nydumms,doGbm)
@@ -882,7 +882,7 @@ plot.qeGBoost <- function(object)
    gbm.perf(object$gbmOuts)
 }
 
-#########################  qelightGBoost()  #################################
+#########################  qeLightGBoost()  #################################
 
 # lightGBM 
 
@@ -894,10 +894,10 @@ plot.qeGBoost <- function(object)
 
 # value:  see above
  
-qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
+qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   requireNamespace(lightgbm)
+   requireNamespace('lightgbm')
    classif <- is.factor(data[[yName]])
    if (classif) stop('classification cases not implemented yet')  
    ycol <- which(names(data) == yName)
@@ -925,7 +925,7 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    
    # convert to lighGBM binned form 
    trnxm <- as.matrix(trnx)
-   lgbData <- lgb.Dataset(data=trnxm,label=trny)
+   lgbData <- lightgbm::lgb.Dataset(data=trnxm,label=trny)
 
    outlist <- 
       list(classif=classif,factorsInfo=factorsInfo,trnx=trnx,
@@ -956,9 +956,9 @@ qelightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 }
 
 # arguments:  see above
-# value:  object of class 'qelightGBoost'; see above for components
+# value:  object of class 'qeLightGBoost'; see above for components
 
-predict.qelightGBoost <- function(object,newx) 
+predict.qeLightGBoost <- function(object,newx) 
 {
    newx <- setTrainFactors(object,newx)
    newx <- factorsToDummies(newx,omitLast=TRUE,factorsInfo=object$factorsInfo)
@@ -983,7 +983,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
 {
    if (!is.factor(data[[yName]])) stop('for classification problems only')
    if (!is.null(holdout)) splitData(holdout,data)
-   requireNamespace(JOUSBoost)
+   requireNamespace('JOUSBoost')
    outlist <- list()
 
    # factors to dummies, both for x and y
@@ -1010,7 +1010,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    {
       yi <- 2 * yDumms[,colI] - 1
       adaboostout <- 
-         adaboost(xMatrix,yi,tree_depth=treeDepth,n_rounds=nRounds,
+         JOUSBoost::adaboost(xMatrix,yi,tree_depth=treeDepth,n_rounds=nRounds,
          control=rpartControl)
    }
    outlist$abOuts <- lapply(1:nydumms,doAdaBoost)
@@ -1089,7 +1089,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
       hidden <- as.numeric(strsplit(hidden,',')[[1]])
 
    classif <- is.factor(data[[yName]])
-   requireNamespace(keras)
+   requireNamespace('keras')
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1174,7 +1174,7 @@ qeNeuralNet <- function(data,yName,hidden=c(5),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
-   requireNamespace(neuralnet)
+   requireNamespace('neuralnet')
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1193,7 +1193,8 @@ qeNeuralNet <- function(data,yName,hidden=c(5),
    frml <- paste0(yName,' ~ .')
    data <- as.data.frame(cbind(x,y))
    names(data)[ncol(data)] <- yName
-   nnout <- neuralnet(frml,data=data,hidden=hidden,linear.output=linear.output)
+   nnout <- neuralnet::neuralnet(frml,data=data,hidden=hidden,
+      linear.output=linear.output)
    nnout$classif <- classif
    nnout$classNames=classNames
    nnout$factorsInfo=factorsInfo
@@ -1254,7 +1255,7 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
    data <- as.data.frame(data)
    names(data)[ncol(data)] <- yName
 
-   requireNamespace(polyreg)
+   requireNamespace('polyreg')
    qeout <- regtools::penrosePoly(d=data,yName=yName,deg=deg,maxInteractDeg)
    qeout$x <- x
    qeout$y <- y
@@ -1298,12 +1299,12 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol,drop=FALSE]
-   requireNamespace(polyreg)
-   polyout <- getPoly(x,deg)
-   requireNamespace(glmnet)
+   requireNamespace('polyreg')
+   polyout <- polyreg::getPoly(x,deg)
+   requireNamespace('glmnet')
    glmx <- as.matrix(polyout$xdata)
    fam <- if (classif) 'multinomial' else 'gaussian'
-   glmout <- cv.glmnet(glmx,y,alpha=alpha,family=fam)
+   glmout <- glmnet::cv.glmnet(glmx,y,alpha=alpha,family=fam)
    res <- list(polyout=polyout,glmout=glmout,
       deg=deg,maxInteractDeg=maxInteractDeg,classif=classif,
       classNames=levels(y))
@@ -1354,11 +1355,11 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
       splitData(holdout,data)
    }
 
-   requireNamespace(polyreg)
+   requireNamespace('polyreg')
    if (!checkPkgVersion('polyreg','0.7'))
       stop('polyreg must be of version >= 1.7')
       
-   qeout <- polyFit(xy,deg,use='glm')
+   qeout <- polyreg::polyFit(xy,deg,use='glm')
    qeout$trainRow1 <- getRow1(data,yName)
    qeout$classif <- classif
    class(qeout) <- c('qePolyLog',class(qeout))
@@ -1382,7 +1383,7 @@ predict.qePolyLog <- function(object,newx)
 
 qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 {
-   requireNamespace(glmnet)
+   requireNamespace('glmnet')
    ycol <- which(names(data) == yName)
    if (!is.null(holdout)) splitData(holdout,data)
    y <- data[,ycol]
@@ -1392,7 +1393,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    classif <- is.factor(y)
    fam <- if (classif) 'multinomial' else 'gaussian'
    ym <- as.matrix(y)
-   qeout <- cv.glmnet(x=xm,y=ym,alpha=alpha,family=fam)
+   qeout <- glmnet::cv.glmnet(x=xm,y=ym,alpha=alpha,family=fam)
    qeout$x <- x
    qeout$y <- y
    qeout$classif <- classif
@@ -1483,7 +1484,7 @@ qeIso <- function(data,yName,isoMethod='isoreg',
       isout <- isoreg(xs,ys)
       isout$regests <- isout$yf[rank(x)]
    } else if (isoMethod == 'pava') {
-      requireNamespace(Iso)
+      requireNamespace('Iso')
    }
    if (!is.null(holdout)) {
       predictHoldout(isout)
@@ -1586,7 +1587,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
    nComps=NULL,nNeighbors=NULL)
 {
-   requireNamespace(umap)
+   requireNamespace('umap')
 
    # eventual return value
    res <- list()
@@ -1602,10 +1603,10 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    res$classif <- is.factor(y)
    
    # add more flexibility later
-   umdf <- umap.defaults
-   if (!is.null(nComps)) umdf$n_components <- nComps
-   if (!is.null(nNeighbors)) umdf$n_neighbors <- nNeighbors
-   tmp <- umap(x,config=umdf)
+   umdf <- umap::umap.defaults
+   if (!is.null(nComps)) umap::umdf$n_components <- nComps
+   if (!is.null(nNeighbors)) umap::umdf$n_neighbors <- nNeighbors
+   tmp <- umap::umap(x,config=umdf)
    UMAPnames <- paste0('U',1:ncol(tmp$layout))  # need for later use in factors
    colnames(tmp$layout) <- UMAPnames
    newDFrame <- as.data.frame(tmp$layout)
@@ -1779,7 +1780,7 @@ predict.qeText <- function(object,newDocs)
 qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   requireNamespace(reticulate)
+   requireNamespace('reticulate')
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1799,7 +1800,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    names(data)[ncol(data)] <- yName
    res$factorsInfo <- attr(x,'factorsInfo')
 
-   rfmod <- import('sklearn.ensemble')
+   rfmod <- reticulate::import('sklearn.ensemble')
    if (!classif) {
       rf <- rfmod$RandomForestRegressor(
          n_estimators=as.integer(nTree),
@@ -1809,7 +1810,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
          n_estimators=as.integer(nTree),
          min_samples_leaf=as.integer(minNodeSize))
    }
-   rf$fit(r_to_py(x),r_to_py(y))
+   rf$fit(reticulate::r_to_py(x),reticulate::r_to_py(y))
    res$rf <- rf
    class(res) <- 'qeskRF'
    if (!is.null(holdout)) {
@@ -1845,7 +1846,7 @@ predict.qeskRF <- function(object,newx)
 qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   requireNamespace(reticulate)
+   requireNamespace('reticulate')
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1865,10 +1866,10 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    names(data)[ncol(data)] <- yName
    res$factorsInfo <- attr(x,'factorsInfo')
 
-   svmmod <- import('sklearn.svm')
+   svmmod <- reticulate::import('sklearn.svm')
    svmobj <- 
       svmmod$SVC(gamma=gamma,C=cost,kernel=kernel,degree=as.integer(degree))
-   svmobj$fit(r_to_py(x),r_to_py(y))
+   svmobj$fit(reticulate::r_to_py(x),reticulate::r_to_py(y))
    res$svmobj <- svmobj
    class(res) <- 'qeskSVM'
    if (!is.null(holdout)) {
@@ -2075,12 +2076,12 @@ qeDT <- function(data,yName,
    mincriterion <- 1 - alpha
    classif <- is.factor(data[[yName]])
    if (!is.null(holdout)) splitData(holdout,data)
-   requireNamespace(party)
+   requireNamespace('party')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- as.formula(paste(yName,'~ .'))
-   ctrl <- ctree_control(mincriterion=mincriterion,minsplit=minsplit,
+   ctrl <- party::ctree_control(mincriterion=mincriterion,minsplit=minsplit,
       mtry=mtry,maxdepth=maxdepth,minbucket=minbucket)
-   ctout <- ctree(frml,data=data,controls=ctrl)
+   ctout <- party::ctree(frml,data=data,controls=ctrl)
    dtout <- list(ctout=ctout)
    dtout$classNames <- xyc$classNames
    dtout$classif <- classif
@@ -2196,7 +2197,7 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
-   requireNamespace(pROC)
+   requireNamespace('pROC')
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    ys <- as.factor(holdY == yLevelName)
@@ -2204,7 +2205,7 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    if (is.null(probs)) stop('no holdoutPreds$probs')
    probs <- probs[,yLevelName]
    probs <- probs/sum(probs)
-   roc(ys,probs,plot=T,aug=T)
+   pRoc::roc(ys,probs,plot=T,aug=T)
 }
 
 ######################  qeToweranNA()  #############################
