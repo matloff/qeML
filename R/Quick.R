@@ -824,7 +824,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       }
       outlist$gbmOuts <- lapply(1:nydumms,doGbm)
    } else {   # regression case
-      cmd <- paste0('gbmout <- gbm(',yName)
+      cmd <- paste0('gbmout <- gbm::gbm(',yName)
       cmd <- paste0(cmd,' ~ .,data=data,distribution="gaussian",')
       cmd <- paste0(cmd,'n.trees=',nTree,',')
       cmd <- paste0(cmd,'n.minobsinnode=',minNodeSize,',')
