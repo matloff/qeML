@@ -934,7 +934,8 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    # regression case
    
    params <- list(min_data_in_leaf=minNodeSize,learning_rate=learnRate)
-   cmd <- 'lgbout <- lgb.train(params=params,data=lgbData,obj="regression",'
+   cmd <- 
+    'lgbout <- lightgbm::lgb.train(params=params,data=lgbData,obj="regression",'
    cmd <- paste0(cmd,'nrounds=nTree)')
    eval(parse(text=cmd))
    outlist$lgbout <- lgbout
