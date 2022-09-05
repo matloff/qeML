@@ -1758,7 +1758,7 @@ predict.qeText <- function(x,newDocs)
 {
    xyout <- x$textToXYout
    if (!is.vector(newDocs)) newDocs <- as.vector(newDocs[,1])
-   newDocsOut <- textToXYpred(xyout,newDocs)
+   newDocsOut <- regtools::textToXYpred(xyout,newDocs)
    newDocsOut <- as.data.frame(newDocsOut)
    names(newDocsOut) <- paste0('keyword',1:ncol(newDocsOut))
    predict(x$cmdout,newDocsOut)
