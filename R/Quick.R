@@ -1482,7 +1482,7 @@ qeIso <- function(data,yName,isoMethod='isoreg',
    xs <- x[xorder]
    ys <- y[xorder]
    if (isoMethod == 'isoreg') {
-      isout <- isoreg(xs,ys)
+      isout <- Iso::isoreg(xs,ys)
       isout$regests <- isout$yf[rank(x)]
    } else if (isoMethod == 'pava') {
       requireNamespace('Iso')
