@@ -314,7 +314,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    # if holdout, x,y are now the training set
    
    if (!allNumeric(x)) {
-      x <- factorsToDummies(x,omitLast=TRUE)
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
       factorsInfo <- attr(x,'factorsInfo') 
    } else factorsInfo <- NULL
 
@@ -333,7 +333,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       dta <- xm[,expandVars,drop=FALSE]
       dta <- rbind(expandVals,dta)
       dta <- as.data.frame(dta)
-      tmp <- factorsToDummies(dta,omitLast=TRUE)
+      tmp <- regtools::factorsToDummies(dta,omitLast=TRUE)
       expandVars <- colnames(tmp)
       expandVals <- tmp[1,]
       # convert expandVars from names to column numbers (not efficient, but
@@ -383,7 +383,7 @@ predict.qeKNN <- function(x,newx,newxK=1)
    classif <- x$classif
 
    if (!is.null(x$factorsInfo)) 
-      newx <- factorsToDummies(newx,omitLast=TRUE,x$factorsInfo)
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,x$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
 
@@ -401,7 +401,7 @@ predict.qeKNN <- function(x,newx,newxK=1)
    }
 
    if (!is.null(x$expandVars)) 
-      newx <- multCols(newx,x$expandVars,x$expandVals)
+      newx <- regtools::multCols(newx,x$expandVars,x$expandVals)
 
    preds <- predict(x,newx,newxK)
 preds
@@ -962,7 +962,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 predict.qeLightGBoost <- function(x,newx) 
 {
    newx <- setTrainFactors(x,newx)
-   newx <- factorsToDummies(newx,omitLast=TRUE,factorsInfo=x$factorsInfo)
+   newx <- regtools::factorsToDummies(newx,omitLast=TRUE,factorsInfo=x$factorsInfo)
    lgbout <- x$lgbout
    predict(lgbout,newx)
 }
@@ -1138,7 +1138,7 @@ predict.qeNeural <- function(x,newx=NULL,k=NULL)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=x$factorsInfo)
    }
-   preds <- regtools:::predict.krsFit(x,newx)
+   preds <- regtools::predict.krsFit(x,newx)
    probs <- attr(preds,'probs')  # may be NULL
    if (kludge1row) preds <- preds[1]
    if (!x$classif) {
@@ -1229,7 +1229,7 @@ predict.qeNeuralNet <- function(x,newx=NULL,k=NULL)
       if (!is.null(k)) {
          # not ideal, but no apparent easy way to get this during 
          # training phases
-         trnScores <- predict.krsFit(x,x$x)
+         trnScores <- regools::predict.krsFit(x,x$x)
          trnScores <- attr(trnScores,'probs')
          newScores <- matrix(probs,ncol=length(classNames))
          probs <- knnCalib(x$yFactor,trnScores,newScores,k)
@@ -1940,7 +1940,7 @@ getXY <- function(data,yName,xMustNumeric=FALSE,classif,
 {
    if (is.vector(data) && is.null(yName)) data <- data.frame(data)
    if (!is.data.frame(data))
-      stopBrowser('data must be a data frame')
+      stop('data must be a data frame')
    if (!is.null(yName)) {
       ycol <- which(names(data) == yName)
       y <- data[,ycol]
@@ -2370,7 +2370,7 @@ predict.qeKNNna <- function(x,newx,kPred=1)
 {
 
    if (!regtools::allNumeric(newx)) 
-      newx <- factorsToDummies(newx,omitLast=FALSE,
+      newx <- regtools::factorsToDummies(newx,omitLast=FALSE,
          factorsInfo=x$factorsInfo)
    classif <- x$classif
    nr <- nrow(newx)
