@@ -8,6 +8,8 @@ importFrom('regtools','kNN', 'allNumeric', 'factorToDummies', 'charsToFactors', 
 
 importFrom('grf','regression_forest','ll_regression_forest')
 
+importFrom('gbm','gbm.perf')
+
 import('FOCI','gtools','partools')
 
 S3method(predict,qeLogit)
