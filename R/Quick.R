@@ -1325,7 +1325,7 @@ predict.qePolyLASSO <- function(x,newx)
    }
    else oneRow <- FALSE
    fittedPolyOut <- x$polyout
-   polyout <- getPoly(newx,deg=x$deg,
+   polyout <- polyreg::getPoly(newx,deg=x$deg,
       maxInteractDeg=x$maxInteractDeg, 
       modelFormula=x$modelFormula,
       retainedNames=fittedPolyOut$retainedNames)
