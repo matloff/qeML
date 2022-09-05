@@ -1,3 +1,4 @@
 
-The file xTests.R consists of tests for ../R/x.R.
+Designed to be quick checks that the code is still working after some
+change in infrastructure.  Copy and paste to run.
 
