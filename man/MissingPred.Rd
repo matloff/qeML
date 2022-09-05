@@ -22,6 +22,8 @@ qeKNNna(data,yName,k,minNonNA,holdout=floor(min(1000,0.1*nrow(data))))
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
   \item{k}{Number of nearest neighbors in training set.} 
+  \item{minNonNA}{For row y to be considered a neighbor of row x,
+#       y must have at least \code{minNonNA} non-NAs in common with x}
   \item{kPred}{Number of nearest neighbors in prediction.}
 }
 
