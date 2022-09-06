@@ -439,7 +439,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('randomForest')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
-   frml <- as.formula(paste(yName,'~ .'))
+   frml <- stats::as.formula(paste(yName,'~ .'))
    rfout <- randomForest::randomForest(frml,data=data,
       ntree=nTree,nodesize=minNodeSize,mtry=mtry)
    rfout$classNames <- xyc$classNames
