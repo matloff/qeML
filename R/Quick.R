@@ -404,11 +404,8 @@ predict.qeKNN <- function(x,newx,newxK=1)
       newx <- regtools::multCols(newx,x$expandVars,x$expandVals)
 
    preds <- predict(x,newx,newxK)
-preds
-
 
    if (!x$classif) return(preds)
-return(preds)
 
    probs <- preds
    predClasses <- round(probs) 
@@ -1163,82 +1160,84 @@ predict.qeNeural <- function(x,newx=NULL,k=NULL)
    } 
 }
 
-#########################  qeNeuralNet()  #################################
-
-# neural networks, wrapping 'neuralnet' package 
-
-# arguments:  see above, plus
-
-#     hidden, vector of units per hidden layer
-
-qeNeuralNet <- function(data,yName,hidden=c(5),
-   holdout=floor(min(1000,0.1*nrow(data))))
-{
-   classif <- is.factor(data[[yName]])
-   requireNamespace('neuralnet')
-   if (!is.null(holdout)) splitData(holdout,data)
-   ycol <- which(names(data) == yName)
-   x <- data[,-ycol]
-   if (!is.numeric(x)) {
-      x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      factorsInfo <- attr(x,'factorsInfo')
-   } else factorsInfo <- NULL
-   y <- data[,ycol]
-   if (classif) {
-      classNames <- levels(y)
-      linear.output <- FALSE
-   } else {
-      classNames <- NULL
-      linear.output <- TRUE
-   }
-   frml <- paste0(yName,' ~ .')
-   data <- as.data.frame(cbind(x,y))
-   names(data)[ncol(data)] <- yName
-   nnout <- neuralnet::neuralnet(frml,data=data,hidden=hidden,
-      linear.output=linear.output)
-   nnout$classif <- classif
-   nnout$classNames=classNames
-   nnout$factorsInfo=factorsInfo
-   nnout$x <- x
-   nnout$y <- y
-   class(nnout) <- c('qeNeuralNet',class(nnout))
-   if (!is.null(holdout)) {
-      predictHoldout(nnout)
-      nnout$holdIdxs <- holdIdxs
-   }
-   nnout
-}
-
-predict.qeNeuralNet <- function(x,newx=NULL,k=NULL)
-{
-   class(x) <- class(x)[-1]
-   ### newx <- setTrainFactors(x,newx)
-   if (!is.null(x$factorsInfo)) {
-      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=x$factorsInfo)
-   }
-   preds <- predict(x,newx)
-   probs <- attr(preds,'probs')  # may be NULL
-   if (!x$classif) {
-      preds
-   } else {
-      classNames <- x$classNames
-      preds <- classNames[preds+1]
-
-      origProbs <- probs
-      if (!is.null(k)) {
-         # not ideal, but no apparent easy way to get this during 
-         # training phases
-         trnScores <- regools::predict.krsFit(x,x$x)
-         trnScores <- attr(trnScores,'probs')
-         newScores <- matrix(probs,ncol=length(classNames))
-         probs <- knnCalib(x$yFactor,trnScores,newScores,k)
-      }
-
-      outlist <- list(predClasses=preds,probs=probs,origProbs=origProbs)
-      outlist
-   } 
-}
+### removing, to avoid CRAN issues
+### 
+### #########################  qeNeuralNet()  #################################
+### 
+### # neural networks, wrapping 'neuralnet' package 
+### 
+### # arguments:  see above, plus
+### 
+### #     hidden, vector of units per hidden layer
+### 
+### qeNeuralNet <- function(data,yName,hidden=c(5),
+###    holdout=floor(min(1000,0.1*nrow(data))))
+### {
+###    classif <- is.factor(data[[yName]])
+###    requireNamespace('neuralnet')
+###    if (!is.null(holdout)) splitData(holdout,data)
+###    ycol <- which(names(data) == yName)
+###    x <- data[,-ycol]
+###    if (!is.numeric(x)) {
+###       x <- regtools::factorsToDummies(x,omitLast=TRUE)
+###       factorsInfo <- attr(x,'factorsInfo')
+###    } else factorsInfo <- NULL
+###    y <- data[,ycol]
+###    if (classif) {
+###       classNames <- levels(y)
+###       linear.output <- FALSE
+###    } else {
+###       classNames <- NULL
+###       linear.output <- TRUE
+###    }
+###    frml <- paste0(yName,' ~ .')
+###    data <- as.data.frame(cbind(x,y))
+###    names(data)[ncol(data)] <- yName
+###    nnout <- neuralnet::neuralnet(frml,data=data,hidden=hidden,
+###       linear.output=linear.output)
+###    nnout$classif <- classif
+###    nnout$classNames=classNames
+###    nnout$factorsInfo=factorsInfo
+###    nnout$x <- x
+###    nnout$y <- y
+###    class(nnout) <- c('qeNeuralNet',class(nnout))
+###    if (!is.null(holdout)) {
+###       predictHoldout(nnout)
+###       nnout$holdIdxs <- holdIdxs
+###    }
+###    nnout
+### }
+### 
+### predict.qeNeuralNet <- function(x,newx=NULL,k=NULL)
+### {
+###    class(x) <- class(x)[-1]
+###    ### newx <- setTrainFactors(x,newx)
+###    if (!is.null(x$factorsInfo)) {
+###       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
+###          factorsInfo=x$factorsInfo)
+###    }
+###    preds <- predict(x,newx)
+###    probs <- attr(preds,'probs')  # may be NULL
+###    if (!x$classif) {
+###       preds
+###    } else {
+###       classNames <- x$classNames
+###       preds <- classNames[preds+1]
+### 
+###       origProbs <- probs
+###       if (!is.null(k)) {
+###          # not ideal, but no apparent easy way to get this during 
+###          # training phases
+###          trnScores <- regools::predict.krsFit(x,x$x)
+###          trnScores <- attr(trnScores,'probs')
+###          newScores <- matrix(probs,ncol=length(classNames))
+###          probs <- knnCalib(x$yFactor,trnScores,newScores,k)
+###       }
+### 
+###       outlist <- list(predClasses=preds,probs=probs,origProbs=origProbs)
+###       outlist
+###    } 
+### }
 
 #########################  qePolyLin()  #################################
 
