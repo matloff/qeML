@@ -506,7 +506,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('ranger')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
-   frml <- as.formula(paste(yName,'~ .'))
+   frml <- stats::as.formula(paste(yName,'~ .'))
    if (!is.null(deweightPars)) {
       dataNames <- names(data)
       yCol <- which(dataNames == yName)
@@ -691,7 +691,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     if (!is.null(holdout))
         splitData(holdout, data)
     requireNamespace('e1071')
-    frml <- as.formula(paste(yName, "~ ."))
+    frml <- stats::as.formula(paste(yName, "~ ."))
     svmout <- if (allDefaults)
         e1071::svm(frml, data = data, probability = TRUE)
     else e1071::svm(frml, data = data, cost = cost, gamma = gamma,
@@ -1670,7 +1670,7 @@ qeTS <- function(lag,data,qeName,opts=NULL,
    }
 
    # convert to "rectangular" form
-   tx <- TStoX(data,lag)
+   tx <- regtools::TStoX(data,lag)
    tx <- as.data.frame(tx)
    yName <- names(tx)[ncol(tx)]
 
@@ -1723,7 +1723,7 @@ qeText <- function(data,kTop=50,
 
    res <- list()  # ultimately, the return value
 
-   textToXYout <- textToXY(data[,1],data[,2],kTop,stopWords)
+   textToXYout <- regtools::textToXY(data[,1],data[,2],kTop,stopWords)
    textToXYout$y <- data[,2]  # convert back to factor
    res$textToXYout <- textToXYout
 
@@ -2079,7 +2079,7 @@ qeDT <- function(data,yName,
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('party')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
-   frml <- as.formula(paste(yName,'~ .'))
+   frml <- stats::as.formula(paste(yName,'~ .'))
    ctrl <- party::ctree_control(mincriterion=mincriterion,minsplit=minsplit,
       mtry=mtry,maxdepth=maxdepth,minbucket=minbucket)
    ctout <- party::ctree(frml,data=data,controls=ctrl)
