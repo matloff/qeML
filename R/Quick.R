@@ -1523,7 +1523,7 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    # eventual return value
    res <- list()
    res$scaleX <- FALSE  # already scaled via prcomp()
-   if (is.character(data)) data <- get(dataName)
+   if (is.character(data)) data <- get(data)
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol]
