@@ -1,5 +1,5 @@
 
 .onAttach <- function(libname, pkgname) {
    packageStartupMessage(
-      '\n\n\n\n\nRequires regtools (>= 1.6), at github/matloff')
+      '\n\n\n\n\nLatest version of qeML, at github/matloff')
 }
