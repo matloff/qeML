@@ -1135,7 +1135,7 @@ predict.qeNeural <- function(x,newx=NULL,k=NULL)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=x$factorsInfo)
    }
-   preds <- regtools::predict.krsFit(x,newx)
+   preds <- regtools:::predict.krsFit(x,newx)
    probs <- attr(preds,'probs')  # may be NULL
    if (kludge1row) preds <- preds[1]
    if (!x$classif) {
@@ -1463,49 +1463,51 @@ plot.qeLASSO <- function(x)
    genericPlot(x)
 }
 
-#########################  qeIso()  #################################
-
-# isotonic regression
-
-qeIso <- function(data,yName,isoMethod='isoreg', 
-   holdout=floor(min(1000,0.1*nrow(data))))
-{
-   if (!is.null(holdout)) splitData(holdout,data)
-   ycol <- which(names(data) == yName)
-   y <- data[,ycol]
-   if (!is.numeric(y)) stop('cannot be used in classification problems')
-   if (ncol(data) > 2) stop('for single features only')
-   x <- data[,-ycol]
-   if (!is.numeric(x)) stop('x must be numeric')
-   xorder <- order(x)
-   xs <- x[xorder]
-   ys <- y[xorder]
-   if (isoMethod == 'isoreg') {
-      isout <- Iso::isoreg(xs,ys)
-      isout$regests <- isout$yf[rank(x)]
-   } else if (isoMethod == 'pava') {
-      requireNamespace('Iso')
-   }
-   if (!is.null(holdout)) {
-      predictHoldout(isout)
-      isout$holdIdxs <- holdIdxs
-   }
-   isout$x <- x
-   isout$xs <- xs
-   isout$y <- y
-   class(isout) <- c('qeIso',class(isout))
-   isout
-}
-
-predict.qeIso <- function(x,newx)
-{
-   # will need to know where newx is within the original x vector
-   xs <- x$xs
-   yf <- x$yf
-   idxs <- findInterval(newx,xs)
-   # could improve using interpolation
-   x$y[idxs]
-}
+### to facilitate CRAN adherence, temporarily removed
+### 
+### #########################  qeIso()  #################################
+### 
+### # isotonic regression
+### 
+### qeIso <- function(data,yName,isoMethod='isoreg', 
+###    holdout=floor(min(1000,0.1*nrow(data))))
+### {
+###    if (!is.null(holdout)) splitData(holdout,data)
+###    ycol <- which(names(data) == yName)
+###    y <- data[,ycol]
+###    if (!is.numeric(y)) stop('cannot be used in classification problems')
+###    if (ncol(data) > 2) stop('for single features only')
+###    x <- data[,-ycol]
+###    if (!is.numeric(x)) stop('x must be numeric')
+###    xorder <- order(x)
+###    xs <- x[xorder]
+###    ys <- y[xorder]
+###    if (isoMethod == 'isoreg') {
+###       isout <- Iso:::isoreg(xs,ys)
+###       isout$regests <- isout$yf[rank(x)]
+###    } else if (isoMethod == 'pava') {
+###       requireNamespace('Iso')
+###    }
+###    if (!is.null(holdout)) {
+###       predictHoldout(isout)
+###       isout$holdIdxs <- holdIdxs
+###    }
+###    isout$x <- x
+###    isout$xs <- xs
+###    isout$y <- y
+###    class(isout) <- c('qeIso',class(isout))
+###    isout
+### }
+### 
+### predict.qeIso <- function(x,newx)
+### {
+###    # will need to know where newx is within the original x vector
+###    xs <- x$xs
+###    yf <- x$yf
+###    idxs <- findInterval(newx,xs)
+###    # could improve using interpolation
+###    x$y[idxs]
+### }
 
 #########################  qePCA()  #################################
 
