@@ -2367,18 +2367,18 @@ smoothKNNna <- function(newX,xMatrix,ymuhat,minNonNA,K)
 #    number of nearest neighbors, generally small, even 1, since it
 #       makes use of values already smoothed by qeKNNna()
 
-predict.qeKNNna <- function(x,newx,kPred=1) 
+predict.qeKNNna <- function(object,newx,kPred=1) 
 {
 
    if (!regtools::allNumeric(newx)) 
       newx <- regtools::factorsToDummies(newx,omitLast=FALSE,
-         factorsInfo=x$factorsInfo)
-   classif <- x$classif
+         factorsInfo=object$factorsInfo)
+   classif <- object$classif
    nr <- nrow(newx)
    preds <- vector(length=nr)
    for (i in 1:nr) {
       preds[i] <- 
-         smoothKNNna(newx[i,],x$trainx,x$muhat,x$minNonNA,kPred)
+         smoothKNNna(newx[i,],object$trainx,object$muhat,object$minNonNA,kPred)
    }
    preds
 }
@@ -2476,14 +2476,14 @@ qeParallel <- function(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
 
 qepar <- qeParallel
 
-predict.qeParallel <- function(obj,newx) 
+predict.qeParallel <- function(object,newx) 
 {
-   if (!is.null(obj$libs)) 
-      for (lb in obj$libs) getSuggestedLib(lb)
+   if (!is.null(object$libs)) 
+      for (lb in object$libs) getSuggestedLib(lb)
 
-   nClust <- length(obj$cls)
-   retVals <- obj[1:nClust]
-   if (!obj$classif) {
+   nClust <- length(object$cls)
+   retVals <- object[1:nClust]
+   if (!object$classif) {
       preds <- sapply(retVals,function(cElt) predict(cElt,newx))
       return(mean(preds))
    }

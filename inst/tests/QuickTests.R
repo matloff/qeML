@@ -171,3 +171,13 @@ predict(z,newx)
 #         [,1]
 # [1,] 1440.44
 
+mlb1 <-mlb[,-c(1:2,7)]  # except name, team, PosCat
+mlb2 <- factorsToDummies(mlb1) 
+colnames(mlb2)
+mlb2[,-10] <- makeNA(mlb2[,-10],0.1)  # except Weight
+mlb2 <- as.data.frame(mlb2)
+set.seed(9999) 
+mlb3 <- mlb2[sample(1:nrow(mlb2),100),]  # ftn is long-running
+z <- qeKNNna(mlb3,'Weight')
+z$testAcc  # 15.0r
+
