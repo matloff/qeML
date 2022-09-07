@@ -36,7 +36,6 @@ S3method(plot,qeFT)
 S3method(plot,doubleD)
 S3method(print,qeDT)
 S3method(predict,qePolyLASSO)
-S3method(predict,qeIso)
 S3method(predict,qePCA)
 S3method(predict,qeUMAP)
 S3method(predict,qeTS)
@@ -50,7 +49,7 @@ export(
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
-   qeParallel,qeIso,qeTS,qeText,buildQEcall,splitData,
+   qeParallel,qeTS,qeText,buildQEcall,splitData,
    getRow1,predictHoldout,qeLightGBoost,
    checkNumericNames,prepend,makeAllNumeric,getXY,
    doubleD,qeFOCI,qeKNNna,qeLinKNN)
