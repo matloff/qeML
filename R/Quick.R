@@ -152,11 +152,11 @@ qeLogit <-
 
 # value:  object of class 'qeLogit'; see above for components
  
-predict.qeLogit <- function(x,newx) 
+predict.qeLogit <- function(object,newx) 
 {
-   newx <- setTrainFactors(x,newx)
+   newx <- setTrainFactors(object,newx)
    # get probabilities for each class
-   glmOuts <- x$glmOuts
+   glmOuts <- object$glmOuts
    g <- function(glmOutsElt) predict(glmOutsElt,newx,type='response') 
    probs <- sapply(glmOuts,g)
    if (is.vector(probs)) probs <- matrix(probs,nrow=1)
@@ -164,15 +164,15 @@ predict.qeLogit <- function(x,newx)
    # if > 2 classes, separate logits for the m classes will not
    # necessrily sum to 1, so normalize
 
-   if (x$nClasses > 2) {
+   if (object$nClasses > 2) {
       sumprobs <- apply(probs,1,sum)  
       probs <- (1/sumprobs) * probs
-      classNames <- x$classNames
+      classNames <- object$classNames
       colnames(probs) <- classNames
       predClasses <- apply(probs,1,which.max) 
       predClasses <- classNames[predClasses]
    } else {
-      predClasses <- ifelse(probs >= 0.5,x$yesYVal,x$noYVal)
+      predClasses <- ifelse(probs >= 0.5,object$yesYVal,object$noYVal)
    }
    list(predClasses=predClasses,probs=probs)
 }
@@ -251,11 +251,11 @@ qeLin <- function(data,yName,noBeta0=FALSE,
 
 # value:  see above
 
-predict.qeLin <- function(x,newx,useTrainRow1=TRUE) {
-   class(x) <- class(x)[-1]
-   if (useTrainRow1) newx <- setTrainFactors(x,newx)
-   preds <- predict(x,newx)
-   if (!x$classif) return(preds)
+predict.qeLin <- function(object,newx,useTrainRow1=TRUE) {
+   class(object) <- class(object)[-1]
+   if (useTrainRow1) newx <- setTrainFactors(object,newx)
+   preds <- predict(object,newx)
+   if (!object$classif) return(preds)
    probs <- pmax(preds,0)
    probs <- pmin(probs,1)
    if (is.vector(probs)) probs <- matrix(probs,nrow=1)
@@ -376,13 +376,13 @@ newMultCols <- function (x,cols,vals) {
    x
 }
 
-predict.qeKNN <- function(x,newx,newxK=1)
+predict.qeKNN <- function(object,newx,newxK=1)
 {
-   class(x) <- 'kNN'
-   if (!regtools::allNumeric(newx)) newx <- setTrainFactors(x,newx)
-   classif <- x$classif
+   class(object) <- 'kNN'
+   if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
+   classif <- object$classif
 
-   if (!is.null(x$factorsInfo)) 
+   if (!is.null(object$factorsInfo)) 
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,x$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
@@ -394,23 +394,23 @@ predict.qeKNN <- function(x,newx,newxK=1)
    } 
    newx <- matrix(newx,nrow=nr)
 
-   if (!is.null(x$scalePars)) {
-      ctr <- x$scalePars$ctr
-      scl <- x$scalePars$scl
+   if (!is.null(object$scalePars)) {
+      ctr <- object$scalePars$ctr
+      scl <- object$scalePars$scl
       newx <- scale(newx,ctr,scl)
    }
 
-   if (!is.null(x$expandVars)) 
-      newx <- regtools::multCols(newx,x$expandVars,x$expandVals)
+   if (!is.null(object$expandVars)) 
+      newx <- regtools::multCols(newx,object$expandVars,object$expandVals)
 
-   preds <- predict(x,newx,newxK)
+   preds <- predict(object,newx,newxK)
 
-   if (!x$classif) return(preds)
+   if (!object$classif) return(preds)
 
    probs <- preds
    predClasses <- round(probs) 
-   yesYVal <- x$yesYVal
-   noYVal <- x$noYVal
+   yesYVal <- object$yesYVal
+   noYVal <- object$noYVal
    predClasses[predClasses == 1] <- yesYVal
    predClasses[predClasses == 0] <- noYVal
    list(predClasses=predClasses,probs=probs)
@@ -453,13 +453,13 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
 predict.qeRF <- function(x,newx)
 {
    class(x) <- 'randomForest'
-   newx <- setTrainFactors(x,newx)
+   newx <- setTrainFactors(object,newx)
    classif <- x$classif
    if (classif) {
-      probs <- predict(x,newx,type='prob')
-      res <- collectForReturn(x,probs)
+      probs <- predict(object,newx,type='prob')
+      res <- collectForReturn(object,probs)
    } else {
-      res <- predict(x,newx,type='response')
+      res <- predict(object,newx,type='response')
    }
    res
 }
@@ -535,14 +535,14 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
 
 qerfranger <- qeRFranger
 
-predict.qeRFranger <- function(x,newx) 
+predict.qeRFranger <- function(object,newx) 
 {
-   class(x) <- 'ranger'
-   if (is.null(x$importance.mode)) x$importance.mode <- 'none'
-   classif <- x$classif
-   res <- predict(x, newx, type = "response")$predictions
+   class(object) <- 'ranger'
+   if (is.null(object$importance.mode)) object$importance.mode <- 'none'
+   classif <- object$classif
+   res <- predict(object, newx, type = "response")$predictions
    if (classif) {
-       res <- collectForReturn(x,res)
+       res <- collectForReturn(object,res)
    }
    res
 }
@@ -618,17 +618,17 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    rfout
 }
 
-predict.qeRFgrf<- function(x,newx)
+predict.qeRFgrf<- function(object,newx)
 {
-  newx <- setTrainFactors(x,newx)
-  classif <- x$classif
+  newx <- setTrainFactors(object,newx)
+  classif <- object$classif
   if (!regtools::allNumeric(newx)) {
      ## newx <- regtools::charsToFactors(newx)
      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-        factorsInfo=x$factorsInfo)
+        factorsInfo=object$factorsInfo)
   }
   if (classif) {
-     grfOuts <- x$grfOuts
+     grfOuts <- object$grfOuts
      # do OVA on the various classes
      getProbs <- function(grfOut) {
         tmp <- predict(grfOut,newx)
@@ -650,13 +650,13 @@ predict.qeRFgrf<- function(x,newx)
      sumprobs <- apply(probs,1,sum)  
      probs <- (1/sumprobs) * probs
      predClasses <- apply(probs,1,which.max) 
-     predClasses <- x$classNames[predClasses]
+     predClasses <- object$classNames[predClasses]
      res <- list(predClasses=predClasses,probs=probs)
      ## probs <- predict(x,newx,type='prob')
      ## res <- collectForReturn(x,probs)
   } else {
-     class(x) <- 'regression_forest'
-     res <- predict(x,newx)
+     class(object) <- 'regression_forest'
+     res <- predict(object,newx)
      res <- as.matrix(res)[,1]
   }
   res
@@ -712,15 +712,15 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     svmout
 }
 
-predict.qeSVM <- function (x, newx) 
+predict.qeSVM <- function (object, newx) 
 {
     requireNamespace('e1071')
-    class(x) <- class(x)[-1]
-    newx <- setTrainFactors(x, newx)
-    preds <- predict(x, newx, decision.values = TRUE,probability=TRUE)
+    class(object) <- class(object)[-1]
+    newx <- setTrainFactors(object, newx)
+    preds <- predict(object, newx, decision.values = TRUE,probability=TRUE)
     probs <- attr(preds,'probabilities')
     attributes(preds) <- NULL
-    predClasses <- x$classNames[preds]
+    predClasses <- object$classNames[preds]
     res <- list(predClasses = predClasses, probs = probs)
     res
 }
@@ -841,14 +841,14 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 
 # arguments:  see above
 # value:  object of class 'qeGBoost'; see above for components
-predict.qeGBoost <- function(x,newx,newNTree=NULL) 
+predict.qeGBoost <- function(object,newx,newNTree=NULL) 
 {
-   newx <- setTrainFactors(x,newx)
-   gbmOuts <- x$gbmOuts
+   newx <- setTrainFactors(object,newx)
+   gbmOuts <- object$gbmOuts
    if (is.null(newNTree)) {
       nTree <- x$nTree
    } else nTree <- newNTree
-   if (x$classif) {
+   if (object$classif) {
       # get probabilities for each class; 
       # NOTE: we have a choice of 'link' and 'response', not much
       # difference between the two; from man page, we are getting
@@ -857,7 +857,7 @@ predict.qeGBoost <- function(x,newx,newNTree=NULL)
          predict(gbmOutsElt,newx,n.trees=nTree,type='response') 
       probs <- sapply(gbmOuts,g)
       if (is.vector(probs)) probs <- matrix(probs,nrow=1)
-      classNames <- x$classNames
+      classNames <- object$classNames
       colnames(probs) <- classNames
       # normalize
       sumprobs <- apply(probs,1,sum)  
@@ -866,7 +866,7 @@ predict.qeGBoost <- function(x,newx,newNTree=NULL)
       predClasses <- classNames[predClasses]
       res <- list(predClasses=predClasses,probs=probs)
    } else {
-      res <- predict(x$gbmOuts,newx,n.trees=nTree)
+      res <- predict(object$gbmOuts,newx,n.trees=nTree)
    }
    class(res) <- 'qeGBoost'
    res
@@ -956,11 +956,11 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 # arguments:  see above
 # value:  object of class 'qeLightGBoost'; see above for components
 
-predict.qeLightGBoost <- function(x,newx) 
+predict.qeLightGBoost <- function(object,newx) 
 {
-   newx <- setTrainFactors(x,newx)
-   newx <- regtools::factorsToDummies(newx,omitLast=TRUE,factorsInfo=x$factorsInfo)
-   lgbout <- x$lgbout
+   newx <- setTrainFactors(object,newx)
+   newx <- regtools::factorsToDummies(newx,omitLast=TRUE,factorsInfo=object$factorsInfo)
+   lgbout <- object$lgbout
    predict(lgbout,newx)
 }
 
@@ -1028,16 +1028,16 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
 
 # arguments:  see above
 # value:  object of class 'qeAdaBoost'; see above for components
-predict.qeAdaBoost <- function(x,newx,newNTree=NULL) 
+predict.qeAdaBoost <- function(object,newx,newNTree=NULL) 
 {
-   newx <- setTrainFactors(x,newx)
-   factorsInfo <- x$factorsInfo
+   newx <- setTrainFactors(object,newx)
+   factorsInfo <- object$factorsInfo
    if (!is.null(factorsInfo))
       xyc <- getXY(newx,NULL,TRUE,FALSE,factorsInfo)
    newx <- xyc$x
-   abOuts <- x$abOuts
+   abOuts <- object$abOuts
    if (is.null(newNTree)) {
-      nTree <- x$nTree
+      nTree <- object$nTree
    } else nTree <- newNTree
       # get probabilities for each class; 
       # NOTE: we have a choice of 'prob' and 'response'; the latter
@@ -1048,7 +1048,7 @@ predict.qeAdaBoost <- function(x,newx,newNTree=NULL)
          predict(abOutsElt,newx,n_tree=nTree,type='prob') 
       probs <- sapply(abOuts,g)
       if (is.vector(probs)) probs <- matrix(probs,nrow=1)
-      classNames <- x$classNames
+      classNames <- object$classNames
       colnames(probs) <- classNames
       # normalize
       sumprobs <- apply(probs,1,sum)  
@@ -1123,25 +1123,25 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
    krsout
 }
 
-predict.qeNeural <- function(x,newx=NULL,k=NULL)
+predict.qeNeural <- function(object,newx=NULL,k=NULL)
 {
-   class(x) <- class(x)[-1]
-   newx <- setTrainFactors(x,newx)
+   class(object) <- class(object)[-1]
+   newx <- setTrainFactors(object,newx)
    if (nrow(newx) == 1) {  # kludge!; Tensorflow issue
       kludge1row <- TRUE
       newx <- rbind(newx,newx)
    } else kludge1row <- FALSE
-   if (!is.null(x$factorsInfo)) {
+   if (!is.null(object$factorsInfo)) {
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=x$factorsInfo)
+         factorsInfo=object$factorsInfo)
    }
-   preds <- regtools:::predict.krsFit(x,newx)
+   preds <- regtools:::predict.krsFit(object,newx)
    probs <- attr(preds,'probs')  # may be NULL
    if (kludge1row) preds <- preds[1]
-   if (!x$classif) {
+   if (!object$classif) {
       preds
    } else {
-      classNames <- x$classNames
+      classNames <- object$classNames
       preds <- classNames[preds+1]
       if (kludge1row) probs <- probs[1,]
 
@@ -1149,10 +1149,10 @@ predict.qeNeural <- function(x,newx=NULL,k=NULL)
       if (!is.null(k)) {
          # not ideal, but no apparent easy way to get this during 
          # training phases
-         trnScores <- regtools:::predict.krsFit(x,x$x)
+         trnScores <- regtools:::predict.krsFit(object,object$x)
          trnScores <- attr(trnScores,'probs')
          newScores <- matrix(probs,ncol=length(classNames))
-         probs <- knnCalib(x$yFactor,trnScores,newScores,k)
+         probs <- knnCalib(object$yFactor,trnScores,newScores,k)
       }
 
       outlist <- list(predClasses=preds,probs=probs,origProbs=origProbs)
@@ -1270,18 +1270,18 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
    qeout
 }
 
-predict.qePolyLin <- function(x,newx)
+predict.qePolyLin <- function(object,newx)
 {  
-   class(x) <- 'penrosePoly'
-   if (ncol(x$x) == 1) {
+   class(object) <- 'penrosePoly'
+   if (ncol(object$x) == 1) {
       newx <- as.data.frame(newx)
-      names(newx) <- names(x$x)
+      names(newx) <- names(object$x)
    }
    
    newx <- regtools::charsToFactors(newx)
    newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-      factorsInfo=x$factorsInfo)
-   predict(x,newx)
+      factorsInfo=object$factorsInfo)
+   predict(object,newx)
 }
 
 predict.qePoly <- function() 
@@ -1316,25 +1316,25 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    res
 }
 
-predict.qePolyLASSO <- function(x,newx)
+predict.qePolyLASSO <- function(object,newx)
 {
    if (nrow(newx) == 1) {
        oneRow <- TRUE
        newx <- rbind(newx, newx)
    }
    else oneRow <- FALSE
-   fittedPolyOut <- x$polyout
-   polyout <- polyreg::getPoly(newx,deg=x$deg,
-      maxInteractDeg=x$maxInteractDeg, 
-      modelFormula=x$modelFormula,
+   fittedPolyOut <- object$polyout
+   polyout <- polyreg::getPoly(newx,deg=object$deg,
+      maxInteractDeg=object$maxInteractDeg, 
+      modelFormula=object$modelFormula,
       retainedNames=fittedPolyOut$retainedNames)
-   fittedGlm <- x$glmout
+   fittedGlm <- object$glmout
    newx <- as.matrix(polyout$xdata)
    preds <- predict(fittedGlm,newx,type='response')
-   if (x$classif) {
+   if (object$classif) {
       probs <- preds
       maxCols <- apply(preds,1,which.max)
-      predClasses <- x$classNames[maxCols]
+      predClasses <- object$classNames[maxCols]
       list(predClasses=predClasses,probs=probs)
    } else preds
 }
@@ -1370,10 +1370,10 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    qeout
 }
 
-predict.qePolyLog <- function(x,newx)
+predict.qePolyLog <- function(object,newx)
 {
-   class(x) <- 'polyFit'
-   predClasses <- predict(x,newx)
+   class(object) <- 'polyFit'
+   predClasses <- predict(object,newx)
    probs <- attr(predClasses,'prob')
    attributes(predClasses) <- NULL 
    list(predClasses=predClasses, probs=probs)
@@ -1438,23 +1438,23 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 
 qelasso <- qeLASSO
 
-predict.qeLASSO <- function(x,newx) 
+predict.qeLASSO <- function(object,newx) 
 {
-   class(x) <- class(x)[-1]
+   class(object) <- class(object)[-1]
    newx <- regtools::charsToFactors(newx)
    newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-      factorsInfo=x$factorsInfo)
+      factorsInfo=object$factorsInfo)
 
-   if (!x$classif) return(predict(x,newx))
+   if (!object$classif) return(predict(object,newx))
    # classif case
-   classNames <- x$classNames
-   tmp <- predict(x,newx,type='response')
+   classNames <- object$classNames
+   tmp <- predict(object,newx,type='response')
    tmp <- tmp[,,1,drop=TRUE]
    # dropped too far?
-   if (is.vector(tmp)) tmp <- matrix(tmp,ncol=ncol(x$x))
+   if (is.vector(tmp)) tmp <- matrix(tmp,ncol=ncol(object$x))
    colnames(tmp) <- classNames
    maxCols <- apply(tmp,1,which.max)
-   predClasses <- x$classNames[maxCols]
+   predClasses <- object$classNames[maxCols]
    list(predClasses=predClasses,probs=tmp)
 }
 
@@ -1558,24 +1558,24 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    res
 }
 
-predict.qePCA <- function(x,newx)
+predict.qePCA <- function(object,newx)
 {
-   class(x) <- class(x)[-1]
+   class(object) <- class(object)[-1]
    if (!regtools::allNumeric(newx)) {
       # newx <- regtools::charsToFactors(newx)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=x$factorsInfo)
+         factorsInfo=object$factorsInfo)
    }
-   newx <- predict(x$pcaout,newx)
+   newx <- predict(object$pcaout,newx)
    if (is.vector(newx)) {
       newxnames <- names(newx)
       newx <- matrix(newx,nrow=1)
    } else newxNames <- colnames(newx)
-   numPCs <- x$numPCs
+   numPCs <- object$numPCs
    newx <- newx[,1:numPCs,drop=FALSE]
    newx <- as.data.frame(newx)
    colnames(newx) <- newxNames[1:numPCs]
-   predict(x$qeOut,newx=newx)
+   predict(object$qeOut,newx=newx)
 }
 
 #########################  qeUMAP()  #################################
@@ -1633,22 +1633,22 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    res
 }
 
-predict.qeUMAP <- function(x,newx)
+predict.qeUMAP <- function(object,newx)
 {
-   class(x) <- class(x)[-1]
+   class(object) <- class(object)[-1]
    if (!regtools::allNumeric(newx)) {
       ## newx <- regtools::charsToFactors(newx)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=x$factorsInfo)
+         factorsInfo=object$factorsInfo)
    }
    if (is.vector(newx)) {
-      newx <- matrix(newx,ncol=x$nColX)
+      newx <- matrix(newx,ncol=object$nColX)
    }
 
-   newx <- predict(x$UMAPout,newx)
+   newx <- predict(object$UMAPout,newx)
    newx <- as.data.frame(newx)
-   # names(newx) <- x$UMAPnames
-   predict(x$qeOut,newx=newx)
+   # names(newx) <- object$UMAPnames
+   predict(object$qeOut,newx=newx)
 }
 
 ###########################  qeTS  #################################
@@ -1687,16 +1687,16 @@ qeTS <- function(lag,data,qeName,opts=NULL,
    res
 }
 
-predict.qeTS <- function(x,newx)
+predict.qeTS <- function(object,newx)
 {
    if (is.vector(newx)) {
       newx <- matrix(newx,nrow=1)
       newx <- as.data.frame(newx)
    } 
-   lag <- x$lag
+   lag <- object$lag
    if (ncol(newx) != lag) 
       stop('newx must have length "lag" or "lag" columns')
-   predict(x$cmdout,newx)
+   predict(object$cmdout,newx)
 }
 
 # text classification
@@ -1755,14 +1755,14 @@ qeText <- function(data,kTop=50,
 
 qetext <- qeText
 
-predict.qeText <- function(x,newDocs) 
+predict.qeText <- function(object,newDocs) 
 {
-   xyout <- x$textToXYout
+   xyout <- object$textToXYout
    if (!is.vector(newDocs)) newDocs <- as.vector(newDocs[,1])
    newDocsOut <- regtools::textToXYpred(xyout,newDocs)
    newDocsOut <- as.data.frame(newDocsOut)
    names(newDocsOut) <- paste0('keyword',1:ncol(newDocsOut))
-   predict(x$cmdout,newDocsOut)
+   predict(object$cmdout,newDocsOut)
 }
 
 #################################################################
