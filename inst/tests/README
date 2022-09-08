@@ -1,4 +1,7 @@
 
 Designed to be quick checks that the code is still working after some
-change in infrastructure.  Copy and paste to run.
+change in infrastructure.  Copy and paste to run.  Main files:
+
+PredictFtns.R
+
 

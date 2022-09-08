@@ -16,6 +16,10 @@ qeNeural(pef,'wageinc')$testAcc
 qeLASSO(pef,'wageinc')$testAcc
 qePCA(pef,'wageinc','qeKNN',pcaProp=0.5)$testAcc
 
+# MLB, about 13
+qeCompare(mlb,'Weight',
+   c('qeLin','qePolyLin','qeKNN','qeRF','qeLASSO','qeNeural'),25)
+
 
 # longer-running
 
