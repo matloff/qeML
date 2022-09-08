@@ -1,7 +1,11 @@
 
+
+
 #########################  qeLinKNN()  #################################
 
-# arguments:  see above, plus
+# fit linear model, then fit KNN to residuals
+
+# arguments:  as in Quick.R, plus
 
 #     k: number of nearest neighbors
 #     scaleX: if TRUE, features will be centered and scaled; note that
@@ -39,7 +43,7 @@ qeLinKNN <- function(data,yName,k=25,scaleX=TRUE,
    linknnout
 }
 
-predict.qeLinKNN <- function(object,newx,newxK=1)
+predict.qeLinKNN <- function(object,newx,newxK=1,...)
 {
    classif <- object$classif
    if (classif) stop('not set up for classification problems')

@@ -152,7 +152,7 @@ qeLogit <-
 
 # value:  object of class 'qeLogit'; see above for components
  
-predict.qeLogit <- function(object,newx) 
+predict.qeLogit <- function(object,newx,...) 
 {
    newx <- setTrainFactors(object,newx)
    # get probabilities for each class
@@ -251,7 +251,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
 
 # value:  see above
 
-predict.qeLin <- function(object,newx,useTrainRow1=TRUE) {
+predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
    class(object) <- class(object)[-1]
    if (useTrainRow1) newx <- setTrainFactors(object,newx)
    preds <- predict(object,newx)
@@ -376,7 +376,7 @@ newMultCols <- function (x,cols,vals) {
    x
 }
 
-predict.qeKNN <- function(object,newx,newxK=1)
+predict.qeKNN <- function(object,newx,newxK=1,...)
 {
    class(object) <- 'kNN'
    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
@@ -450,7 +450,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    rfout
 }
 
-predict.qeRF <- function(x,newx)
+predict.qeRF <- function(x,newx,...)
 {
    class(x) <- 'randomForest'
    newx <- setTrainFactors(object,newx)
@@ -535,7 +535,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
 
 qerfranger <- qeRFranger
 
-predict.qeRFranger <- function(object,newx) 
+predict.qeRFranger <- function(object,newx,...) 
 {
    class(object) <- 'ranger'
    if (is.null(object$importance.mode)) object$importance.mode <- 'none'
@@ -618,7 +618,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    rfout
 }
 
-predict.qeRFgrf<- function(object,newx)
+predict.qeRFgrf<- function(object,newx,...)
 {
   newx <- setTrainFactors(object,newx)
   classif <- object$classif
@@ -712,7 +712,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     svmout
 }
 
-predict.qeSVM <- function (object, newx) 
+predict.qeSVM <- function (object, newx,...) 
 {
     requireNamespace('e1071')
     class(object) <- class(object)[-1]
@@ -841,7 +841,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 
 # arguments:  see above
 # value:  object of class 'qeGBoost'; see above for components
-predict.qeGBoost <- function(object,newx,newNTree=NULL) 
+predict.qeGBoost <- function(object,newx,newNTree=NULL,...) 
 {
    newx <- setTrainFactors(object,newx)
    gbmOuts <- object$gbmOuts
@@ -956,7 +956,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
 # arguments:  see above
 # value:  object of class 'qeLightGBoost'; see above for components
 
-predict.qeLightGBoost <- function(object,newx) 
+predict.qeLightGBoost <- function(object,newx,...) 
 {
    newx <- setTrainFactors(object,newx)
    newx <- regtools::factorsToDummies(newx,omitLast=TRUE,factorsInfo=object$factorsInfo)
@@ -1028,7 +1028,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
 
 # arguments:  see above
 # value:  object of class 'qeAdaBoost'; see above for components
-predict.qeAdaBoost <- function(object,newx,newNTree=NULL) 
+predict.qeAdaBoost <- function(object,newx,newNTree=NULL,...) 
 {
    newx <- setTrainFactors(object,newx)
    factorsInfo <- object$factorsInfo
@@ -1123,7 +1123,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
    krsout
 }
 
-predict.qeNeural <- function(object,newx=NULL,k=NULL)
+predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
 {
    class(object) <- class(object)[-1]
    newx <- setTrainFactors(object,newx)
@@ -1270,7 +1270,7 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
    qeout
 }
 
-predict.qePolyLin <- function(object,newx)
+predict.qePolyLin <- function(object,newx,...)
 {  
    class(object) <- 'penrosePoly'
    if (ncol(object$x) == 1) {
@@ -1316,7 +1316,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    res
 }
 
-predict.qePolyLASSO <- function(object,newx)
+predict.qePolyLASSO <- function(object,newx,...)
 {
    if (nrow(newx) == 1) {
        oneRow <- TRUE
@@ -1370,7 +1370,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    qeout
 }
 
-predict.qePolyLog <- function(object,newx)
+predict.qePolyLog <- function(object,newx,...)
 {
    class(object) <- 'polyFit'
    predClasses <- predict(object,newx)
@@ -1438,7 +1438,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 
 qelasso <- qeLASSO
 
-predict.qeLASSO <- function(object,newx) 
+predict.qeLASSO <- function(object,newx,...) 
 {
    class(object) <- class(object)[-1]
    newx <- regtools::charsToFactors(newx)
@@ -1558,7 +1558,7 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    res
 }
 
-predict.qePCA <- function(object,newx)
+predict.qePCA <- function(object,newx,...)
 {
    class(object) <- class(object)[-1]
    if (!regtools::allNumeric(newx)) {
@@ -1633,7 +1633,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    res
 }
 
-predict.qeUMAP <- function(object,newx)
+predict.qeUMAP <- function(object,newx,...)
 {
    class(object) <- class(object)[-1]
    if (!regtools::allNumeric(newx)) {
@@ -1687,7 +1687,7 @@ qeTS <- function(lag,data,qeName,opts=NULL,
    res
 }
 
-predict.qeTS <- function(object,newx)
+predict.qeTS <- function(object,newx,...)
 {
    if (is.vector(newx)) {
       newx <- matrix(newx,nrow=1)
@@ -1755,7 +1755,7 @@ qeText <- function(data,kTop=50,
 
 qetext <- qeText
 
-predict.qeText <- function(object,newDocs) 
+predict.qeText <- function(object,newDocs,...) 
 {
    xyout <- object$textToXYout
    if (!is.vector(newDocs)) newDocs <- as.vector(newDocs[,1])
@@ -1822,7 +1822,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    res
 }
 
-predict.qeskRF <- function(object,newx) 
+predict.qeskRF <- function(object,newx,...) 
 {
    if(is.vector(newx)) newx <- setTrainFactors(object,newx)
    if (regtools::hasFactors(newx))
@@ -1881,7 +1881,7 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    res
 }
 
-predict.qeskSVM <- function(object,newx) 
+predict.qeskSVM <- function(object,newx,...) 
 {
    if(is.vector(newx)) newx <- setTrainFactors(object,newx)
    if (regtools::hasFactors(newx))
@@ -2105,7 +2105,7 @@ qeDT <- function(data,yName,
    dtout
 }
 
-predict.qeDT <- function(object,newx)
+predict.qeDT <- function(object,newx,...)
 {
    ctout <- x$ctout
    newx <- setTrainFactors(object,newx)
@@ -2367,7 +2367,7 @@ smoothKNNna <- function(newX,xMatrix,ymuhat,minNonNA,K)
 #    number of nearest neighbors, generally small, even 1, since it
 #       makes use of values already smoothed by qeKNNna()
 
-predict.qeKNNna <- function(object,newx,kPred=1) 
+predict.qeKNNna <- function(object,newx,kPred=1,...) 
 {
 
    if (!regtools::allNumeric(newx)) 
@@ -2476,7 +2476,7 @@ qeParallel <- function(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
 
 qepar <- qeParallel
 
-predict.qeParallel <- function(object,newx) 
+predict.qeParallel <- function(object,newx,...) 
 {
    if (!is.null(object$libs)) 
       for (lb in object$libs) getSuggestedLib(lb)
