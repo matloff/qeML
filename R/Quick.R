@@ -2107,7 +2107,7 @@ qeDT <- function(data,yName,
 
 predict.qeDT <- function(object,newx,...)
 {
-   ctout <- x$ctout
+   ctout <- object$ctout
    newx <- setTrainFactors(object,newx)
    tmp <- predict(ctout,newx)
    if (object$classif) list(predClasses=tmp)
