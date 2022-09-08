@@ -1822,16 +1822,16 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    res
 }
 
-predict.qeskRF <- function(x,newx) 
+predict.qeskRF <- function(object,newx) 
 {
-   if(is.vector(newx)) newx <- setTrainFactors(x,newx)
+   if(is.vector(newx)) newx <- setTrainFactors(object,newx)
    if (regtools::hasFactors(newx))
       # need omitLast = TRUE to be consistent with getXY()
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=x$factorsInfo)
-   rf <- x$rf
+         factorsInfo=object$factorsInfo)
+   rf <- object$rf
    preds <- rf$predict(newx)
-   if (x$classif) preds <- list(predClasses=preds)
+   if (object$classif) preds <- list(predClasses=preds)
    preds
 }
 
@@ -1881,16 +1881,16 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    res
 }
 
-predict.qeskSVM <- function(x,newx) 
+predict.qeskSVM <- function(object,newx) 
 {
-   if(is.vector(newx)) newx <- setTrainFactors(x,newx)
+   if(is.vector(newx)) newx <- setTrainFactors(object,newx)
    if (regtools::hasFactors(newx))
       # need omitLast = TRUE to be consistent with getXY()
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-         factorsInfo=x$factorsInfo)
-   svmobj <- x$svmobj
+         factorsInfo=object$factorsInfo)
+   svmobj <- object$svmobj
    preds <- svmobj$predict(newx)
-   if (x$classif) preds <- list(predClasses=preds)
+   if (object$classif) preds <- list(predClasses=preds)
    preds
 }
 
@@ -2105,12 +2105,12 @@ qeDT <- function(data,yName,
    dtout
 }
 
-predict.qeDT <- function(x,newx)
+predict.qeDT <- function(object,newx)
 {
    ctout <- x$ctout
-   newx <- setTrainFactors(x,newx)
+   newx <- setTrainFactors(object,newx)
    tmp <- predict(ctout,newx)
-   if (x$classif) list(predClasses=tmp)
+   if (object$classif) list(predClasses=tmp)
    else tmp
 }
 
