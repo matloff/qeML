@@ -383,7 +383,7 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
    classif <- object$classif
 
    if (!is.null(object$factorsInfo)) 
-      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,x$factorsInfo)
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
 
@@ -450,11 +450,11 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    rfout
 }
 
-predict.qeRF <- function(x,newx,...)
+predict.qeRF <- function(object,newx,...)
 {
-   class(x) <- 'randomForest'
+   class(object) <- 'randomForest'
    newx <- setTrainFactors(object,newx)
-   classif <- x$classif
+   classif <- object$classif
    if (classif) {
       probs <- predict(object,newx,type='prob')
       res <- collectForReturn(object,probs)
@@ -846,7 +846,7 @@ predict.qeGBoost <- function(object,newx,newNTree=NULL,...)
    newx <- setTrainFactors(object,newx)
    gbmOuts <- object$gbmOuts
    if (is.null(newNTree)) {
-      nTree <- x$nTree
+      nTree <- object$nTree
    } else nTree <- newNTree
    if (object$classif) {
       # get probabilities for each class; 

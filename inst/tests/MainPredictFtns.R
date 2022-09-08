@@ -17,11 +17,12 @@ qeLASSO(pef,'wageinc')$testAcc
 
 # longer-running
 
-qeRF(pef,'wageinc')$testAcc
-qeNeuralNet(pef,'wageinc')$testAcc
-qePolyLin(pef,'wageinc')$testAcc
-qePolyLASSO(pef,'wageinc')$testAcc
-qeskRF(pef,'wageinc')$testAcc
+pefSmall <- pef[sample(1:nrow(pef),5000),]
+
+qeRF(pefSmall,'wageinc')$testAcc
+qePolyLin(pefSmall,'wageinc')$testAcc
+qePolyLASSO(pefSmall,'wageinc')$testAcc
+qeskRF(pefSmall,'wageinc')$testAcc
 
 pef1 <- pef
 pef1[c('age','wkswrkd')] <- makeNA(as.matrix(pef1[c('age','wkswrkd')]),0.1)
