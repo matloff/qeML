@@ -43,7 +43,7 @@ doubleD <- function(qeFtnCall,xPts,nReps,makeDummies=NULL,classif=FALSE)
    if (!is.null(makeDummies)) {
       dta <- makeDummies
       cmd <- 
-         paste0(dta,' <- factorsToDummies(',dta,
+         paste0(dta,' <- regtools::factorsToDummies(',dta,
          ',omitLast=TRUE)')
       eval(parse(text=cmd))
       cmd <- paste0(dta, ' <- as.data.frame(',dta,')')
@@ -69,9 +69,9 @@ doubleD <- function(qeFtnCall,xPts,nReps,makeDummies=NULL,classif=FALSE)
    res
 }
 
-plot.doubleD <- function(obj,xLab='xPts') 
+plot.doubleD <- function(x,xLab='xPts',...) 
 {
-   z <- as.data.frame(obj$outMatrix)
+   z <- as.data.frame(x$outMatrix)
    yLab <- 'err'
    yLim <- c(0,1.1*max(z[,-1]))
    plot(loess(testAcc ~ xPts,data=z),type='l',col='red',xlab=xLab,

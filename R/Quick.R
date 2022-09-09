@@ -464,7 +464,7 @@ predict.qeRF <- function(object,newx,...)
    res
 }
 
-plot.qeRF <- function(x) 
+plot.qeRF <- function(x,...) 
 {
    genericPlot(x)
 }
@@ -874,7 +874,7 @@ predict.qeGBoost <- function(object,newx,newNTree=NULL,...)
 
 # graph to explore best number of trees
 
-plot.qeGBoost <- function(x) 
+plot.qeGBoost <- function(x,...) 
 {
    gbm.perf(x$gbmOuts)
 }
@@ -1062,7 +1062,7 @@ predict.qeAdaBoost <- function(object,newx,newNTree=NULL,...)
 
 # graph to explore best number of trees
 
-plot.qeGBoost <- function(x) 
+plot.qeGBoost <- function(x,...) 
 {
    gbm.perf(x$gbmOuts)
 }
@@ -1458,9 +1458,9 @@ predict.qeLASSO <- function(object,newx,...)
    list(predClasses=predClasses,probs=tmp)
 }
 
-plot.qeLASSO <- function(x) 
+plot.qeLASSO <- function(x,...) 
 {
-   genericPlot(x)
+   plot(x)
 }
 
 ### to facilitate CRAN adherence, temporarily removed
@@ -2052,7 +2052,7 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
    z
 }
 
-plot.qeFT <- function(x) 
+plot.qeFT <- function(x,...) 
 {
    regtools:::plot.tuner(x)
 }
@@ -2114,12 +2114,12 @@ predict.qeDT <- function(object,newx,...)
    else tmp
 }
 
-plot.qeDT <- function(x) 
+plot.qeDT <- function(x,...) 
 {
    plot(x$ctout)
 }
 
-print.qeDT <- function(x) 
+print.qeDT <- function(x,...) 
 {
    print(x$ctout)
 }
