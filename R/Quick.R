@@ -99,7 +99,7 @@ qeLogit <-
       whichYes <- which(yLevels == yesYVal)
       noYVal <- yLevels[3 - whichYes]
    }
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE) 
    xy <- xyc$xy
@@ -216,7 +216,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    if (classif) {
       xyc <- getXY(data,yName,classif=TRUE,makeYdumms=TRUE)
@@ -305,7 +305,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    ycol <- which(names(data) == yName)
    if (classif) data[,ycol] <- as.integer(data[,ycol] == yesYVal)
 
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout,data)
       y <- data[-idxs,ycol]
@@ -436,7 +436,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('randomForest')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
@@ -504,7 +504,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
          }
       }
    }
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('ranger')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
@@ -579,7 +579,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
       factorsInfo <- attr(x,'factorsInfo')
    } else factorsInfo <- NULL
 
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
 
    # start the computation
@@ -691,7 +691,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
         print("for classification problems only")
         return(NA)
     }
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
     if (!is.null(holdout))
         splitData(holdout, data)
     requireNamespace('e1071')
@@ -802,7 +802,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('gbm')
    outlist <- list(classif=classif)
@@ -915,7 +915,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       factorsInfo <- attr(x,'factorsInfo')
    } else factorsInfo <- NULL
 
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout,x)
       trnx <- trn
@@ -989,7 +989,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    if (!is.factor(data[[yName]])) stop('for classification problems only')
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('JOUSBoost')
    outlist <- list()
@@ -1098,7 +1098,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
 
    classif <- is.factor(data[[yName]])
    requireNamespace('keras')
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    x <- data[,-ycol]
@@ -1257,11 +1257,12 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
 {
    classif <- is.factor(data[[yName]])
    if (classif) {print('currently not for classification problems'); return(NA)}
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol,drop=FALSE]
+   factorsInfo <- NULL; xm <- NULL  # for CRAN "unbound globals" complaint
    makeAllNumeric(x,data)
    data <- cbind(xm,y)
    data <- as.data.frame(data)
@@ -1307,7 +1308,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    classif <- is.factor(data[[yName]])
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
@@ -1364,7 +1365,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    classif <- is.factor(data[[yName]])
    if (!classif) stop('for classification problems')
 
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout,data)
    }
@@ -1399,10 +1400,11 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 {
    requireNamespace('glmnet')
    ycol <- which(names(data) == yName)
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    y <- data[,ycol]
    x <- data[,-ycol]
+   factorsInfo <- NULL; xm <- NULL  # for CRAN "unbound globals" complaint
    makeAllNumeric(x,data)
    
    classif <- is.factor(y)
@@ -1733,7 +1735,7 @@ qeText <- function(data,kTop=50,
 {
    if (!is.factor(data[,2])) stop('y must be an R factor')
    
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout,data)
    }
@@ -1875,7 +1877,7 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    if (classif) res$classNames <- levels(y)
    res$trainRow1 <- getRow1(data,yName)
 
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout))  splitData(holdout,data)
 
    xy <- getXY(data,yName,xMustNumeric=TRUE,classif=classif)
@@ -2095,7 +2097,7 @@ qeDT <- function(data,yName,
 {
    mincriterion <- 1 - alpha
    classif <- is.factor(data[[yName]])
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('party')
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
@@ -2268,7 +2270,7 @@ qeKNNna <- function(data,yName,k=25,
     # housekeeping, prelim tasks
     trainRow1 <- getRow1(data, yName)
     classif <- is.factor(data[[yName]])
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
     if (!is.null(holdout))
         splitData(holdout, data)
     xyc <- getXY(data, yName, xMustNumeric = TRUE, classif = classif,
@@ -2438,7 +2440,7 @@ qeParallel <- function(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
    } else newCLS <- FALSE
 
    ### data <- get(dataName)
-   holdIdxs <- NULL  # for CRAN "unbound globals" complaint
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout, data)  # trn, tst; data <- trn
    }
