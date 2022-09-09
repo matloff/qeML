@@ -10,7 +10,6 @@ qeKNN(pef,'wageinc')$testAcc
 qeRFranger(pef,'wageinc')$testAcc
 qeRFgrf(pef,'wageinc')$testAcc
 qeGBoost(pef,'wageinc')$testAcc
-qeAdaBoost(pef,'wageinc')$testAcc
 qeLightGBoost(pef,'wageinc')$testAcc
 qeNeural(pef,'wageinc')$testAcc
 qeLASSO(pef,'wageinc')$testAcc
