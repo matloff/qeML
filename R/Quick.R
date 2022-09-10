@@ -236,6 +236,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
    lmout$trainRow1 <- getRow1(data,yName)
    class(lmout) <- c('qeLin',class(lmout))
    if (!is.null(holdout)) {
+      preds <- NULL  # for CRAN "unbound globals" complaint
       predictHoldout(lmout)
       lmout$holdIdxs <- holdIdxs
       if (!classif) {
@@ -308,8 +309,8 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout,data)
-      y <- data[-idxs,ycol]
-      x <- data[-idxs,-ycol]
+      y <- data[-holdIdxs,ycol]
+      x <- data[-holdIdxs,-ycol]
    } else {
       x <- data[,-ycol]
       y <- data[,ycol]
@@ -834,6 +835,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       cmd <- paste0(cmd,'n.trees=',nTree,',')
       cmd <- paste0(cmd,'n.minobsinnode=',minNodeSize,',')
       cmd <- paste0(cmd,'shrinkage=',learnRate,')')
+      gbmout <- NULL  # for CRAN "unbound globals" complaint
       eval(parse(text=cmd))
       outlist$gbmOuts <- gbmout
    }
