@@ -945,6 +945,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    cmd <- 
     'lgbout <- lightgbm::lgb.train(params=params,data=lgbData,obj="regression",'
    cmd <- paste0(cmd,'nrounds=nTree)')
+   lgbout <- NULL  # for CRAN "unbound globals" complaint
    eval(parse(text=cmd))
    outlist$lgbout <- lgbout
    
