@@ -47,5 +47,9 @@ qeskSVM(pefSmall,'sex')$testAcc
 qeAdaBoost(pef,'sex')$testAcc
 qePolyLog(pef,'sex')$testAcc
 
-
 qeGBoost(pefSmall,'sex')$testAcc
+
+# should give something like wkswrked then age, and then occ and sex
+# values in some order
+qeFOCI(pef,'wageinc')$sel
+

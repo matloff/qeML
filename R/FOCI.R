@@ -18,7 +18,7 @@ qeFOCI <- function(data,yName,
    }
    x <- data[,-ycol]
    if (!allNumeric(x)) {
-      x <- factorsToDummies(x,omitLast=TRUE)
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
       x <- as.data.frame(x)
    }
    ccx <- regtools::constCols(x)

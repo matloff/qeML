@@ -236,7 +236,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
    lmout$trainRow1 <- getRow1(data,yName)
    class(lmout) <- c('qeLin',class(lmout))
    if (!is.null(holdout)) {
-      preds <- NULL  # for CRAN "unbound globals" complaint
+      ycol <- preds <- NULL  # for CRAN "unbound globals" complaint
       predictHoldout(lmout)
       lmout$holdIdxs <- holdIdxs
       if (!classif) {
