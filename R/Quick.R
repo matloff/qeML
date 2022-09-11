@@ -87,7 +87,7 @@
 qeLogit <- 
    function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
-   data <- na.exclude(data)
+   data <- stats::na.exclude(data)
    dataY <- data[[yName]]
    classif <- is.factor(dataY)
    if (classif && length(levels(dataY)) == 2)
@@ -1374,8 +1374,8 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    }
 
    requireNamespace('polyreg')
-   if (!checkPkgVersion('polyreg','0.7'))
-      stop('polyreg must be of version >= 1.7')
+   # if (!checkPkgVersion('polyreg','0.7'))
+   #    stop('polyreg must be of version >= 1.7')
       
    qeout <- polyreg::polyFit(xy,deg,use='glm')
    qeout$trainRow1 <- getRow1(data,yName)
@@ -2519,59 +2519,4 @@ predict.qeParallel <- function(object,newx,...)
    winners <- apply(probsAvg,1,which.max)
    colnames(probsAvg)[winners]
 }
-
-#########################  misc.  ################################
-
-# lm() balks if a label begins with a digit; check to see if we have any
-checkNumericNames <- function(nms)
-{
-   for (nm in nms) {
-      s <- substr(nm,1,1)
-      if (s >= '0' && s <= '9') {
-         stop('factor level begins with a digit')
-      }
-   }
-}
-
-# prepend the string s to each element of the character vector v
-prepend <- function(s,v)
-{
-   v <- as.character(v)
-   for (i in 1:length(v)) {
-      v[i] <- paste0(s,v[i])
-   }
-   as.factor(v)
-}
-
-# plot code for most
-
-genericPlot <- function(x) 
-{
-   obj <- x
-   class(obj) <- class(obj)[-1]  # actually not needed in many cases
-   plot(obj)
-}
-
-whatSplit <- function(qeObj) 
-{
-}
-
-# check whether an installed package is of version at least that
-# specified in 'atleast'; latter of form x.y for now, not x.y.x, i.e.
-# only the number and subnumber will be checked; e.g. '1.3.5' >= '1.3'
-checkPkgVersion <- function(pkgname,atleast) 
-{
-   pkgVersion <- as.character(packageVersion(pkgname))
-   nums <- strsplit(pkgVersion,'.',fixed=T)[[1]]
-   nums <- nums[1:2]
-   pkgVersion <- paste(nums,collapse='.')
-   pkgVersion >= atleast
-
-}
-
-# wrapper to load pkg that was only Suggested for, not Imported by, qeML
-
-getSuggestedLib <- function(pkgName) 
-   if (!requireNamespace(pkgName,quietly=TRUE))
-      stop(paste0(pkgName, 'not loaded'))
 
