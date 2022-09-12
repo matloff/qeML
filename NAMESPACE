@@ -49,7 +49,6 @@ export(
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
-   qeParallel,qeTS,qeText,buildQEcall,splitData,
-   getRow1,predictHoldout,qeLightGBoost,
-   checkNumericNames,prepend,makeAllNumeric,getXY,
+   qeParallel,qeTS,qeText,
+   qeLightGBoost,
    doubleD,qeFOCI,qeKNNna,qeLinKNN)
