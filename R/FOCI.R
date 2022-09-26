@@ -56,7 +56,7 @@ qeFOCIrand <- function(data,yName,xSetSize,nXSets)
        steps <- fociOut$stepT
        data.frame(selectedVars=selectedVars,steps=steps)
    }
-   tmp <- lapply(1:nrow(xSetIdxs),doOneFOCI)
+   lapply(1:nrow(xSetIdxs),doOneFOCI)
 
 }
 
