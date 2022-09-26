@@ -35,3 +35,28 @@ qeFOCI <- function(data,yName,
    FOCIout
 }
 
+# qeFOCIrand() runs qeFOCI() nXSets times, on random subsets of the
+# predictors of size xSetSize, outputting the union of the selected variables
+
+# this may be useful in datasets with lots of NAs; qeFOCI() does
+# na.exclude(), possibly resulting in a very large reduction in the 
+# dataset; taking small subsets of the predictors avoids this problem, especially if in the end one does use only a few of the predictors
+
+qeFOCIrand <- function(data,yName,xSetSize,nXSets)
+{
+   n <- nrow(data)
+   allXIdxs <- which(names(data) != yName)
+   nX <- length(allXIdxs)
+   xSetIdxs <- t(replicate(nXSets,{sample(allXIdxs,xSetSize)}))
+   yIdx <- which(names(data) == yName)
+   doOneFOCI <- function(i) 
+   {   xIdxs <- xSetIdxs[i,]
+       fociOut <- qeFOCI(data[,c(xIdxs,yIdx)],yName)
+       selectedVars <- fociOut$selectedVar$names
+       steps <- fociOut$stepT
+       data.frame(selectedVars=selectedVars,steps=steps)
+   }
+   tmp <- lapply(1:nrow(xSetIdxs),doOneFOCI)
+
+}
+
