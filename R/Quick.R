@@ -487,7 +487,7 @@ plot.qeRF <- function(x,...)
 
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),yYesName='')
+   holdout=floor(min(1000,0.1*nrow(data))),yesYVal='')
 {
    classif <- is.factor(data[[yName]])
    # in binary Y case, change to 0,1
@@ -495,8 +495,8 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    yvec <- data[,ycol]
    if (is.factor(yvec)) {
       if (length(levels(yvec)) == 2) {
-         if (length(yYesName) > 0) {
-            whichYes <- which(yvec == yYesName)
+         if (length(yesYVal) > 0) {
+            whichYes <- which(yvec == yesYVal)
             yvec <- as.character(yvec)
             yvec[whichYes] <- '1'
             yvec[-whichYes] <- '0'
@@ -529,7 +529,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    rfrout$classNames <- xyc$classNames
    rfrout$classif <- classif
    rfrout$trainRow1 <- getRow1(data,yName)
-   rfrout$yYesName <- yYesName
+   rfrout$yesYVal <- yesYVal
    class(rfrout) <- c('qeRFranger','ranger')
    if (!is.null(holdout)) {
       predictHoldout(rfrout)
