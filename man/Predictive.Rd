@@ -132,7 +132,8 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
   \item{alpha}{1 for LASSO, 2 for ridge.}
   \item{gamma}{Scale parameter in \code{e1071::svm}.}
   \item{cost}{Cost parameter in \code{e1071::svm}.}
-  \item{kernel}{One of 'linear','radial','polynomial' and 'sigmoid'.}
+  \item{kernel}{One of 'linear','radial','polynomial' and 'sigmoid'.  In
+  the case of \code{qeSVM}, this can be 'spline.'}
   \item{degree}{Degree of SVM polynomial kernel, if any.}
   \item{qeFtnList}{Character vector of \code{qe*} names.}
   \item{nReps}{Number of holdout sets to generate.}
