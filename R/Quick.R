@@ -215,6 +215,7 @@ predict.qeLogit <- function(object,newx,...)
 qeLin <- function(data,yName,noBeta0=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -1544,7 +1545,11 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    # eventual return value
    res <- list()
    res$scaleX <- FALSE  # already scaled via prcomp()
+
+   # error checks
    if (is.character(data)) data <- get(data)
+   if (!is.character(qeName)) stop('specify function name, not the function')
+
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol]
@@ -1959,12 +1964,21 @@ collectForReturn <- function(x,probs)
 
 # if yName is null, check features only
 
+# input could be tibble or data table
+checkForNonDF <- function(data) 
+{
+   if (class(data)[1] != 'data.frame') {
+      print('data must be a data frame')
+      stop('please convert and retry')
+   }
+
+}
+
 getXY <- function(data,yName,xMustNumeric=FALSE,classif,
    factorsInfo=NULL,makeYdumms=FALSE) 
 {
    if (is.vector(data) && is.null(yName)) data <- data.frame(data)
-   if (!is.data.frame(data))
-      stop('data must be a data frame')
+   if (!is.data.frame(data)) stop('must be a data frame')
    if (!is.null(yName)) {
       ycol <- which(names(data) == yName)
       y <- data[,ycol]
