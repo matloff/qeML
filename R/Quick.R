@@ -88,6 +88,7 @@ qeLogit <-
    function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
    data <- stats::na.exclude(data)
+   checkForNonDF(data)
    dataY <- data[[yName]]
    classif <- is.factor(dataY)
    if (classif && length(levels(dataY)) == 2)
@@ -290,7 +291,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-
+   checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    if (classif) {
