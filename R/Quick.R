@@ -438,6 +438,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -491,6 +492,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),yesYVal='')
 {
+   checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    # in binary Y case, change to 0,1
    ycol <- which(names(data) == yName)
@@ -571,6 +573,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkForNonDF(data)
    classif <- is.factor(data[[yName]])
 
    ycol <- which(names(data) == yName)
@@ -689,6 +692,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     degree = 2, allDefaults = TRUE, holdout = floor(min(1000,
         0.1 * nrow(data))))
 {
+   checkForNonDF(data)
     classif <- is.factor(data[[yName]])
     if (!classif) {
         print("for classification problems only")
@@ -1097,6 +1101,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
    acts=rep("relu",length(hidden)),learnRate=0.001,conv=NULL,xShape=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkForNonDF(data)
    # for use with qeRT(), hidden could be a string
    if (is.character(hidden)) 
       hidden <- as.numeric(strsplit(hidden,',')[[1]])
