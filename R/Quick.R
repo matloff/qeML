@@ -1964,16 +1964,6 @@ collectForReturn <- function(x,probs)
 
 # if yName is null, check features only
 
-# input could be tibble or data table
-checkForNonDF <- function(data) 
-{
-   if (class(data)[1] != 'data.frame') {
-      print('data must be a data frame')
-      stop('please convert and retry')
-   }
-
-}
-
 getXY <- function(data,yName,xMustNumeric=FALSE,classif,
    factorsInfo=NULL,makeYdumms=FALSE) 
 {
