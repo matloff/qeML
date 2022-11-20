@@ -1,6 +1,8 @@
 #  Clearing the Confusion:  Understanding overfitting--bias and variance of WHAT?
 
-**N. Matloff, UC Davis**
+N. Matloff, UC Davis
+
+**Goal**
 
 Explanations of overfitting in machine learning tend to be frustratingly
 vague.  We for instance hear "An overfitted model predicts poorly on new
@@ -18,6 +20,10 @@ Tradeoff:
 OK, but the bias and variance of WHAT?  Our treatment here is based on
 that notion, **but with more emphasis on what it is that we are really
 talking about** in discussing bias and variance.
+
+**Required Background**
+
+Very basic statistical concepts + patience (document is a bit long).
 
 **Setting**
 
@@ -62,52 +68,83 @@ Parametric methods such as linear and logistic models have a bias, in
 the sense of the inaccuracy of the model itself.  Say we use a linear
 model to predict weight from height, i.e. our model for &rho;(height) is
 
-mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
+&rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
+
+(This is called a "parametric" model, in that it expresses r(t) in terms
+of some parameters, in this case the &beta;<sub>i</sub>.)
+
+Our sample-based estimate is
+
+r(weight) = mean weight = b<sub>0</sub> + b<sub>1</sub> height
+
+The b<sub>i</sub> are the sample estimates of the &beta;<sub>i</sub>.
 
 Though the true population relation may be somewhat linear, the linear
 model cannot be perfectly correct.  So, no matter how much data we have,
-our estimated r(t) will not converge to the true &rho;(t)
-as the sample size grows.
+our estimated r(t) will not converge to the true &rho;(t) as the sample
+size grows; r(t) WILL converge to something, but that something will be
+the best-fitting LINEAR FUNCTION for the population, not the
+best-fitting FUNCTION.
 
 The bias here is the difference between the true &rho;(t) and the
 limiting value of r(t) as the sample size grows to infinity.  It will be
 different at each t, probably larger at larger t.  E.g. the bias for the
 linear model may be larger for taller people.
 
-For model-free methods, the bias is subtler.  Consider k-Nearest
-Neighbors (k-NN), say again predicting weight from height.  To
-calculate, say, r(68.2), we find the k points in our data closest
-to 68.2, then take the average weight among those people.  Bias arises
-as follows:  Say we wish to predict the weight for a person of height
-64, which is on the shorter end of the height range.  Then the
-neighboring data points are likely be taller than 64, and since our
-prediction will consist of the mean weight among the neighbors, this
-64-inch tall person's weight will likely be overestimated.  
+For model-free, i.e. nonparametric, methods, the bias is subtler.
+Consider k-Nearest Neighbors (k-NN), say again predicting weight from
+height.  To calculate, say, r(68.2), we find the k points in our data
+closest to 68.2, then take as r(68.2) the average weight among those
+people.  Bias arises as follows:  Say we wish to predict the weight for
+a person of height 64, which is on the shorter end of the height range.
+Then the neighboring data points are likely be predominantly taller than
+64, and since our prediction will consist of the mean weight among the
+neighbors, this 64-inch tall person's weight will likely be
+overestimated.  
 
-So again, there is a bias, again dependent on the value of t of interest,
-just as in the case of parametric methods.  However, for this very
-reason, we let the size of the neighborhood get smaller as our dataset
-size grows.  There is no such (direct) remedy for a linear model.
-There are analogs of this point for random forests, neural nets etc. 
+So again, there is a bias, again dependent on the value of t of
+interest, just as in the case of parametric methods.  However, for this
+very reason, we let the size of the neighborhood get smaller as our
+dataset size grows, causing the bias to shrink.  There is no such
+(direct) remedy for a linear model.  There are analogs of this point for
+random forests, neural nets etc.  On the other hand, a linear model will
+have a smaller variance, our next topic:
 
 **Variance**
 
 This refers to sampling variance, which measures the degree of
-instability of one's estimated r(t) from one sample to another.
-In the k-NN example above, say we take too small a value of k, even k = 1.  
-So we estimate r(68.2,32.9) to be the weight of whichever person in our 
-sample is closest to (68.2,32.9).  Clearly this value varies a lot from
-one sample to another, hence a large variance.  "But we only have one
-sample," you might object.  True, but we are interested in the
-probability that that sample is representative of the population.
+instability of one's estimated r(t) from one sample to another,
+e.g. the variation of the b<sub>i</sub> from one sample to another in
+our linear model above.
+
+The same holds for nonparametric models.  In the k-NN example above, say
+we take too small a value of k, even k = 1.  So we estimate r(68.2) to
+be the weight of whichever person in our sample is closest to 68.2.
+Clearly this value varies a lot from one sample to another, hence a
+large variance.  
+
+The relevance of variance is difficult for many nonspecialists in
+statistics/machine learning to accept.  "But we only have one sample,"
+some might object to the analysis in the preceding paragraphs.  True, but
+we are interested in the probability that that our sample is
+representative of the population.  In a gambling casino, you may play a
+game just once, but you still would like to know the probability of
+winning.  The same is true in data science, and that in turn means that
+sampling variance is key.
 
 **A U-Shaped Curve**
 
 We stated above that a linear model cannot be exactly correct, even with
-an unlimited amount of data.  So, why not a quadratic model?  How about
-one of degree 3?  with higher and higher degree polymials, we can reduce
-the bias to smaller and smaller amounts--if we have infinitely many data
-points.
+an unlimited amount of data.  So, why not a quadratic model?  
+
+&rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height + &beta;<sub>2</sub> height<sup>2</sup>
+
+This includes the linear model as a special case (&beta;<sub>2</sub> =
+0), but also is more general.  In the population, the best-fitting
+quadratic model will be more accurate than the best-fitting linear one.
+How about one of degree 3?  With higher and higher degree polynomials,
+we can reduce the bias to smaller and smaller amounts--if we have
+infinitely many data points.
 
 But in finite samples, the higher the degree of the polynomial, the
 larger the variance.  (We have more parameters to estimate, and I like
@@ -115,23 +152,38 @@ to think in terms of them "sharing" the data, less data available to
 each one.) 
 
 So, we have a battle between bias and variance!  As we increase the
-degree, first 1, then 2, then 3 and so on, the bias shrinks a lot while
-the variance grows only a little.  But eventually, inceasing the degree
-by 1 will reduce bias only a little, while variance increases a lot.
+degree, first 1, then 2, then 3 and so on, the bias initially shrinks a
+lot while the variance grows only a little.  But eventually, inceasing
+the degree by 1 will reduce bias only a little, while variance increases
+a lot.
 
 Result:
 
-> If we plot prediction accuracy vs. degree, we typically will get a
-> U-shaped curve.
+> If we plot prediction error vs. degree, we typically will get a
+> U-shaped curve.  Bias reduction dominates variance increase initially,
+> but eventually variance overpowers bias.  Once we pass the low point
+> of the curve, we we overfitting.
+
+The same is true for k-NN, plotting prediction error against k.  As
+noted, we can achieve smaller bias with smaller k.  The latter situation
+means smaller neighborhoods, making the problem of "using tall people to
+predict a short person's weight" less likely.  But smaller k means we
+are taking an average over a small set of people, which will vary a lot
+from one sample to another.
+
+Or, consider the number of predictors/features, say in the [Million Song
+Dataset](https://archive.ics.uci.edu/ml/datasets/YearPredictionMSD).
+The goal is to predict the year of release of a song, based on various
+audio characteristics of the song, 91 features in all.  Let p denote the
+number of features used in our analysis.  We might use just the first
+feature (needn't be the first, just an example), p = 1, or the first
+two, p = 2 and so on.  The more features we use, the smaller the bias,
+but the larger the variance.
 
 **Empirical Illustration**
 
-The dataset here is the [Million Song
-Dataset](https://archive.ics.uci.edu/ml/datasets/YearPredictionMSD),
-where the goal is to predict the year of release of a song, based on
-various audio characteristics of the song.  To keep the amount of
-computation manageable, I used only a random subset of 10,000 songs, and
-only two audio variables.
+I used the Million Song Dataset  To reduce the amount of computation,
+I used only a random subset of 10,000 songs, and only two audio variables.
 
 As noted, mean squared prediction error is a sum of bias squared and
 variance.  I calculated mean absolute prediction error (MAPE), but the
@@ -146,7 +198,7 @@ My goal was to show that:
 
 Combining these two points, we can observe the battle between bias and
 variance in their impact on MAPE.  At first the reduction in bias
-overpowers the increase in variable, but for larger degrees, the
+dominates the increase in variance, but for larger degrees, the
 opposite it true.
 
 Remember, variance is *always* increasing as degree increases here.  But
@@ -177,6 +229,8 @@ In the top row, one can see variance steadily increasing through degree
 9.  Starting with degree 10, there are serious numerical issues, arising
 from exact or nearly exact collinearity among the various terms in the
 polynomial.  
+
+The code is [here]()
 
 MAPE is shown in the second row.  There is a general "U" trend, albeit a
 shallow one.  We seem to have *numerical* overfitting starting at degree 10,
