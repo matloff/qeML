@@ -54,7 +54,7 @@ probability of class 1.
 
 Parametric methods such as linear and logistic models have a bias, in
 the sense of the inaccuracy of the model itself.  Say we use a linear
-model to predict weight from height and age.  Though the relation may be
+model to predict weight from height.  Though the relation may be
 somewhat linear, the line model cannot be perfect.  No matter how much
 data we have, our estimated r(t) will not converge to the true &rho;(t).
 The bias here is the difference between the true &rho;(t) and the
@@ -63,18 +63,19 @@ different at each t, probably larger at larger t.  E.g. the bias for the
 linear model may be larger for taller, older people.
 
 For model-free methods, the bias is subtler.  Consider k-Nearest
-Neighbors (k-NN), say again predicting weight from height and age.  To
-calculate, say, r(68.2,32.9), we find the k points in our data closest
-to (68.2,32.9), then take the average weight among those people.
-Assuming that &rho;(t<sub>1</sub>,t<sub>2</sub> is an increasing
-function of both variables (e.g. taller people tend to be heavier), the
-mean weight of people who are shorter/younger in that neighborhood will
-likely be overestimated.  
+Neighbors (k-NN), say again predicting weight from height.  To
+calculate, say, r(68.2), we find the k points in our data closest
+to 68.2, then take the average weight among those people.  Bias arises
+as follows:  Say we wish to predict the weight for a person of height
+64, which is on the shorter end of the height range.  Then the
+neighboring data points are likely be taller than 64, and since our
+prediction will consist of the mean weight among the neighbors, this
+64-inch tall person's weight will likely be overestimated.  
 
 So again, there is a bias, again dependent on the value of t of interest,
 just as in the case of parametric methods.  However, for this very
 reason, we let the size of the neighborhood get smaller as our dataset
-grows.  There is no such (direct) remedy for a linear model.
+size grows.  There is no such (direct) remedy for a linear model.
 There are analogs of this point for random forests, neural nets etc. 
 
 **Variance**
@@ -136,22 +137,22 @@ variance in their impact on MAPE.  At first the reduction in bias
 overpowers the increase in variable, but for larger degrees, the
 opposite it true.
 
-But how can we measure variance?  Most readers here know that R reports
-standard errors of estimates, but for different degrees with have
-different numbers of estimated parameters, thus with noncomparable
-standard errors.
+Remember, variance is *always* increasing as degree increases here.  But
+how can we measure variance to show this numerically?  Most readers here
+know that R reports standard errors of estimates, but for different
+degrees with have different numbers of estimated parameters, thus with
+noncomparable standard errors.
 
 Instead, I took the first song in the dataset, and let x = the audio
 characterstics of that particular song.  I then found the variance of
 r(x) (a matrix quadratic form in x and the estimated covariance matrix
 of the vector of coefficients of the polynomial).
 
-
-
+I fit degrees 1 through 12.  (Again, the save on computation, I used
+interaction terms only of degree 2.)  For cross-validated MAPE values, I
+used 20 random holdout sets of size 1000.  Here is the output:
 
 ```text
-sapply(1:12,function(i) biasVar(yr3,'V1',i,1000,20))
-
            [,1]       [,2]       [,3]       [,4]       [,5]       [,6]
 [1,] 0.02440784 0.02718803 0.03184419 0.04229401 0.04945168 0.05450264
 [2,] 7.86296820 7.74149419 7.74222432 7.66320622 7.70638321 7.69907202
@@ -159,4 +160,26 @@ sapply(1:12,function(i) biasVar(yr3,'V1',i,1000,20))
 [1,] 0.06572677 0.07980077 0.114887 -0.008906266       NA       NA
 [2,] 7.73367546 7.70928618 7.733230  7.793813681 9.980302 17.36951
 ```
+
+In the top row, one can see variance steadily increasing through degree
+9.  Starting with degree 10, there are serious numerical issues, arising
+from exact or nearly exact collinearity among the various terms in the
+polynomial.  
+
+MAPE is shown in the second row.  There is a general "U" trend, albeit a
+shallow one.  We seem to have *numerical* overfitting starting at degree 10,
+but *statisical* overfitting starting at degree 5 or so.
+
+**Double Descent**
+
+In recent years, the phenomenon of ``double descent'' has caused quite a
+stir in statistics and machine learning communities.  It turns out that
+one can actually have *two* U-shapes, the second one coming immediately
+after the first.  Here is an example, also using the Million Song
+dataset, but in this case using more and more columns of the dataset
+rather than using polymials of increasing degree.
+
+![alt text](https://matloff.files.wordpress.com/2020/11/overfit.png)
+
+Many people have theorized as to the cause of this.
 
