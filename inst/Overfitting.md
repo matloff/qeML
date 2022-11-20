@@ -212,7 +212,7 @@ characterstics of that particular song.  I then found the variance of
 r(x) (a matrix quadratic form in x and the estimated covariance matrix
 of the vector of coefficients of the polynomial).
 
-I fit degrees 1 through 12.  (Again, the save on computation, I used
+I fit degrees 1 through 12.  (Again, to save on computation, I used
 interaction terms only of degree 2.)  For cross-validated MAPE values, I
 used 20 random holdout sets of size 1000.  Here is the output:
 
@@ -230,7 +230,7 @@ In the top row, one can see variance steadily increasing through degree
 from exact or nearly exact collinearity among the various terms in the
 polynomial.  
 
-The code is [here]()
+The code is [here](https://github.com/matloff/qeML/blob/master/inst/BiasVar.R).
 
 MAPE is shown in the second row.  There is a general "U" trend, albeit a
 shallow one.  We seem to have *numerical* overfitting starting at degree 10,
@@ -239,7 +239,7 @@ but *statisical* overfitting starting at degree 5 or so.
 **Double Descent**
 
 In recent years, the phenomenon of ``double descent'' has caused quite a
-stir in statistics and machine learning communities.  It turns out that
+stir in the statistics and machine learning communities.  It turns out that
 one can actually have *two* U-shapes, the second one coming immediately
 after the first.  Here is an example, also using the Million Song
 dataset, but in this case using more and more columns of the dataset
