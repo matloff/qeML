@@ -1,6 +1,6 @@
 #  Clearing the Confusion:  Understanding overfitting--bias and variance of WHAT?
 
-**N. Matloff, UC Davis**
+**N. Matloff, UC Davis** 
 
 Explanations of overfitting in machine learning tend to be frustratingly
 vague.  We for instance hear "An overfitted model predicts poorly on new
