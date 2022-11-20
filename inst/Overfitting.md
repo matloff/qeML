@@ -4,8 +4,9 @@
 
 Explanations of overfitting in machine learning tend to be frustratingly
 vague.  We for instance hear "An overfitted model predicts poorly on new
-examples," not helpful.  Or we hear that overfitting results from
-"fitting the training data too well" or that we are "fitting the noise."
+examples," which is a definition, not an explanation.  Or we hear that
+overfitting results from "fitting the training data too well" or that we
+are "fitting the noise," again rather unsatisfying.
 
 Somewhat better are the explanations based on the famous Bias-Variance
 Tradeoff:
@@ -16,11 +17,11 @@ Tradeoff:
 
 OK, but the bias and variance of WHAT?  Our treatment here is based on
 that notion, **but with more emphasis on what it is that we are really
-talking about.**
+talking about** in discussing bias and variance.
 
 **Setting**
 
-Yet Y denote our outcome variable, and X represent the vector of our
+Let Y denote our outcome variable, and X represent the vector of our
 predictors/features.  For instance, Y might be human weight, with X
 being (height, age).  We include binary classification problems, with Y
 = 1 or 0.  (In multiclass problems, Y is a vectors of 1s and 0s, with
@@ -33,15 +34,20 @@ Y for the given X values.  In the weight/height/age example,
 &rho;(68.2,32.9) is the mean weight of all people of height 68.2 and age
 32.9.  
 
-&rho; is the best predictor of weight based on height and age, the ideal.
-Note the phrase "based on," though.  If we had a third predictor
-variable/feature available, there would be another &rho; for that,
-better than the two-predictor one.
+&rho; is the best predictor of weight based on height and age, the
+ideal.  Note the phrase "based on," though.  If we had a third predictor
+variable/feature available, say waist size, there would be another &rho;
+for that 3-predictor setting, better than the 2-predictor one.
 
-Note that &rho; is a population entity, which we estimate from our sample
-data.  Denote the estimated &rho;(t) by r(t).  (Note:  "Sample" means
-our entire dataset; we say, "A sample of 100 peoplee," not "We have 100
-samples.")
+Note that &rho; is a population entity, which we estimate from our
+sample data.  Denote the estimated &rho;(t) by r(t).  Say we are
+studying diabetic people.  &rho;(t) gives us the relation of weight vs.
+height and age in the entire population of diabetics; if our study
+involves 100 patients, that is considered a sample from the population,
+and our estimate r(t) is based on that sample.
+
+(Note:  "Sample" means our entire dataset; we say, "A sample of 100
+peoplee," not "We have 100 samples.")
 
 Also, though some books use the term "regression" to mean a
 linear model, the actual definition is unrestricted; it applies just as
@@ -54,13 +60,19 @@ probability of class 1.
 
 Parametric methods such as linear and logistic models have a bias, in
 the sense of the inaccuracy of the model itself.  Say we use a linear
-model to predict weight from height.  Though the relation may be
-somewhat linear, the line model cannot be perfect.  No matter how much
-data we have, our estimated r(t) will not converge to the true &rho;(t).
+model to predict weight from height, i.e. our model for &rho;(height) is
+
+mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
+
+Though the true population relation may be somewhat linear, the linear
+model cannot be perfectly correct.  So, no matter how much data we have,
+our estimated r(t) will not converge to the true &rho;(t)
+as the sample size grows.
+
 The bias here is the difference between the true &rho;(t) and the
 limiting value of r(t) as the sample size grows to infinity.  It will be
 different at each t, probably larger at larger t.  E.g. the bias for the
-linear model may be larger for taller, older people.
+linear model may be larger for taller people.
 
 For model-free methods, the bias is subtler.  Consider k-Nearest
 Neighbors (k-NN), say again predicting weight from height.  To
