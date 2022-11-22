@@ -7,6 +7,8 @@
 \alias{qeRFgrf}
 \alias{qeSVM}
 \alias{qeGBoost}
+\alias{qeAdaBoost}
+\alias{qeLightGBoost}
 \alias{qeNeural}
 \alias{qeLASSO}
 \alias{qePolyLin}
@@ -28,6 +30,7 @@
 \alias{predict.qeSVM}
 \alias{predict.qeGBoost}
 \alias{predict.qelightGBoost}
+\alias{predict.qeAdaBoost}
 \alias{predict.qeNeural}
 \alias{predict.qeLASSO}
 \alias{predict.qePolyLin}
