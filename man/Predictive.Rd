@@ -29,7 +29,7 @@
 \alias{predict.qeRFgrf}
 \alias{predict.qeSVM}
 \alias{predict.qeGBoost}
-\alias{predict.qelightGBoost}
+\alias{predict.qeLightGBoost}
 \alias{predict.qeAdaBoost}
 \alias{predict.qeNeural}
 \alias{predict.qeLASSO}
@@ -73,7 +73,9 @@ qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
-qelightGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
+qeAdaBoost(data, yName, treeDepth = 3, nRounds = 100, rpartControl = NULL, 
+    holdout = floor(min(1000, 0.1 * nrow(data)))) 
+qeLightGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeNeural(data,yName,hidden=c(100,100),nEpoch=30,
    acts=rep("relu",length(hidden)),learnRate=0.001,
@@ -164,6 +166,9 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
      images.  Must be non-NULL if \code{conv} is.}
   \item{yYesName}{For a binary classification problem, the value to
      be considered "yes" in probability reports.}
+  \item{treeDepth}{Number of levels in each tree.}
+  \item{nRounds}{Number of boosting rounds.}
+  \item{rpartControl}{An R list specifying properties of fitted trees.}
 }
 
 \details{
