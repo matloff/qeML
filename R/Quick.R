@@ -2428,9 +2428,10 @@ predict.qeKNNna <- function(object,newx,kPred=1,...)
 #     params: R list of tuning parameters; see documentation fo
 #        xgboost::xgboost()
  
-qeXGBoost <- function(data,yName,nRounds=5,params=list(),yesYVal,
+qeXGBoost <- function(data,yName,nRounds=100,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   require(xgboost)
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
@@ -2463,6 +2464,10 @@ qeXGBoost <- function(data,yName,nRounds=5,params=list(),yesYVal,
       factorsInfo <- attr(x,'factorsInfo') 
    } else factorsInfo <- NULL
 
+   xm <- as.matrix(x)
+   xgbOut <- xgboost(data=xm,label=y,nrounds=nRounds)
+
+   xgboost
 
 }
 
