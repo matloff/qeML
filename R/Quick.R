@@ -2428,7 +2428,7 @@ predict.qeKNNna <- function(object,newx,kPred=1,...)
 #     params: R list of tuning parameters; see documentation fo
 #        xgboost::xgboost()
  
-qeXGBoost <- function(data,yName,nRounds=100,params=list(),yesYVal,
+qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    require(xgboost)
@@ -2466,10 +2466,28 @@ qeXGBoost <- function(data,yName,nRounds=100,params=list(),yesYVal,
 
    xm <- as.matrix(x)
    xgbOut <- xgboost(data=xm,label=y,nrounds=nRounds)
+   class(xgbOut) <- c('qeXGBoost','xgb.Booster')
 
-   xgboost
+   xgbOut$classif <- classif
+   xgbOut$factorsInfo <- factorsInfo
+
+   xgbOut
 
 }
+
+predict.qeXGBoost <- function(xgbOut,x) 
+{
+   if (!allNumeric(x)) 
+      x <- factorsToDummies(x,omitLast=TRUE,factorsInfo=xgbOut$ffactorsInfo)
+   class(xgbOut) <- class(xgbOut)[-1]
+   predict(xgbOut,x)
+}
+
+# data(pef)
+# pef1<- pef[,-2]
+# z <- qeXGBoost(pef1,'wageinc',holdout=NULL,nRounds=250)
+# predict(z,pef1[1:28,-4])
+
 
 #######################  qeParallel()  ##############################
 
