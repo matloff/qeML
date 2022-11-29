@@ -52,5 +52,6 @@ export(
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
    qeParallel,qeTS,qeText,
    qeLightGBoost,
+   qeXGBoost,
    doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,
    checkForNonDF)
