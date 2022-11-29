@@ -2479,6 +2479,7 @@ predict.qeXGBoost <- function(xgbOut,x)
 {
    if (!allNumeric(x)) 
       x <- factorsToDummies(x,omitLast=TRUE,factorsInfo=xgbOut$ffactorsInfo)
+   else x <- as.matrix(x)
    class(xgbOut) <- class(xgbOut)[-1]
    predict(xgbOut,x)
 }
