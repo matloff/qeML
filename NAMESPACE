@@ -51,7 +51,7 @@ export(
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
    qeParallel,qeTS,qeText,
-   qeLightGBoost,
-   qeXGBoost,
+   qeLightGBoost, qeXGBoost,
+   splitData, predictHoldout,
    doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,
    checkForNonDF)

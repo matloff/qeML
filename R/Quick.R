@@ -2471,6 +2471,12 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    xgbOut$classif <- classif
    xgbOut$factorsInfo <- factorsInfo
 
+   if (!is.null(holdout)) {
+        predictHoldout(xgbOut)
+        xgbOut$holdIdxs <- holdIdxs
+    }
+   else xgbOut$holdIdxs <- NULL
+
    xgbOut
 
 }
