@@ -1736,18 +1736,24 @@ predict.qeTS <- function(object,newx,...)
 
 # arguments:
 
-#    data: 2-col data frame; col 1 is a vector of character strings,
-#       one per training set document; col 2 is R factor, doc categories
+#    data: as in other qe* functions, but with the "Y" column
+#       consisting of a character vector, with one element storing an
+#       entire document in a single string
+#    yName: as in other qe* functions
 #    kTop: number of most-frequent words to use
 #    stopWords: stop lists to use
 #    qeName: qe-series function to use
+#    opts: optional arguments for that function
 #    holdout: as with the other qe-series functions
 
-qeText <- function(data,kTop=50,
+qeText <- function(data,yName,kTop=50,
    stopWords=tm::stopwords('english'),qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   if (!is.factor(data[,2])) stop('y must be an R factor')
+
+   ycol <- which(names(data) == yName)
+   y <- data[,ycol]
+   if (!is.factor(y)) stop('y must be an R factor')
    
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
@@ -1757,17 +1763,18 @@ qeText <- function(data,kTop=50,
    res <- list()  # ultimately, the return value
 
    textToXYout <- regtools::textToXY(data[,1],data[,2],kTop,stopWords)
-   textToXYout$y <- data[,2]  # convert back to factor
+   ## textToXYout$y <- data[,2]  # convert back to factor
    res$textToXYout <- textToXYout
 
    # form data for ML call
    qeData <- textToXYout$x
    qeData <- as.data.frame(qeData)
-   qeData <- cbind(qeData,textToXYout$y)
+   qeData <- cbind(qeData,y)
+   # names(qeData)[ncol(qeData)] <- yName
    ncx <- ncol(qeData) - 1
    names(qeData) <- paste0('keyword',1:ncx)
    names(qeData)[ncx+1] <- 'label'
-   yName <- names(data)[2]
+   # yName <- names(data)[2]
 
    # now call the ML function, forming the call in string form first
    cmd <- paste0(qeName,'(qeData,','"label",')
