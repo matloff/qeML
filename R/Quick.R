@@ -1751,6 +1751,8 @@ qeText <- function(data,yName,kTop=50,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
 
+   if (ncol(data) > 2) stop('must have only 1 text column and 1 label column')
+
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    if (!is.factor(y)) stop('y must be an R factor')
@@ -1762,7 +1764,7 @@ qeText <- function(data,yName,kTop=50,
 
    res <- list()  # ultimately, the return value
 
-   textToXYout <- regtools::textToXY(data[,1],data[,2],kTop,stopWords)
+   textToXYout <- regtools::textToXY(data[,3-ycol],data[,ycol],kTop,stopWords)
    ## textToXYout$y <- data[,2]  # convert back to factor
    res$textToXYout <- textToXYout
 
