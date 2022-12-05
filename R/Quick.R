@@ -1771,7 +1771,7 @@ qeText <- function(data,yName,kTop=50,
    # form data for ML call
    qeData <- textToXYout$x
    qeData <- as.data.frame(qeData)
-   qeData <- cbind(qeData,y)
+   qeData <- cbind(qeData,y[-holdIdxs])
    # names(qeData)[ncol(qeData)] <- yName
    ncx <- ncol(qeData) - 1
    names(qeData) <- paste0('keyword',1:ncx)
