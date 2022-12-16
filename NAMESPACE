@@ -53,5 +53,4 @@ export(
    qeParallel,qeTS,qeText,
    qeLightGBoost, qeXGBoost,
    splitData, predictHoldout,
-   doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,
-   checkForNonDF)
+   doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN)
