@@ -194,6 +194,14 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
   \item{parPlat}{Parallel platforParallel platform.  Valid values are
      'none', 'cluster' (output of \code{parallel::makeCluster}), and 
      'locThreads' (local cores).}
+  \item{xSetSize}{Size of subsets of the predictor variables.}
+  \item{nXSets}{Number of subsets of the predictor variables.}
+  \item{deg}{Degree of a polynomial.}
+  \item{maxInteractDeg}{Maximul degree of interaction terms in
+     a polynomial.}
+  \item{yLevelName}{Name of the class to be considered a positive
+     response in a classification problem.}
+  \item{params}{Tuning parameters for \code{xgboost}.}
 }
 
 \details{
