@@ -20,6 +20,13 @@
 \alias{qeskRF}
 \alias{qeskSVM}
 \alias{qeParallel}
+\alias{qeDT}
+\alias{qeFOCI}
+\alias{qeFOCIrand}
+\alias{qeLinKNN}
+\alias{qePolyLASSO}
+\alias{qeROC}
+\alias{qeXGBoost}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
@@ -91,6 +98,19 @@ qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 qePCA(dataName,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
+   yesYLevel=NULL)
+qeFOCIrand(data,yName,xSetSize,nXSets)
+qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
+   expandVars=NULL,expandVals=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeROC(dataIn,qeOut,yName,yLevelName)
+qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
 \method{predict}{qeLogit}(object,newx)
 \method{predict}{qeLin}(object,newx)
