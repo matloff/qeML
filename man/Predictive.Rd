@@ -154,7 +154,8 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
   \item{acts}{Vector of names of the activation functions, one per
      hidden layer.  Choices inclde 'relu', 'sigmoid', 'tanh', 'softmax',
      'elu', 'selu'.}
-  \item{alpha}{1 for LASSO, 2 for ridge.}
+  \item{alpha}{In the case of \code{qeDT}, a p-value cutoff criterion.
+     Otherwise 1 for LASSO, 2 for ridge.}
   \item{gamma}{Scale parameter in \code{e1071::svm}.}
   \item{cost}{Cost parameter in \code{e1071::svm}.}
   \item{kernel}{In the case of \code{qeSVM}, this is 
@@ -189,6 +190,10 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
   \item{treeDepth}{Number of levels in each tree.}
   \item{nRounds}{Number of boosting rounds.}
   \item{rpartControl}{An R list specifying properties of fitted trees.}
+  \item{numCores}{Number of cores to use in parallel computation.}
+  \item{parPlat}{Parallel platforParallel platform.  Valid values are
+     'none', 'cluster' (output of \code{parallel::makeCluster}), and 
+     'locThreads' (local cores).}
 }
 
 \details{
