@@ -52,5 +52,4 @@ export(
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
    qeParallel,qeTS,qeText,
    qeLightGBoost, qeXGBoost,
-   splitData, predictHoldout,
    doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN)
