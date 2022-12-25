@@ -2440,7 +2440,6 @@ predict.qeKNNna <- function(object,newx,kPred=1,...)
 qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   require(xgboost)
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
@@ -2474,7 +2473,7 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    } else factorsInfo <- NULL
 
    xm <- as.matrix(x)
-   xgbOut <- xgboost(data=xm,label=y,nrounds=nRounds)
+   xgbOut <- xgboost::xgboost(data=xm,label=y,nrounds=nRounds)
    class(xgbOut) <- c('qeXGBoost','xgb.Booster')
 
    xgbOut$classif <- classif
@@ -2490,13 +2489,13 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
 
 }
 
-predict.qeXGBoost <- function(xgbOut,x) 
+predict.qeXGBoost <- function(object,x) 
 {
    if (!allNumeric(x)) 
-      x <- factorsToDummies(x,omitLast=TRUE,factorsInfo=xgbOut$ffactorsInfo)
+      x <- factorsToDummies(x,omitLast=TRUE,factorsInfo=object$ffactorsInfo)
    else x <- as.matrix(x)
-   class(xgbOut) <- class(xgbOut)[-1]
-   predict(xgbOut,x)
+   class(object) <- class(object)[-1]
+   predict(object,x)
 }
 
 # data(pef)
