@@ -120,14 +120,13 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 \method{predict}{qeRFgrf}(object,newx)
 \method{predict}{qeSVM}(object,newx,k=25)
 \method{predict}{qeGBoost}(object,newx)
-\method{predict}{qelightGBoost}(object,newx)
+\method{predict}{qeLightGBoost}(object,newx)
 \method{predict}{qeNeural}(object,newx)
 \method{predict}{qeLASSO}(object,newx)
 \method{predict}{qePoly}(object,newx)
 \method{predict}{qePCA}(object,newx)
 \method{predict}{qeUMAP}(object,newx)
 \method{plot}{qeLASSO}(object,newx)
-\method{plot}{qeSVM}(object,newx,k=25)
 \method{plot}{qeRF}(object,newx)
 }
 
