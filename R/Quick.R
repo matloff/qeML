@@ -2489,10 +2489,11 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
 
 }
 
-predict.qeXGBoost <- function(object,x) 
+predict.qeXGBoost <- function(object,x,...) 
 {
    if (!allNumeric(x)) 
-      x <- factorsToDummies(x,omitLast=TRUE,factorsInfo=object$ffactorsInfo)
+      x <- regtools::factorsToDummies(x,omitLast=TRUE,
+         factorsInfo=object$ffactorsInfo)
    else x <- as.matrix(x)
    class(object) <- class(object)[-1]
    predict(object,x)
