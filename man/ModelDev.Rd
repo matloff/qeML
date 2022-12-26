@@ -16,10 +16,10 @@ Utilties to help build models.
 \usage{
 qeCompare(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
-qeText(data,kTop=50,stopWords=tm::stopwords("english"),
+qeText(data,yName,kTop=50,stopWords=tm::stopwords("english"),
    qeName,opts=NULL,holdout=floor(min(1000,0.1*nrow(data))))
 qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
-\method{predict}{qeText}(object,newx)
+\method{predict}{qeText}(object,newDocs)
 \method{predict}{qeTS}(object,newx)
 }
 

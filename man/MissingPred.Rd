@@ -13,7 +13,7 @@ values.
 \usage{
 qeKNNna(data,yName,k=25,minNonNA=1,holdout=floor(min(1000,0.1*nrow(data))),
 printDists=FALSE)
-\method{predict}{qeKNNna}(object,newx,kPred=1)
+\method{predict}{qeKNNna}(object,newx,kPred=1,...)
 }
 
 \arguments{
