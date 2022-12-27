@@ -73,14 +73,14 @@ qeRFranger(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),yesYVal="") 
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
-   holdout=floor(min(1000,0.1*nrow(data))),
-   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
+   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
+   holdout=floor(min(1000,0.1*nrow(data))))
 qeskRF(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
+   allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeAdaBoost(data, yName, treeDepth = 3, nRounds = 100, rpartControl = NULL, 
@@ -98,10 +98,10 @@ qePolyLog(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeCompare(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
-qePCA(dataName,yName,qeName,opts=NULL,pcaProp,
+qePCA(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
-   holdout=floor(min(1000,0.1*nrow(data))))
+qeUMAP(data,yName,qeName,opts=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))),nComps,nNeighbors)
 qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
