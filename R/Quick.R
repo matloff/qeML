@@ -472,9 +472,9 @@ predict.qeRF <- function(object,newx,...)
    res
 }
 
-plot.qeRF <- function(object,...) 
+plot.qeRF <- function(x,...) 
 {
-   genericPlot(object)
+   genericPlot(x)
 }
 
 #########################  qeRFranger()  #################################
@@ -1485,9 +1485,9 @@ predict.qeLASSO <- function(object,newx,...)
    list(predClasses=predClasses,probs=tmp)
 }
 
-plot.qeLASSO <- function(object,...) 
+plot.qeLASSO <- function(x,...) 
 {
-   plot(object)
+   plot(x)
 }
 
 ### to facilitate CRAN adherence, temporarily removed
