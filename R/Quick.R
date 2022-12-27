@@ -2278,8 +2278,7 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
 # l1 distance is used; some Yi might be NAs
 
 qeKNNna <- function(data,yName,k=25,
-   minNonNA=1,holdout = floor(min(1000, 0.1 * nrow(data))),
-   printDists=FALSE)
+   minNonNA=1,holdout = floor(min(1000, 0.1 * nrow(data))))
 {
 
     # error checks
