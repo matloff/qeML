@@ -1,5 +1,6 @@
-\name{mlb,mlb1}
-\alias{mlb,mlb1}
+\name{mlb}
+\alias{mlb}
+\alias{mlb1}
 
 \title{
 Major Leage Baseball player data set.

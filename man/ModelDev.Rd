@@ -19,8 +19,8 @@ qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 qeText(data,yName,kTop=50,stopWords=tm::stopwords("english"),
    qeName,opts=NULL,holdout=floor(min(1000,0.1*nrow(data))))
 qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
-\method{predict}{qeText}(object,newDocs)
-\method{predict}{qeTS}(object,newx)
+\method{predict}{qeText}(object,newDocs,...)
+\method{predict}{qeTS}(object,newx,...)
 }
 
 \arguments{
