@@ -130,8 +130,8 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 \method{predict}{qePoly}(object,newx)
 \method{predict}{qePCA}(object,newx,...)
 \method{predict}{qeUMAP}(object,newx,...)
-\method{plot}{qeLASSO}(object,x,...)
-\method{plot}{qeRF}(object,x,...)
+\method{plot}{qeLASSO}(x,...)
+\method{plot}{qeRF}(x,...)
 }
 
 \arguments{
