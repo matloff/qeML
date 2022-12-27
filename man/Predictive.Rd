@@ -78,9 +78,9 @@ qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
 qeskRF(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
-qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    allDefaults=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
+qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
+   holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeAdaBoost(data, yName, treeDepth = 3, nRounds = 100, rpartControl = NULL, 
@@ -101,7 +101,7 @@ qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 qePCA(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeUMAP(data,yName,qeName,opts=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),nComps,nNeighbors)
+   holdout=floor(min(1000,0.1*nrow(data))),scaleX=TRUE,nComps,nNeighbors)
 qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
@@ -115,22 +115,22 @@ qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
 qeROC(dataIn,qeOut,yName,yLevelName)
 qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
-\method{predict}{qeLogit}(object,newx)
-\method{predict}{qeLin}(object,newx)
-\method{predict}{qeKNN}(object,newx,newxK=1)
-\method{predict}{qeRF}(object,newx)
-\method{predict}{qeRFranger}(object,newx)
-\method{predict}{qeRFgrf}(object,newx)
-\method{predict}{qeSVM}(object,newx,k=25)
-\method{predict}{qeGBoost}(object,newx)
-\method{predict}{qeLightGBoost}(object,newx)
-\method{predict}{qeNeural}(object,newx)
-\method{predict}{qeLASSO}(object,newx)
+\method{predict}{qeLogit}(object,newx,...)
+\method{predict}{qeLin}(object,newx,...)
+\method{predict}{qeKNN}(object,newx,newxK=1,...)
+\method{predict}{qeRF}(object,newx,...)
+\method{predict}{qeRFranger}(object,newx,...)
+\method{predict}{qeRFgrf}(object,newx,...)
+\method{predict}{qeSVM}(object,newx,k=25,...)
+\method{predict}{qeGBoost}(object,newx,...)
+\method{predict}{qeLightGBoost}(object,newx,...)
+\method{predict}{qeNeural}(object,newx,k=NULL,...)
+\method{predict}{qeLASSO}(object,newx,...)
 \method{predict}{qePoly}(object,newx)
-\method{predict}{qePCA}(object,newx)
-\method{predict}{qeUMAP}(object,newx)
-\method{plot}{qeLASSO}(object,newx)
-\method{plot}{qeRF}(object,newx)
+\method{predict}{qePCA}(object,newx,...)
+\method{predict}{qeUMAP}(object,newx,...)
+\method{plot}{qeLASSO}(object,newx,...)
+\method{plot}{qeRF}(object,x,...)
 }
 
 \arguments{
