@@ -66,11 +66,12 @@ for teaching.
 qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 qeLin(data,yName,noBeta0=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
 qeKNN(data,yName,k,scaleX=TRUE,smoothingFtn=mean,yesYVal=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))))
+   expandVars=NULL,expandVals =NULL,holdout=floor(min(1000,0.1*nrow(data))))
 qeRF(data,yName,nTree=500,minNodeSize=10,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeRFranger(data,yName,nTree,minNodeSize,
-   holdout=floor(min(1000,0.1*nrow(data))),   yYesName="") 
+qeRFranger(data,yName,nTree=500,minNodeSize=10,
+   mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))),yesYVal="") 
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))),
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
