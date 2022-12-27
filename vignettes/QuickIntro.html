@@ -1,0 +1,169 @@
+<h1 id="the-qeml-package-quick-and-easy-wrappers-for-machine-learning">The qeML package: “Quick and easy” wrappers for machine learning</h1>
+<h3 id="easy-for-learners-powerful-for-advanced-users">“Easy for learners, powerful for advanced users”</h3>
+<h3 id="norm-matloff-uc-davis">Norm Matloff, UC Davis,</h3>
+<p>I am a professor of computer science, and a former professor of statistics, highly active in the areas of machine learning and statistical computing, <a href="heather.cs.ucdavis.edu/matloff.html">bio</a>.</p>
+<h1 id="what-this-package-is-about">What this package is about</h1>
+<ul>
+<li><p>“Quick and Easy” ML</p>
+<ul>
+<li><p>“Works right out of the box!”</p></li>
+<li><p>much simpler interface than <strong>tidymodels</strong>, <strong>caret</strong>, <strong>mlr3</strong>, <strong>superlearner</strong>, <strong>SuperML</strong> etc.</p></li>
+<li><p>easy for learners, powerful/convenient for experts</p></li>
+</ul></li>
+<li><p>Special Feature for ML Learners</p>
+<ul>
+<li>includes a <strong>tutorial</strong> on major ML methods</li>
+</ul></li>
+<li><p>Special Features for Those Experienced in ML</p>
+<ul>
+<li><p>variety of functions for feeature selection and model development</p></li>
+<li><p>large variety of ML algorithms, including some novel/unusual ones</p></li>
+<li><p>advanced plotting utilities, e.g. Double Descent</p></li>
+<li><p>includes <strong>tutorials</strong> on special topics</p></li>
+</ul></li>
+</ul>
+<h2 id="overview">Overview</h2>
+<p>(Also see extensive Function List section below.)</p>
+<p>The letters ‘qe’ in the package title stand for “quick and easy,” alluding to the convenience goal of the package. We bring together a variety of machine learning (ML) tools from standard R packages, providing wrappers with a simple, uniform interface. Hence the term “quick and easy.”</p>
+<p>For instance, consider the <strong>mlb1</strong> data included in the package, consisting of data on professional baseball players. Say we wish to predict weight of a player. For SVM, we would make the simple call</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qeSVM</span>(mlb1,<span class="st">&#39;Weight&#39;</span>)</span></code></pre></div>
+<p>For gradient boosting, the call would be similar,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qeGBoost</span>(mlb1,<span class="st">&#39;Weight&#39;</span>)</span></code></pre></div>
+<p>and so on. It couldn’t be easier!</p>
+<p>Default values are used on the above calls, but nondefaults can be specified, e.g.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qeSVM</span>(mlb1,<span class="st">&#39;Weight&#39;</span>,<span class="at">gamma=</span><span class="fl">0.8</span>)</span></code></pre></div>
+<h2 id="prediction">Prediction</h2>
+<p>Each qe-series function is paired with a <strong>predict</strong> method, e.g. predict player weight:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(mlb1)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z <span class="ot">&lt;-</span> <span class="fu">qeGBoost</span>(mlb1,<span class="st">&#39;Weight&#39;</span>,<span class="at">holdout=</span><span class="cn">NULL</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">predict</span>(z,<span class="fu">data.frame</span>(<span class="at">Position=</span><span class="st">&#39;Catcher&#39;</span>,<span class="at">Height=</span><span class="dv">73</span>,<span class="at">Age=</span><span class="dv">28</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">204.2406</span></span></code></pre></div>
+<p>A catcher of height 73 and age 28 would be predicted to have weight about 204.</p>
+<p>Categorical variables can be predicted too. Where possible, class probabilities are computed in addition to class:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w <span class="ot">&lt;-</span> <span class="fu">qeGBoost</span>(mlb1,<span class="st">&#39;Position&#39;</span>,<span class="at">holdout=</span><span class="cn">NULL</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">predict</span>(w,<span class="fu">data.frame</span>(<span class="at">Height=</span><span class="dv">73</span>,<span class="at">Weight=</span><span class="dv">185</span>,<span class="at">Age=</span><span class="dv">28</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>predClasses</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;Relief_Pitcher&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>probs</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        Catcher First_Baseman Outfielder Relief_Pitcher Second_Baseman</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,] <span class="fl">0.02396515</span>    <span class="fl">0.03167778</span>  <span class="fl">0.2369061</span>      <span class="fl">0.2830575</span>      <span class="fl">0.1421796</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>     Shortstop Starting_Pitcher Third_Baseman</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,] <span class="fl">0.0592867</span>        <span class="fl">0.1824601</span>    <span class="fl">0.04046717</span></span></code></pre></div>
+<p>A player of height 73, weight 185 and age 28 would be predicted to be a relief pitcher, with probability 0.28.</p>
+<h2 id="holdout-sets">Holdout sets</h2>
+<p>By default, the qe functions reserve a holdout set on which to assess accuracy.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z <span class="ot">&lt;-</span> <span class="fu">qeRF</span>(mlb1,<span class="st">&#39;Weight&#39;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>holdout set has  <span class="dv">101</span> rows</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> randomForest</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>randomForest <span class="fl">4.6</span><span class="dv">-14</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>Type <span class="fu">rfNews</span>() to see new features<span class="sc">/</span>changes<span class="sc">/</span>bug fixes.</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z<span class="sc">$</span>testAcc</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">14.45285</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z<span class="sc">$</span>trainAcc</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">8.23018</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z<span class="sc">$</span>baseAcc</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">17.22356</span></span></code></pre></div>
+<p>The mean absolute prediction error on the holdout data was about 14.5 pounds. As is typical, it was much smaller on the training set, 8.2.</p>
+<p>If one simply predicted every player using the overall mean weight, the MAPE would be about 17.2.</p>
+<p>One can skip holdout by setting the <strong>holdout</strong> argument to NULL.</p>
+<p>Of course, since the holdout set is random, the same is true for the accuracy numbers. To gauge the predictedive power of a model over many holdout sets, one can use <strong>replicMeans()</strong>, which is available in qeML by automatic loading of the <strong>regtools</strong> package. Say for 100 holdout sets:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">replicMeans</span>(<span class="dv">100</span>,<span class="st">&quot;qeRF(mlb1,&#39;Weight&#39;)$testAcc&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">13.6354</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(,<span class="st">&quot;stderr&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">0.1147791</span></span></code></pre></div>
+<p>So the true MAPE for this model on new data is estimated to be 13.6. The standard error is also output, to gauge whether 100 replicates is enough.</p>
+<h2 id="dimension-reductionfeature-selection">Dimension reduction/Feature Selection</h2>
+<p>One can preprocess the data, both when fitting the training data and later when predicting new cases. For instance, consider the <strong>pef</strong> dataset included with the package. It consists of Census data on programmers and engineers in 2000.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">head</span>(pef)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       age     educ occ sex wageinc wkswrkd</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="fl">50.30082</span> zzzOther <span class="dv">102</span>   <span class="dv">2</span>   <span class="dv">75000</span>      <span class="dv">52</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="fl">41.10139</span> zzzOther <span class="dv">101</span>   <span class="dv">1</span>   <span class="dv">12300</span>      <span class="dv">20</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="fl">24.67374</span> zzzOther <span class="dv">102</span>   <span class="dv">2</span>   <span class="dv">15400</span>      <span class="dv">52</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span> <span class="fl">50.19951</span> zzzOther <span class="dv">100</span>   <span class="dv">1</span>       <span class="dv">0</span>      <span class="dv">52</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span> <span class="fl">51.18112</span> zzzOther <span class="dv">100</span>   <span class="dv">2</span>     <span class="dv">160</span>       <span class="dv">1</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span> <span class="fl">57.70413</span> zzzOther <span class="dv">100</span>   <span class="dv">1</span>       <span class="dv">0</span>       <span class="dv">0</span></span></code></pre></div>
+<p>First, let’s try PCA. The <strong>qePCA()</strong> function calculates the principal components, retains the major ones, then applies a specified ML method on the reduced dataset. We’ll specify that we want as many principal components as will comprise 60% of the total variance, and will use k-Nearest Neighbor analysis.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(pef)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>  w <span class="ot">&lt;-</span> <span class="fu">qePCA</span>(pef,<span class="st">&#39;wageinc&#39;</span>,<span class="st">&#39;qeKNN&#39;</span>,<span class="at">pcaProp=</span><span class="fl">0.6</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>holdout set has  <span class="dv">1000</span> rows</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w<span class="sc">$</span>testAcc</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">24351.91</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w<span class="sc">$</span>baseAcc</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">31444.26</span></span></code></pre></div>
+<p>On average, our predictions were off about about $24K. If we were to just predict using the overall mean income, MAPE would be about $31K.</p>
+<p>A much more powerful method of dimension reduction is FOCI (Feature Ordering by Conditional Independence). We have a wrapper.</p>
+<p>Here we will use it on a 50K subset of the Million Songs dataset from the UCI Machine Language Data Repository. The goal is to predict the year of release of the song, based on 90 different audio measurements.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">system.time</span>(z <span class="ot">&lt;-</span> <span class="fu">qeFOCI</span>(s50,<span class="st">&#39;V1&#39;</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    user   system  elapsed</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fl">1464.245</span>   <span class="fl">22.246</span>  <span class="fl">208.174</span></span></code></pre></div>
+<p>It can be time-consuming. But it did reduce dimension:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dim</span>(s50)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">50000</span>    <span class="dv">91</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dim</span>(z<span class="sc">$</span>newData)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">50000</span>     <span class="dv">9</span></span></code></pre></div>
+<p>FOCI settled on a set of 8 of the original 90 predictors.</p>
+<p>Let’s try predicting using random forests, say the <strong>ranger</strong> version:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w <span class="ot">&lt;-</span> <span class="fu">qeRFranger</span>(z<span class="sc">$</span>newData,<span class="st">&#39;V1&#39;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>holdout set has  <span class="dv">1000</span> rows</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> ranger</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w<span class="sc">$</span>testAcc</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">6.661694</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w<span class="sc">$</span>trainAcc</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">3.39568</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w<span class="sc">$</span>baseAcc</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">8.169616</span></span></code></pre></div>
+<p>So, we seem to be able to predict release year of a song by about 6.7 years on average. If we were to simply use the overall average year as our prediction, on average we’d be off by about 8.2 years, so yes, the features do help. Of course, we might try the same on the full 500K dataset, but used a subset here to save time.</p>
+<p>Note again the tiny value of the training set accuracy, about 3.4 years! This is a great reminder of the fact that training set accuracy tends to be overly optimistic.</p>
+<h2 id="function-list">Function list</h2>
+<ul>
+<li><p>ML algorithms</p>
+<ul>
+<li><p><strong>qeAdaBoost()</strong>: Ada Boosting, wraps <strong>Jousboost</strong> pkg</p></li>
+<li><p><strong>qeDT()</strong>: decision trees, wraps <strong>party</strong> pkg</p></li>
+<li><p><strong>qeGBoost()</strong>: gradient boosting, wraps <strong>gbm</strong> pkg</p></li>
+<li><p><strong>qeISO()</strong>: isotonice regression</p></li>
+<li><p><strong>qeKNN()</strong>: k-Nearest Neighbors, wraps <strong>regtools</strong> pkg; includes predictor importance settings; allows linear interpolation within a bin</p></li>
+<li><p><strong>qeKNNna()</strong>: k-Nearest Neighbors for NA-ridden data, special algorithm</p></li>
+<li><p><strong>qeLASSO()</strong>: LASSO and ridge regression, wraps <strong>glmment</strong> pkg</p></li>
+<li><p><strong>qelightGBoost()</strong>: gradient boosting, wraps <strong>lightgbm</strong> pkg</p></li>
+<li><p><strong>qeLin()</strong>: wraps R’s <strong>lm()</strong>; can be used for multiclass classification, for speed</p></li>
+<li><p><strong>qeLogit()</strong>: wraps R’s <strong>glm()</strong></p></li>
+<li><p><strong>qeNeural()</strong>: wraps <strong>keras</strong> package, including CNN</p></li>
+<li><p><strong>qePolyLASSO()</strong>: LASSO/ridge applied to polynomial regression; wraps <strong>glmnet</strong>, <strong>polyreg</strong> pkgs</p></li>
+<li><p><strong>qePolyLin()</strong>: polynomial regression on linear models; uses Moore-Penrose inverse if overfitting; wraps <strong>polyreg</strong> pkg</p></li>
+<li><p><strong>qePolyLog()</strong>: polynomial regression on logistic models; wraps <strong>polyreg</strong> pkg</p></li>
+<li><p><strong>qeRF()</strong>: random forests, wraps <strong>randomforest</strong> pkg</p></li>
+<li><p><strong>qeRFgrf</strong>: random forests, wraps <strong>grf</strong> pkg; allows linear interpolation within a bin</p></li>
+<li><p><strong>qeRFranger()</strong>: random forests, wraps <strong>ranger</strong> pkg</p></li>
+<li><p><strong>qeskRF()</strong>: random forests, wraps Python <strong>Scilearn</strong> pkg</p></li>
+<li><p><strong>qeskSVM()</strong>: SVM, wraps Python <strong>Scilearn</strong> pkg</p></li>
+<li><p><strong>qeSVM()</strong>: SVM, wraps <strong>e1071</strong> pkg</p></li>
+<li><p><strong>qeSVMliquid()</strong>: SVM, wraps <strong>liquid SVM</strong> pkg</p></li>
+<li><p>k-NN, dec. trees, random forests, gradient boosting, SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs</p></li>
+</ul></li>
+<li><p>feature selection and model-fitting</p>
+<ul>
+<li><p><strong>qeFOCI()</strong>: fully nonparametric method for feature selection</p></li>
+<li><p><strong>qeLASSO()</strong>: for fit and/or feature selection</p></li>
+<li><p><strong>qePCA()</strong>: find principal components, number specified by user, then fit the resulting model, according to <strong>qe</strong>* function specified by user</p></li>
+<li><p><strong>qeUMAP()</strong>: same as <strong>qePCA()</strong> but using UMAP</p></li>
+<li><p><strong>qeFT()</strong>: automated grid hyperparameter search, <em>with Bonferroni-Dunn corrected standard errors</em></p></li>
+<li><p><strong>replicMeans()</strong>: (from <strong>regtools</strong>, included in <strong>qeML</strong>) averages output, e.g. <strong>testAcc</strong>, over many holdout sets</p></li>
+<li><p><strong>qeDoubleD()</strong>: computation and plotting for exploring Double Descent</p></li>
+<li><p><strong>qeROC()</strong>: ROC computation and plotting, wraps <strong>pROC</strong> pkg</p></li>
+</ul></li>
+<li><p>application-specific functions (elementary)</p>
+<ul>
+<li><p><strong>qeText()</strong> text classification</p></li>
+<li><p><strong>qeTS():</strong> time series</p></li>
+<li><p><em>Image classification</em>: Our <strong>imageClassR</strong> package uses qe functions for this. (Under construction.)</p></li>
+</ul></li>
+<li><p>utilities</p>
+<ul>
+<li><p><strong>qeCompare()</strong>: compare the accuracy various ML methods on a given dataset</p></li>
+<li><p><strong>qeParallel()</strong>: apply “Software Alchemy” to parallize qe functions</p></li>
+<li><p><strong>qePCA()</strong>: apply PCA before running specified qe ML function</p></li>
+<li><p><strong>qeUMAP()</strong>: apply UMAP before running specified qe ML function</p></li>
+</ul></li>
+</ul>
