@@ -101,7 +101,8 @@ qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 qePCA(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeUMAP(data,yName,qeName,opts=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),scaleX=TRUE,nComps,nNeighbors)
+   holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
+   nComps=NULL,nNeighbors=NULL)
 qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
@@ -116,20 +117,20 @@ qeROC(dataIn,qeOut,yName,yLevelName)
 qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
 \method{predict}{qeLogit}(object,newx,...)
-\method{predict}{qeLin}(object,newx,...)
+\method{predict}{qeLin}(object,newx,useTrainRow1=TRUE,...)
 \method{predict}{qeKNN}(object,newx,newxK=1,...)
 \method{predict}{qeRF}(object,newx,...)
 \method{predict}{qeRFranger}(object,newx,...)
 \method{predict}{qeRFgrf}(object,newx,...)
-\method{predict}{qeSVM}(object,newx,k=25,...)
-\method{predict}{qeGBoost}(object,newx,...)
+\method{predict}{qeSVM}(object,newx,...)
+\method{predict}{qeGBoost}(object,newx,newNTree=NULL,...)
 \method{predict}{qeLightGBoost}(object,newx,...)
 \method{predict}{qeNeural}(object,newx,k=NULL,...)
 \method{predict}{qeLASSO}(object,newx,...)
 \method{predict}{qePoly}(object,newx)
 \method{predict}{qePCA}(object,newx,...)
 \method{predict}{qeUMAP}(object,newx,...)
-\method{plot}{qeLASSO}(object,newx,...)
+\method{plot}{qeLASSO}(object,x,...)
 \method{plot}{qeRF}(object,x,...)
 }
 
