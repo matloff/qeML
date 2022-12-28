@@ -24,6 +24,11 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
 }
 
 \arguments{
+  \item{lag}{number of recent values to use in predicting the next.}
+  \item{qeName}{Name of qe-series predictive function, e.g. 'qeRF'.}
+  \item{stopWords}{Stop lists to use.}
+  \item{nTst}{Number of parameter combinations.}
+  \item{kTop}{Number of most-frequent words to use.}
   \item{pcaProp}{Desired proportion of overall variance for the PCs.`}
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
