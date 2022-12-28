@@ -135,6 +135,13 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
+  \item{deweightPars}Values for de-emphasizing variables in a split,
+     e.g. {\code{list(age=0.2,gender=0.5)}.}
+  \item{expandVars}{Columns to be emphasized.}
+  \item{expandVals}{Emphasis values; a value less than 1 means de-emphasis.}
+  \item{mtry}{Number of variables randomly tried at each split.}
+  \item{yesYVal}{Y value to be consideredd "yes," to be coded 1 rather than 0.}
+  \item{noBeta0}{No intercept term.}
   \item{pcaProp}{Desired proportion of overall variance for the PCs.`}
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
