@@ -135,8 +135,10 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
+  \item{conv}{R list specifying the convolutional layers, if any.}
   \item{deweightPars}{Values for de-emphasizing variables in a split,
-     e.g. \code{list(age=0.2,gender=0.5)}.}
+     e.g. 'list(age=0.2,gender=0.5)'.}
+  \item{allDefaults}{Use all default values of the wrapped function.}
   \item{expandVars}{Columns to be emphasized.}
   \item{expandVals}{Emphasis values; a value less than 1 means de-emphasis.}
   \item{mtry}{Number of variables randomly tried at each split.}
@@ -182,7 +184,8 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
      \code{regtools::fineTuning}.}
   \item{nCombs}{Number of hyperparameter combinations to run.  
      See \code{regtools::fineTuning}.}
-  \item{nTsts}{Size of test sets.  See \code{regtools::fineTuning}.}
+  \item{nTst}{Number of data points to be in the test set..  
+     See \code{regtools::fineTuning}.}
   \item{nXval}{Number of cross-validations to run.  
      See \code{regtools::fineTuning}.}
   \item{showProgress}{If TRUE, show results as they arise.  
