@@ -135,6 +135,10 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
+  \item{minsplit}{Minimum number of data points in a node.}
+  \item{minbucket}{Minimum number of data points in a terminal node.}
+  \item{maxdepth}{Maximum number of levels in a tree.}
+  \item{qeName}{Name of qe-series predictive function.}
   \item{conv}{R list specifying the convolutional layers, if any.}
   \item{deweightPars}{Values for de-emphasizing variables in a split,
      e.g. 'list(age=0.2,gender=0.5)'.}
@@ -142,7 +146,8 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
   \item{expandVars}{Columns to be emphasized.}
   \item{expandVals}{Emphasis values; a value less than 1 means de-emphasis.}
   \item{mtry}{Number of variables randomly tried at each split.}
-  \item{yesYVal}{Y value to be consideredd "yes," to be coded 1 rather than 0.}
+  \item{yesYVal}{Y value to be considered "yes," to be coded 1 rather than 0.}
+  \item{yesYLevel}{Y value to be considered "yes," to be coded 1 rather than 0.}
   \item{noBeta0}{No intercept term.}
   \item{pcaProp}{Desired proportion of overall variance for the PCs.`}
   \item{data}{Dataframe, training set. Classification case is signaled
