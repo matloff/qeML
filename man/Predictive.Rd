@@ -135,7 +135,7 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
-  \item{deweightPars}Values for de-emphasizing variables in a split,
+  \item{deweightPars}{Values for de-emphasizing variables in a split,
      e.g. \code{list(age=0.2,gender=0.5)}.}
   \item{expandVars}{Columns to be emphasized.}
   \item{expandVals}{Emphasis values; a value less than 1 means de-emphasis.}
