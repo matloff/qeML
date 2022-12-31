@@ -1,74 +1,216 @@
-<h1 id="clearing-the-confusion-understanding-overfittingbias-and-variance-of-what">Clearing the Confusion: Understanding overfitting–bias and variance of WHAT?</h1>
-<p>N. Matloff, UC Davis</p>
-<p><strong>Goal</strong></p>
-<p>Explanations of overfitting in machine learning tend to be frustratingly vague. We for instance hear “An overfitted model predicts poorly on new examples,” which is a definition, not an explanation. Or we hear that overfitting results from “fitting the training data too well” or that we are “fitting the noise,” again rather unsatisfying.</p>
-<p>Somewhat better are the explanations based on the famous Bias-Variance Tradeoff:</p>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>No P-Values!</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">No P-Values!</h1>
+</header>
+<h1 id="clearing-the-confusion-the-case-against-significance-tests">Clearing the Confusion: the Case Against Significance Tests</h1>
+<p>In March 2016, the august American Statistical Association (ASA) issued the first <a href="https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf">position paper</a> in its 177-year history. It called into question one of core concepts in statistical methodology, <em>significance testing</em> (ST):</p>
 <blockquote>
-<p>Mean squared prediction error is the sum of squared bias and variance. Bias and variance are at odds with each other. The lower the bias, the more the variance.</p>
+<p>“The p-value was never intended to be a substitute for scientific reasoning,” said Ron Wasserstein, the ASA’s executive director. “Well-reasoned statistical arguments contain much more than the value of a single number and whether that number exceeds an arbitrary threshold. The ASA statement is intended to steer research into a ‘post p&lt;0.05 era.’”</p>
 </blockquote>
-<p>OK, but the bias and variance of WHAT? Our treatment here is based on that notion, <strong>but with more emphasis on what it is that we are really talking about</strong> in discussing bias and variance.</p>
-<p><strong>Required Background</strong></p>
-<p>Very basic statistical concepts + patience (document is a bit long).</p>
-<p><strong>Setting</strong></p>
-<p>Let Y denote our outcome variable, and X represent the vector of our predictors/features. For instance, Y might be human weight, with X being (height, age). We include binary classification problems, with Y = 1 or 0. (In multiclass problems, Y is a vectors of 1s and 0s, with only one component being 1 at a time.)</p>
-<p><strong>The “True” Relation between Y and X</strong></p>
-<p>The <em>regression function of Y on X</em>, ρ(t), is defined to be the mean Y for the given X values. In the weight/height/age example, ρ(68.2,32.9) is the mean weight of all people of height 68.2 and age 32.9.</p>
-<p>ρ is the best predictor of weight based on height and age, the ideal. Note the phrase “based on,” though. If we had a third predictor variable/feature available, say waist size, there would be another ρ for that 3-predictor setting, better than the 2-predictor one.</p>
-<p>Note that ρ is a population entity, which we estimate from our sample data. Denote the estimated ρ(t) by r(t). Say we are studying diabetic people. ρ(t) gives us the relation of weight vs. height and age in the entire population of diabetics; if our study involves 100 patients, that is considered a sample from the population, and our estimate r(t) is based on that sample.</p>
-<p>(Note: “Sample” means our entire dataset; we say, “A sample of 100 peoplee,” not “We have 100 samples.”)</p>
-<p>Also, though some books use the term “regression” to mean a linear model, the actual definition is unrestricted; it applies just as much to, say, random forests as to linear models.</p>
-<p>In a binary classification problem, this function reduces to the probability of class 1.</p>
-<p><strong>Bias</strong></p>
-<p>Parametric methods such as linear and logistic models have a bias, in the sense of the inaccuracy of the model itself. Say we use a linear model to predict weight from height, i.e. our model for ρ(height) is</p>
-<p>ρ(weight) = mean weight = β<sub>0</sub> + β<sub>1</sub> height</p>
-<p>(This is called a “parametric” model, in that it expresses r(t) in terms of some parameters, in this case the β<sub>i</sub>.)</p>
-<p>Our sample-based estimate is</p>
-<p>r(weight) = mean weight = b<sub>0</sub> + b<sub>1</sub> height</p>
-<p>The b<sub>i</sub> are the sample estimates of the β<sub>i</sub>.</p>
-<p>Though the true population relation may be somewhat linear, the linear model cannot be perfectly correct. So, no matter how much data we have, our estimated r(t) will not converge to the true ρ(t) as the sample size grows; r(t) WILL converge to something, but that something will be the best-fitting LINEAR FUNCTION for the population, not the best-fitting FUNCTION.</p>
-<p>The bias here is the difference between the true ρ(t) and the limiting value of r(t) as the sample size grows to infinity. It will be different at each t, probably larger at larger t. E.g. the bias for the linear model may be larger for taller people.</p>
-<p>For model-free, i.e. nonparametric, methods, the bias is subtler. Consider k-Nearest Neighbors (k-NN), say again predicting weight from height. To calculate, say, r(68.2), we find the k points in our data closest to 68.2, then take as r(68.2) the average weight among those people. Bias arises as follows: Say we wish to predict the weight for a person of height 64, which is on the shorter end of the height range. Then the neighboring data points are likely be predominantly taller than 64, and since our prediction will consist of the mean weight among the neighbors, this 64-inch tall person’s weight will likely be overestimated.</p>
-<p>So again, there is a bias, again dependent on the value of t of interest, just as in the case of parametric methods. However, for this very reason, we let the size of the neighborhood get smaller as our dataset size grows, causing the bias to shrink. There is no such (direct) remedy for a linear model. There are analogs of this point for random forests, neural nets etc. On the other hand, a linear model will have a smaller variance, our next topic:</p>
-<p><strong>Variance</strong></p>
-<p>This refers to sampling variance, which measures the degree of instability of one’s estimated r(t) from one sample to another, e.g. the variation of the b<sub>i</sub> from one sample to another in our linear model above.</p>
-<p>The same holds for nonparametric models. In the k-NN example above, say we take too small a value of k, even k = 1. So we estimate r(68.2) to be the weight of whichever person in our sample is closest to 68.2. Clearly this value varies a lot from one sample to another, hence a large variance.</p>
-<p>The relevance of variance is difficult for many nonspecialists in statistics/machine learning to accept. “But we only have one sample,” some might object to the analysis in the preceding paragraphs. True, but we are interested in the probability that that our sample is representative of the population. In a gambling casino, you may play a game just once, but you still would like to know the probability of winning. The same is true in data science, and that in turn means that sampling variance is key.</p>
-<p><strong>A U-Shaped Curve</strong></p>
-<p>We stated above that a linear model cannot be exactly correct, even with an unlimited amount of data. So, why not a quadratic model?</p>
-<p>ρ(weight) = mean weight = β<sub>0</sub> + β<sub>1</sub> height + β<sub>2</sub> height<sup>2</sup></p>
-<p>This includes the linear model as a special case (β<sub>2</sub> = 0), but also is more general. In the population, the best-fitting quadratic model will be more accurate than the best-fitting linear one. How about one of degree 3? With higher and higher degree polynomials, we can reduce the bias to smaller and smaller amounts–if we have infinitely many data points.</p>
-<p>But in finite samples, the higher the degree of the polynomial, the larger the variance. (We have more parameters to estimate, and I like to think in terms of them “sharing” the data, less data available to each one.)</p>
-<p>So, we have a battle between bias and variance! As we increase the degree, first 1, then 2, then 3 and so on, the bias initially shrinks a lot while the variance grows only a little. But eventually, inceasing the degree by 1 will reduce bias only a little, while variance increases a lot.</p>
-<p>Result:</p>
-<blockquote>
-<p>If we plot prediction error vs. degree, we typically will get a U-shaped curve. Bias reduction dominates variance increase initially, but eventually variance overpowers bias. Once we pass the low point of the curve, we we overfitting.</p>
-</blockquote>
-<p>The same is true for k-NN, plotting prediction error against k. As noted, we can achieve smaller bias with smaller k. The latter situation means smaller neighborhoods, making the problem of “using tall people to predict a short person’s weight” less likely. But smaller k means we are taking an average over a small set of people, which will vary a lot from one sample to another.</p>
-<p>Or, consider the number of predictors/features, say in the <a href="https://archive.ics.uci.edu/ml/datasets/YearPredictionMSD">Million Song Dataset</a>. The goal is to predict the year of release of a song, based on various audio characteristics of the song, 91 features in all. Let p denote the number of features used in our analysis. We might use just the first feature (needn’t be the first, just an example), p = 1, or the first two, p = 2 and so on. The more features we use, the smaller the bias, but the larger the variance.</p>
-<p><strong>Empirical Illustration</strong></p>
-<p>I used the Million Song Dataset To reduce the amount of computation, I used only a random subset of 10,000 songs, and only two audio variables.</p>
-<p>As noted, mean squared prediction error is a sum of bias squared and variance. I calculated mean absolute prediction error (MAPE), but the principle is the same; it still combines bias and variance.</p>
-<p>My goal was to show that:</p>
+<p>To be sure, though “post p&lt;0.05 era” sounds like a ban on ST, the position paper did not quite call for a ban. It was, in many ways, the proverbial “camel created by a committee”; as some on the committee still believe in ST, the paper stopped short of a ban. Yet, the paper offered no use case in which ST <em>should</em> be used; their silence on that may be considered “significant” (pun intended).</p>
+<p>As the paper points out, these concerns about ST were not new. They were, for instance, explained in <a href="https://wwnorton.com/books/9780393929720">a popular elementary stat text</a> and even <a href="https://www.press.umich.edu/186351/cult_of_statistical_significance">entire books</a>. (See also <a href="https://academic.oup.com/ee/article/20/5/1246/2480617">my paper</a>.)</p>
+<p>Indeed, most statisticians had been aware of the flaws of ST, but had continued to use them and teach them. Why did they proceed in spite of knowing the dangers of STs? For some it was out of habit, for others it was an appreciation of the elegance of the theory. In many cases, it was just plain convenience: An ST will at least give the analyst “an answer,” and the analyst may thus be willing to ignore the potential problems with that answer.</p>
+<p>Then what changed? Among other things, <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124">a paper by John Ionnidis</a>, provcatively titled, “Why Most Published Research Findings Are False,” shook things up . Though it was mainly on the related issue of <em>p-hacking</em> rather on the core of ST, it caused the statistical community to take a long-overdue look at statistical practice.</p>
+<h2 id="running-example-class-of-sts">Running example class of STs</h2>
+<p>Say we have an asymptotically normal estimator T of some population value θ, with standard error s.e.(T). For a test of approximate Type I error α of H<sub>0</sub>: θ = θ<sub>0</sub>, reject H<sub>0</sub> if</p>
+<p>Z = |(T-θ<sub>0</sub></sub>) / s.e.(T)| &gt; 1 - q<sub>α / 2</sub></p>
+<p>where q() is the quantile function for N(0,1).</p>
+<p>If we reject, we say the result is “significant,” that “θ is significantly different from θ<sub>0</sub>,” one of the greatest abuses of the English language in all of science.</p>
+<p>The p-value is the most stringent α at which we would still reject. For researchers, typically the smaller the p-value, the more “significant” the finding, and the more elated the researchers are. “We not only rejected at α = 0.05 but even at α = 0.002!” Journals – and even R output – then report the result as “significant” (α below 0.05), “highly significant” (below 0.01), or “very highly significant” (below 0.001). Given that the word <em>significant</em> ordinarily means important, a very highly significant research finding is a cause for enormous joy. But it may be unwarranted joy, as we will discuss here.</p>
+<h2 id="confidence-intervals-as-the-preferred-alternative-to-sts">Confidence intervals as the preferred alternative to STs</h2>
+<p>The familiar confidence interval (CI) based on T is</p>
+<p>T ± q<sub>α / 2</sub> s.e.(T)</p>
+<p>Some defenders of ST point out, correctly, that there is a mathematical relation between STs and CIs. For instance, we can create a CI by <em>inverting</em> a test. (See for example <a href="https://www.stat.purdue.edu/~fmliang/STAT611/st611lect9.pdf">this presentation</a>.)</p>
+<p>Conversely, if one has a CI for the above H<sub>0</sub>, we can perform an α level test by simply observing whether θ<sub>0</sub> is in the CI. <strong>BUT THIS WOULD BE UNDESIRABLE, BECAUSE THE CI IS MORE INFORMATIVE.</strong> Using a CI to perform a test throws away valuable information:</p>
 <ol type="1">
-<li><p>As degree increases, MAPE at first falls but later rises, i.e. the “U-shape” discussed above.</p></li>
-<li><p>But as degree increases, variance <em>always</em> increases.</p></li>
+<li><p>The center of the CI gives us some indication of how close the true θ is to θ<sub>0</sub>.</p></li>
+<li><p>The width of the CI gives us an idea as to how accurate the indication in (1) is above.</p></li>
 </ol>
-<p>Combining these two points, we can observe the battle between bias and variance in their impact on MAPE. At first the reduction in bias dominates the increase in variance, but for larger degrees, the opposite it true.</p>
-<p>Remember, variance is <em>always</em> increasing as degree increases here. But how can we measure variance to show this numerically? Most readers here know that R reports standard errors of estimates, but for different degrees with have different numbers of estimated parameters, thus with noncomparable standard errors.</p>
-<p>Instead, I took the first song in the dataset, and let x = the audio characterstics of that particular song. I then found the variance of r(x) (a matrix quadratic form in x and the estimated covariance matrix of the vector of coefficients of the polynomial).</p>
-<p>I fit degrees 1 through 12. (Again, to save on computation, I used interaction terms only of degree 2.) For cross-validated MAPE values, I used 20 random holdout sets of size 1000. Here is the output:</p>
-<pre class="text"><code>           [,1]       [,2]       [,3]       [,4]       [,5]       [,6]
-[1,] 0.02440784 0.02718803 0.03184419 0.04229401 0.04945168 0.05450264
-[2,] 7.86296820 7.74149419 7.74222432 7.66320622 7.70638321 7.69907202
-           [,7]       [,8]     [,9]        [,10]    [,11]    [,12]
-[1,] 0.06572677 0.07980077 0.114887 -0.008906266       NA       NA
-[2,] 7.73367546 7.70928618 7.733230  7.793813681 9.980302 17.36951</code></pre>
-<p>In the top row, one can see variance steadily increasing through degree 9. Starting with degree 10, there are serious numerical issues, arising from exact or nearly exact collinearity among the various terms in the polynomial.</p>
-<p>The code is <a href="https://github.com/matloff/qeML/blob/master/inst/BiasVar.R">here</a>.</p>
-<p>MAPE is shown in the second row. There is a general “U” trend, albeit a shallow one. We seem to have <em>numerical</em> overfitting starting at degree 10, but <em>statisical</em> overfitting starting at degree 5 or so.</p>
-<p><strong>Double Descent</strong></p>
-<p>In recent years, the phenomenon of ``double descent’’ has caused quite a stir in the statistics and machine learning communities. It turns out that one can actually have <em>two</em> U-shapes, the second one coming immediately after the first. Here is an example, also using the Million Song dataset, but in this case using more and more columns of the dataset rather than using polymials of increasing degree.</p>
-<figure>
-<img src="https://matloff.files.wordpress.com/2020/11/overfit.png" alt="alt text" /><figcaption aria-hidden="true">alt text</figcaption>
-</figure>
-<p>Many people have theorized as to the cause of this.</p>
+<h3 id="example-opinion-poll-in-an-election">Example: Opinion poll in an election</h3>
+<p>Say you are the campaign manager for Candidate X, and conduct a poll of the electorate. You form a CI for p, the population proportion of voters who favor X, which turns out to be (0.505,0.518). You have two options in terms of reporting the results to X:</p>
+<ul>
+<li><p>Tell X, “Your support is significantly higher than 50%.”</p></li>
+<li><p>Tell X, “You seem to be slightly ahead, with a CI for p being (0.505,0.518).”</p></li>
+</ul>
+<p>Of course, the second choice is far more informative. Not only is the CI close to 0.50, indicating that X is in a tight race, but also the narrowness of the interval says that the estimate of p here is likely very accurate.</p>
+<p>Or, say the CI is (0.492,0.551). While we should not give the impression that all the points in the CI are “equally likely,” it will give Candidate X cause for optimism, as opposed to simply telling X, “Your support is not significantly different from 50%.” At any rate, most important, X sees from the large width of the CI that a much larger poll is needed to get accurate results.</p>
+<h3 id="another-advantage-of-cis-over-st">Another advantage of CIs over ST</h3>
+<p>The opinion poll example illustrates the fact that, in addition to being more informative, another advantage of CIs is their Intuitive interpretability. Every poll is reported with a <em>margin of error</em>. This is actually the radius of a 95% CI for the population proportion under discussiuon. The general public is quite comfortable with margins of error, while by contrast it is exceedingly difficult to explain p-values to them.</p>
+<h2 id="h0-is-always-falsemeaningless">H<sub>0</sub> is always false/meaningless</h2>
+<p>One of the central problems with STs is that we always know <em>a priori</em> that H<sub>0</sub> is false, or worse, meaningless.</p>
+<p>For a toy example, say we have some coin with unknown probability p of heads, and wish to test H<sub>0</sub>: p = 0.5000000000000000000000…, infinitely many 0s. That’s impossible. We know <em>a priori</em> that the coin is weighted slightly differently on one side than the other.</p>
+<p>Or say we have two prescription drugs, A and B, for alleviating hypertension, with μ<sub>A</sub> and μ<sub>B</sub> denoting the population mean reductions in blood pressure. We know those two means cannot be equal to infinitely many decimal places.</p>
+<p>But even worse, the very notion of an “exact” comparison of μ<sub>A</sub> and μ<sub>B</sub> is unwarranted. To begin with, our blood pressure measuring instruments don’t have infinite precision, so it makes no sense to ask whether the two drugs have exactly the same mean, to infinitely many decimal places.</p>
+<h2 id="implication-1">Implication 1</h2>
+<p>In our example with T and θ above, as our sample size n grows, s.e.(T) will converge to 0, while the numerator in Z converges to θ<sub>true</sub> - θ<sub>0</sub>, the difference between the true population value of θ and the hypothesized value. In other words, Z will go to ±∞. The p-value will go to 0, and we will reject H<sub>0</sub> – which we already knew was false anyway.</p>
+<p>Our <a href="https://www.meetup.com/R-Users/">Bay Area R Users Group</a> once had a speaker from LinkedIN, who discussed his analyses of large LinkedIn datasets. At one point in the talk, he mentioned that he had been startled by the results at first, because “Everything came out significant!” Of course, he shouldn’t have been surprised.</p>
+<p>One might argue that these issues could be addressed by paying attention to the power of the test. But it is not very meaningful to ask the probability of rejecting a hypothesis that we already know is false.</p>
+<h2 id="implication-2">Implication 2</h2>
+<p>It makes no sense to ask a question that we already know to be false/meaingless. <strong>THE ST IS SIMPLY ASKING THE WRONG QUESTION.</strong></p>
+<p>In the hypertension drugs example, as mentioned, as a practical matter it is meaningless to ask if the two population means are exactly equal, and anyway what we actually care about is whether one is subtantially better than the other. Thus the proper approach is to form a CI for the difference between the two means, and then factor in comparisons of costs, side effects and so on to our decision as to which one to use.</p>
+<p>The situation for goodness-of-fit tests is similar. Say we are constructing a mixed effects variance components model, which assumes normal distributions. Suppose we have a procedure to test for normality; should we use it? No! We know <em>a priori</em> that the effects can’t be exactly normal – e.g. no one is 20 feet tall nor has a negative height, yet normality would imply both – so again, the ST, by asking whether the distributions are exactly normal, is asking the wrong question. CI approaches may not be practical either (possibly the bootstrap could be made to work), so we may wish to continue a Method of Moments approach to estimating the variance components.</p>
+<h2 id="but-what-if-we-just-want-to-know-whether-there-is-some-difference-even-if-small">But what if we just want to know whether there is <em>some</em> difference, even if small?</h2>
+<p>Say we are investigating the validity of some scientific theory, say the existence of gravity waves. (A statistical analysis was actually done for the latter, with problems, but the details would be a distraction here.) We might have some H<sub>0</sub> for which rejection means confirmation of the validity of the theory; even a tiny but nonzero effect might be of interest.</p>
+<p>Here again we have the problem in which exact specification of the null hypothesis is meaningless, due to issues with our measuring instruments and so on, which make our view “We even care about a tiny effect” untenable.</p>
+<p>In the hypertension drugs example, one might consider</p>
+<p>H<sub>0</sub>: μ<sub>B</sub> ≤ μ<sub>A</sub> + c</p>
+<p>vs.</p>
+<p>H<sub>A</sub>: μ<sub>B</sub> &gt; μ<sub>A</sub> + c</p>
+<p>What if the new drug, B, falls just short of improving over A by an amount c? Should we just scrap the drug, after all the expense of developing it? Of course not. So again the hypothesis should not be taken so literally, which unfortunately the test does. A CI is still the proper analysis.</p>
+<h2 id="p-hacking">p-hacking</h2>
+<p>The term <em>p-hacking</em> refers to analyses of large studies with the following pitfall.</p>
+<p>Say one is studying genetic impacts on some outcome, with very large numbers of genes involved. Even if no gene has a real impact, due to sampling variation one of them will likely appear to have a ``significant’’ impact, just by accident. Note that this is a problem for CIs too, not just STs.</p>
+<p>One way to deal with this is to use the <em>Bonferroni-Dunn Inequality</em>, which in this context means that if you wish to analyze k different aspects of a setting, divide your chosen α value by k. This is the simplest of a class of methods known as <em>simultaneous inference techniques</em> or <em>multiple comparison techniques</em>. See for instance the <a href="https://www.taylorfrancis.com/chapters/introduction-simultaneous-statistical-inference-jason-hsu/10.1201/b15074-6">book by Jason Hsu</a>.</p>
+</body>
+</html>
