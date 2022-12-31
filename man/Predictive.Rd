@@ -135,6 +135,10 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
+  \item{useTrainRow1}{If TRUE, take names in \code{newx} from row 1 in
+     the training data.}
+  \item{newx}{New data to be predicted.}
+  \item{object}{An object returned by a qe-series function.}
   \item{minsplit}{Minimum number of data points in a node.}
   \item{minbucket}{Minimum number of data points in a terminal node.}
   \item{maxdepth}{Maximum number of levels in a tree.}
@@ -152,6 +156,8 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
   \item{pcaProp}{Desired proportion of overall variance for the PCs.`}
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
+  \item{dataIn}{See \code{data}.}
+  \item{qeOut}{Output from a qe-series function.}
   \item{yName}{Name of the class labels column.}
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
