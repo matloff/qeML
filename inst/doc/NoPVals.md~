@@ -1,15 +1,4 @@
 
----
-title: "No P-Values!"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{NoPVals}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
----
-
-
-
 #  Clearing the Confusion: the Case Against Significance Tests
 
 In March 2016, the august American Statistical Association (ASA) issued

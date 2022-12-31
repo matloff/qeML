@@ -6,8 +6,9 @@ Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu",
 Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
 Depends: R (>= 3.5.0),regtools (>= 0.8.0),partools,FOCI,gtools
 Imports: grf,gbm
-Suggests: partykit,randomForest,ranger,e1071,JOUSBoost,lightgbm,
+Suggests: knitr,partykit,randomForest,ranger,e1071,JOUSBoost,lightgbm,
    keras,neuralnet,polyreg,glmnet,umap,reticulate,party,pROC,xgboost
+VignetteBuilder: knitr
 License: GPL (>= 2)
 Description: The letters 'qe' in the package title stand for "quick and
    easy," alluding to the convenience goal of the package. We bring
