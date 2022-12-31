@@ -51,6 +51,7 @@
 \alias{predict.qeskRF}
 \alias{predict.qeskSVM}
 \alias{predict.qeParallel}
+\alias{plot.qePoly}
 \alias{plot.qeRF}
 \alias{plot.qeLASSO}
 
