@@ -139,6 +139,7 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
+  \item{...}{Further arguments.}
   \item{newNTree}{Number of trees to use in prediction.}
   \item{newxK}{If predicting new cases, number of nearest neighbors to
      smooth in the object returned by \code{qeKNN}.}

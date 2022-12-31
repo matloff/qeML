@@ -16,6 +16,7 @@ qeKNNna(data,yName,k=25,minNonNA=1,holdout=floor(min(1000,0.1*nrow(data))))
 }
 
 \arguments{
+  \item{...}{Further arguments.}
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
   \item{yName}{Name of the class labels column.}

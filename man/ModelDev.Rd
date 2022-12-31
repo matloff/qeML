@@ -24,6 +24,8 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
 }
 
 \arguments{
+  \item{...}{Further arguments.}
+  \item{object}{Object returned by a qe-series function.}
   \item{newx}{New data to be predicted.}
   \item{newDocs}{Vector of new documents to be predicted.}
   \item{lag}{number of recent values to use in predicting the next.}
