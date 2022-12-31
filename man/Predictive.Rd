@@ -43,7 +43,6 @@
 \alias{predict.qeNeural}
 \alias{predict.qeLASSO}
 \alias{predict.qePolyLin}
-\alias{predict.qePolyLin}
 \alias{predict.qePolyLog}
 \alias{predict.qeIso}
 \alias{predict.qePCA}
@@ -138,6 +137,9 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 }
 
 \arguments{
+  \item{newNTree}{Number of trees to use in prediction.}
+  \item{newxK}{If predicting new cases, number of nearest neighbors to
+     smooth in the object returned by \code{qeKNN}.}
   \item{useTrainRow1}{If TRUE, take names in \code{newx} from row 1 in
      the training data.}
   \item{newx}{New data to be predicted.}
