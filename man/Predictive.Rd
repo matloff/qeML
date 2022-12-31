@@ -27,6 +27,8 @@
 \alias{qePolyLASSO}
 \alias{qeROC}
 \alias{qeXGBoost}
+\alias{qeCompare}
+\alias{qeFT}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
@@ -41,6 +43,7 @@
 \alias{predict.qeNeural}
 \alias{predict.qeLASSO}
 \alias{predict.qePolyLin}
+\alias{predict.qePolyLin}
 \alias{predict.qePolyLog}
 \alias{predict.qeIso}
 \alias{predict.qePCA}
@@ -48,8 +51,8 @@
 \alias{predict.qeskRF}
 \alias{predict.qeskSVM}
 \alias{predict.qeParallel}
-\alias{plot.RF}
-\alias{plot.LASSO}
+\alias{plot.qeRF}
+\alias{plot.qeLASSO}
 
 \title{Quick-and-Easy Machine Learning Wrappers}
 
@@ -209,8 +212,6 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
      linear model.  Just use the linear model fit to the entire dataset.}
   \item{xShape}{Input X data shape, e.g. c(28,28) for 28x28 grayscale
      images.  Must be non-NULL if \code{conv} is.}
-  \item{yYesName}{For a binary classification problem, the value to
-     be considered "yes" in probability reports.}
   \item{treeDepth}{Number of levels in each tree.}
   \item{nRounds}{Number of boosting rounds.}
   \item{rpartControl}{An R list specifying properties of fitted trees.}
