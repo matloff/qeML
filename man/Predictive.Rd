@@ -13,6 +13,7 @@
 \alias{qeLASSO}
 \alias{qePolyLin}
 \alias{qePolyLog}
+\alias{qePoly}
 \alias{qeIso}
 % \alias{qeCompare}
 \alias{qePCA}
