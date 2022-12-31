@@ -3,7 +3,7 @@
 title: "Overfitting"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{OverfittingNoPVals}
+  %\VignetteIndexEntry{Overfitting}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
