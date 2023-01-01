@@ -1,12 +1,13 @@
 
 ---
-title: "QuickStart"
+title: "Quick Start"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{QuickStart}
+  %\VignetteIndexEntry{Quick Start}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
+
 
 # The qeML package: "Quick and easy" wrappers for machine learning
 

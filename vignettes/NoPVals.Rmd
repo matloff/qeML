@@ -1,13 +1,17 @@
 
 ---
-title: "No P-Values!"
+title: "No P Values"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{NoPVals}
+  %\VignetteIndexEntry{No P Vals}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = T, comment = "#>")
+options(tibble.print_min = 4, tibble.print_max = 4)
+```
 
 
 #  Clearing the Confusion: the Case Against Significance Tests
