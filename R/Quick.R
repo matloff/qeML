@@ -275,6 +275,9 @@ predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
 
 # will be revised qeKNN
 
+# seems to work in all 3 cases: regression, classif binary Y, classif
+# categorical Y; need to revise predict()
+
 # arguments:  see above, plus
 
 #     k: number of nearest neighbors
@@ -289,48 +292,61 @@ predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
 
 # see note in kNN() man pg
  
-qeKNN <- function(data,yName,k=25,scaleX=TRUE,
+qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
-   ycols <- which(names(data) == yName)
+   ycol <- which(names(data) == yName)
+   y <- data[,ycol]
+   x <- data[,-ycol]
 
    # housekeeping for classification case
-   classif <- is.factor(data[[yName]])
-   if (classif) {
-      y <- data[,yName]
+   if (is.factor(y)) {
+      classif <- TRUE
       yLevels <- levels(y)
       classif2 <- length(yLevels) == 2
       if (classif2) {
-         if (is.null(yesYVal) && yLevels == 2) 
+         if (is.null(yesYVal)) 
             stop('must specify yesYVal')
          whichYes <- which(yLevels == yesYVal)
          noYVal <- yLevels[3 - whichYes]
-      }
-   } else noYVal <- NULL
-   if (classif) {
-      if (classif2)
-         data[,ycol] <- as.integer(data[,ycol] == yesYVal)
+      } else noYVal <- NULL
+   } else {
+      noYVal <- NULL
+      classif <- FALSE
    }
+   
+   if (classif) {
+      if (classif2) {
+         y <- as.integer(y == yesYVal)
+         nYcols <- 1
+      }
+       else  {
+         y <- factorsToDummies(y)
+         nYcols <- ncol(y)
+      }
+   } else nYcols <- 1
+
+   if (!is.numeric(x)) {
+      x <- factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo') 
+   } else factorsInfo <- NULL
+   
+
+   newData <- cbind(x,y)
+   browser()
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
-      splitData(holdout,data)
-      y <- data[-holdIdxs,ycol]
-      x <- data[-holdIdxs,-ycol]
-   } else {
-      x <- data[,-ycol]
-      y <- data[,ycol]
-   }
+      splitData(holdout,newData)
+      if (classif2 || !classif) y <- y[-holdIdxs]
+      else y <- y[-holdIdxs,]
+      x <- x[-holdIdxs,]
+   } 
    # if holdout, x,y are now the training set
    
-   if (!allNumeric(x)) {
-      x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      factorsInfo <- attr(x,'factorsInfo') 
-   } else factorsInfo <- NULL
-
    xm <- as.matrix(x)
 
    if (scaleX) {
