@@ -316,6 +316,7 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    } else {
       noYVal <- NULL
       classif <- FALSE
+      classif2 <- FALSE
    }
    
    if (classif) {
@@ -381,6 +382,7 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=FALSE,classif=classif,
       smoothingFtn=smoothingFtn)
    knnout$classif <- classif
+   knnout$classif2 <- classif2
    knnout$yesYVal <- yesYVal
    knnout$noYVal <- noYVal
    knnout$scalePars <- scalePars
@@ -390,12 +392,53 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVars <- expandVars
       knnout$expandVals <- expandVals
    }
-   class(knnout) <- c('qeKNN','kNN')
+   class(knnout) <- c('qeKNNtmp','kNN')
    if (!is.null(holdout)) {
       predictHoldout(knnout)
       knnout$holdIdxs <- holdIdxs
    } else knnout$holdIdxs <- NULL
    knnout
+}
+
+predict.qeKNNtmp <- function(object,newx,newxK=1,...)
+{
+   class(object) <- 'kNN'
+   if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
+   classif <- object$classif
+   classif2 <- object$classif2
+
+   if (!is.null(object$factorsInfo)) 
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
+
+   if (is.data.frame(newx)) newx <- as.matrix(newx)
+
+   if (is.vector(newx)) {
+      nr <- 1
+   } else {
+      nr <- nrow(newx)
+   } 
+   newx <- matrix(newx,nrow=nr)
+
+   if (!is.null(object$scalePars)) {
+      ctr <- object$scalePars$ctr
+      scl <- object$scalePars$scl
+      newx <- scale(newx,ctr,scl)
+   }
+
+   if (!is.null(object$expandVars)) 
+      newx <- regtools::multCols(newx,object$expandVars,object$expandVals)
+
+   preds <- predict(object,newx,newxK)
+
+   if (!object$classif) return(preds)
+
+   probs <- preds
+   predClasses <- round(probs) 
+   yesYVal <- object$yesYVal
+   noYVal <- object$noYVal
+   predClasses[predClasses == 1] <- yesYVal
+   predClasses[predClasses == 0] <- noYVal
+   list(predClasses=predClasses,probs=probs)
 }
 
 #########################  qeKNN()  #################################
@@ -816,7 +859,7 @@ predict.qeRFgrf<- function(object,newx,...)
 #value:  see above
 
 qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
-    degree = 2, allDefaults = TRUE, holdout = floor(min(1000,
+    degree = 2, allDefaults = FALSE, holdout = floor(min(1000,
         0.1 * nrow(data))))
 {
    checkForNonDF(data)
