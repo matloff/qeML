@@ -337,7 +337,6 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    
 
    newData <- cbind(x,y)
-   browser()
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
@@ -432,13 +431,21 @@ predict.qeKNNtmp <- function(object,newx,newxK=1,...)
 
    if (!object$classif) return(preds)
 
-   probs <- preds
-   predClasses <- round(probs) 
-   yesYVal <- object$yesYVal
-   noYVal <- object$noYVal
-   predClasses[predClasses == 1] <- yesYVal
-   predClasses[predClasses == 0] <- noYVal
-   list(predClasses=predClasses,probs=probs)
+   if (object$classif2) {
+      probs <- preds
+      predClasses <- round(probs) 
+      yesYVal <- object$yesYVal
+      noYVal <- object$noYVal
+      predClasses[predClasses == 1] <- yesYVal
+      predClasses[predClasses == 0] <- noYVal
+      return(list(predClasses=predClasses,probs=probs))
+   }
+
+   # multiclass case
+   predClassIdxs <- apply(preds,1,which.max) 
+   predClasses <- colnames(preds)[predClassIdxs]
+   list(predClasses=predClasses,probs=preds)
+
 }
 
 #########################  qeKNN()  #################################
