@@ -340,10 +340,23 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
-      splitData(holdout,newData)
-      if (classif2 || !classif) y <- y[-holdIdxs]
-      else y <- y[-holdIdxs,]
+      # splitData(holdout,newData); no, write separate code for qeKNN
+      nHold <- holdout
+      cat('holdout set has ',nHold, 'rows\n')
+      holdIdxs <- sample(1:nrow(x),nHold)
+
+browser()
+      if (classif2 || !classif) {
+         y <- y[-holdIdxs]
+         yTst <- y[holdIdxs]
+      }
+      else {
+         y <- y[-holdIdxs,]
+         yTst <- y[holdIdxs,]
+      }
       x <- x[-holdIdxs,]
+      xTst <- x[-holdIdxs,]
+      tst <- cbind(xTst,yTst)
    } 
    # if holdout, x,y are now the training set
    
@@ -393,8 +406,8 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    }
    class(knnout) <- c('qeKNNtmp','kNN')
    if (!is.null(holdout)) {
-      predictHoldout(knnout)
-      knnout$holdIdxs <- holdIdxs
+      if (classif2 || !classif) predictHoldout(knnout)
+      else predictHoldoutKNNMulticlass(knnout)
    } else knnout$holdIdxs <- NULL
    knnout
 }

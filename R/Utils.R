@@ -129,6 +129,43 @@ predictHoldout <- defmacro(res,
    }  # end of expr= for the macro
 )
 
+# same as above, but for vector Y
+
+predictHoldoutKNNMulticlass <- defmacro(res,
+   expr={
+      newLvls <- regtools:::checkNewLevels(trnx,xTst)
+      if (length(newLvls) > 0) {
+         xTst <- xTst[-newLvls,,drop=FALSE]
+         warning(paste(length(newLvls),
+            'rows removed from test set, due to new factor levels'))
+      }
+
+browser()
+      preds <- predict(res,xTst);
+      listPreds <- is.list(preds)
+      res$holdoutPreds <- preds
+
+      yesNo <- !is.null(res$yesYVal)
+      if (is.numeric(preds)) {
+         probs <- preds
+         predClasses <- round(probs)
+         if (is.numeric(tsty)) {
+            predClasses <- 
+               ifelse(predClasses,res$yesYVal,res$noYVal)
+            if (is.numeric(tsty)) 
+               tsty <- ifelse(tsty,res$yesYVal,res$noYVal)
+            preds <- list(predClasses=predClasses,probs=probs)
+         } 
+      } 
+      if (listPreds) predClasses <- preds$predClasses
+      # at this point, predClasses should be an R factor in either
+      # case re preds; same for tsty
+      res$testAcc <- mean(predClasses != tsty)
+      res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
+      # res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
+   }  # end of expr= for the macro
+)
+
 # lm() balks if a label begins with a digit; check to see if we have any
 checkNumericNames <- function(nms)
 {
