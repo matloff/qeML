@@ -334,9 +334,6 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
       x <- factorsToDummies(x,omitLast=TRUE)
       factorsInfo <- attr(x,'factorsInfo') 
    } else factorsInfo <- NULL
-   
-
-   newData <- cbind(x,y)
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
@@ -346,6 +343,8 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
       holdIdxs <- sample(1:nrow(x),nHold)
 
 browser()
+      xTst <- x[holdIdxs,]
+      x <- x[-holdIdxs,]
       if (classif2 || !classif) {
          y <- y[-holdIdxs]
          yTst <- y[holdIdxs]
@@ -354,9 +353,10 @@ browser()
          y <- y[-holdIdxs,]
          yTst <- y[holdIdxs,]
       }
-      x <- x[-holdIdxs,]
-      xTst <- x[-holdIdxs,]
       tst <- cbind(xTst,yTst)
+      tst <- as.data.frame(tst)
+      trn <- cbind(x,y)
+      ycol <- (ncol(x)+1):(ncol(x)+nYcols)
    } 
    # if holdout, x,y are now the training set
    
@@ -406,6 +406,7 @@ browser()
    }
    class(knnout) <- c('qeKNNtmp','kNN')
    if (!is.null(holdout)) {
+      yName <- 'yTst'
       if (classif2 || !classif) predictHoldout(knnout)
       else predictHoldoutKNNMulticlass(knnout)
    } else knnout$holdIdxs <- NULL
