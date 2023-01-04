@@ -342,7 +342,6 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
       cat('holdout set has ',nHold, 'rows\n')
       holdIdxs <- sample(1:nrow(x),nHold)
 
-browser()
       xTst <- x[holdIdxs,]
       x <- x[-holdIdxs,]
       if (classif2 || !classif) {
@@ -406,9 +405,9 @@ browser()
    }
    class(knnout) <- c('qeKNNtmp','kNN')
    if (!is.null(holdout)) {
+   browser()
       yName <- 'yTst'
-      if (classif2 || !classif) predictHoldout(knnout)
-      else predictHoldoutKNNMulticlass(knnout)
+      predictHoldoutKNN(knnout)
    } else knnout$holdIdxs <- NULL
    knnout
 }
@@ -420,7 +419,7 @@ predict.qeKNNtmp <- function(object,newx,newxK=1,...)
    classif <- object$classif
    classif2 <- object$classif2
 
-   if (!is.null(object$factorsInfo)) 
+   if (!is.numeric(newx) && !is.null(object$factorsInfo)) 
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
@@ -1128,7 +1127,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       tsty <- NULL
    }
    
-   # convert to lighGBM binned form 
+   # convert to lightGBM binned form 
    trnxm <- as.matrix(trnx)
    lgbData <- lightgbm::lgb.Dataset(data=trnxm,label=trny)
 

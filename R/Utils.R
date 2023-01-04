@@ -129,39 +129,45 @@ predictHoldout <- defmacro(res,
    }  # end of expr= for the macro
 )
 
-# same as above, but for vector Y
+# same as above, but for qeKNN
 
-predictHoldoutKNNMulticlass <- defmacro(res,
+predictHoldoutKNN<- defmacro(res,
    expr={
-      newLvls <- regtools:::checkNewLevels(trnx,xTst)
-      if (length(newLvls) > 0) {
-         xTst <- xTst[-newLvls,,drop=FALSE]
-         warning(paste(length(newLvls),
-            'rows removed from test set, due to new factor levels'))
-      }
-
+      ycol <- which(colnames(tst) == yName);
+      tstx <- tst[,-ycol,drop=FALSE];
+      trnx <- trn[,-ycol,drop=FALSE];
+      trny <- trn[,ycol,drop=FALSE];
+      tsty <- tst[,ycol]
 browser()
-      preds <- predict(res,xTst);
+      preds <- predict(res,tstx);
+      if (!classif) preds <- preds[,1]
       listPreds <- is.list(preds)
       res$holdoutPreds <- preds
 
-      yesNo <- !is.null(res$yesYVal)
-      if (is.numeric(preds)) {
-         probs <- preds
-         predClasses <- round(probs)
-         if (is.numeric(tsty)) {
-            predClasses <- 
-               ifelse(predClasses,res$yesYVal,res$noYVal)
-            if (is.numeric(tsty)) 
-               tsty <- ifelse(tsty,res$yesYVal,res$noYVal)
-            preds <- list(predClasses=predClasses,probs=probs)
+      if (classif2) {
+         yesNo <- !is.null(res$yesYVal)
+         if (is.numeric(preds)) {
+            probs <- preds
+            predClasses <- round(probs)
+            if (is.numeric(tsty)) {
+               predClasses <- 
+                  ifelse(predClasses,res$yesYVal,res$noYVal)
+               if (is.numeric(tsty)) 
+                  tsty <- ifelse(tsty,res$yesYVal,res$noYVal)
+               preds <- list(predClasses=predClasses,probs=probs)
+            } 
          } 
-      } 
-      if (listPreds) predClasses <- preds$predClasses
-      # at this point, predClasses should be an R factor in either
-      # case re preds; same for tsty
-      res$testAcc <- mean(predClasses != tsty)
-      res$baseAcc <- 1 - max(table(data[,ycol])) / nrow(data)
+      }
+
+      if (classif) {
+         predClasses <- preds$predClasses 
+         res$testAcc <- mean(predClasses != tsty,na.rm=TRUE)
+         res$baseAcc <- 1 - max(table(tst[,ycol])) / nrow(tst)
+      } else {
+         res$testAcc <- mean(abs(preds-tsty),na.rm=TRUE)
+         meantrny <- mean(trny,na.rm=TRUE)
+         res$baseAcc <- mean(abs(meantrny-tsty),na.rm=TRUE)
+      }
       # res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
    }  # end of expr= for the macro
 )
