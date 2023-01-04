@@ -133,7 +133,6 @@ predictHoldout <- defmacro(res,
 
 predictHoldoutKNN <- defmacro(res,
    expr={
-   browser()
       tstx <- tst[,-ycol,drop=FALSE]
       trnx <- trn[,-ycol,drop=FALSE]
       trny <- trn[,ycol,drop=FALSE]
