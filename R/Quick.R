@@ -345,17 +345,18 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
       xTst <- x[holdIdxs,]
       x <- x[-holdIdxs,]
       if (classif2 || !classif) {
-         y <- y[-holdIdxs]
          yTst <- y[holdIdxs]
+         y <- y[-holdIdxs]
       }
       else {
-         y <- y[-holdIdxs,]
          yTst <- y[holdIdxs,]
+         y <- y[-holdIdxs,]
       }
       tst <- cbind(xTst,yTst)
       tst <- as.data.frame(tst)
       trn <- cbind(x,y)
-      ycol <- (ncol(x)+1):(ncol(x)+nYcols)
+      if (classif && !classif2) ycol <- (ncol(x)+1):(ncol(x)+nYcols)
+      else ycol <- ncol(trn)
    } 
    # if holdout, x,y are now the training set
    
@@ -405,7 +406,6 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    }
    class(knnout) <- c('qeKNNtmp','kNN')
    if (!is.null(holdout)) {
-   browser()
       yName <- 'yTst'
       predictHoldoutKNN(knnout)
    } else knnout$holdIdxs <- NULL

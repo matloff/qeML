@@ -131,16 +131,15 @@ predictHoldout <- defmacro(res,
 
 # same as above, but for qeKNN
 
-predictHoldoutKNN<- defmacro(res,
+predictHoldoutKNN <- defmacro(res,
    expr={
-      ycol <- which(colnames(tst) == yName);
-      tstx <- tst[,-ycol,drop=FALSE];
-      trnx <- trn[,-ycol,drop=FALSE];
-      trny <- trn[,ycol,drop=FALSE];
+   browser()
+      tstx <- tst[,-ycol,drop=FALSE]
+      trnx <- trn[,-ycol,drop=FALSE]
+      trny <- trn[,ycol,drop=FALSE]
       tsty <- tst[,ycol]
-browser()
-      preds <- predict(res,tstx);
-      if (!classif) preds <- preds[,1]
+      preds <- predict(res,tstx)
+      if (!classif) preds <- preds[1,]
       listPreds <- is.list(preds)
       res$holdoutPreds <- preds
 
@@ -156,14 +155,25 @@ browser()
                   tsty <- ifelse(tsty,res$yesYVal,res$noYVal)
                preds <- list(predClasses=predClasses,probs=probs)
             } 
-         } 
+         }
       }
 
-      if (classif) {
+      if (!classif2 &&classif) {
+         predClasses <- preds$predClasses
+         probs <- preds$probs
+         preds <- list(predClasses=predClasses,probs=probs)
+         tmp <- apply(tsty,1,which.max)
+         charTsty <- colnames(tsty)[tmp]
+         res$testAcc <- mean(predClasses != charTsty,na.rm=TRUE)
+      }
+
+      if (classif2) {
          predClasses <- preds$predClasses 
          res$testAcc <- mean(predClasses != tsty,na.rm=TRUE)
          res$baseAcc <- 1 - max(table(tst[,ycol])) / nrow(tst)
-      } else {
+      } 
+      
+      if (!classif) {
          res$testAcc <- mean(abs(preds-tsty),na.rm=TRUE)
          meantrny <- mean(trny,na.rm=TRUE)
          res$baseAcc <- mean(abs(meantrny-tsty),na.rm=TRUE)
