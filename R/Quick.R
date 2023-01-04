@@ -292,7 +292,7 @@ predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
 
 # see note in kNN() man pg
  
-qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
+qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
@@ -404,7 +404,8 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVars <- expandVars
       knnout$expandVals <- expandVals
    }
-   class(knnout) <- c('qeKNNtmp','kNN')
+   # class(knnout) <- c('qeKNNtmp','kNN')
+   class(knnout) <- c('qeKNN','kNN')
    if (!is.null(holdout)) {
       yName <- 'yTst'
       predictHoldoutKNN(knnout)
@@ -412,7 +413,7 @@ qeKNNtmp <- function(data,yName,k=25,scaleX=TRUE,
    knnout
 }
 
-predict.qeKNNtmp <- function(object,newx,newxK=1,...)
+predict.qeKNN <- function(object,newx,newxK=1,...)
 {
    class(object) <- 'kNN'
    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
@@ -461,109 +462,109 @@ predict.qeKNNtmp <- function(object,newx,newxK=1,...)
 
 }
 
-#########################  qeKNN()  #################################
-
-# arguments:  see above, plus
-
-#     k: number of nearest neighbors
-#     scaleX: if TRUE, features will be centered and scaled; note that
-#        this means the features must be numeric
-#     smoothingFtn: as in kNN(); 'mean' or 'loclin'
-#     expandVars,expandVals:  e.g. expandVars element = 3 and
-#        expandVals = 0.2 means give variable 3 a weight of 0.2
-#        instead of 1.0 in the distance function
-
-# value:  see above
-
-# see note in kNN() man pg
- 
-qeKNN <- function(data,yName,k=25,scaleX=TRUE,
-   smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))))
-{
-   checkForNonDF(data)
-   trainRow1 <- getRow1(data,yName)
-   classif <- is.factor(data[[yName]])
-   if (classif) {
-      y <- data[,yName]
-      yLevels <- levels(y)
-      if (length(yLevels) > 2)
-         stop('use regtools::kNN directly for multiclass case')
-      if (is.null(yesYVal)) 
-         stop('must specify yesYVal')
-      whichYes <- which(yLevels == yesYVal)
-      noYVal <- yLevels[3 - whichYes]
-   } else noYVal <- NULL
-
-   ycol <- which(names(data) == yName)
-   if (classif) data[,ycol] <- as.integer(data[,ycol] == yesYVal)
-
-   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
-   if (!is.null(holdout)) {
-      splitData(holdout,data)
-      y <- data[-holdIdxs,ycol]
-      x <- data[-holdIdxs,-ycol]
-   } else {
-      x <- data[,-ycol]
-      y <- data[,ycol]
-   }
-   # if holdout, x,y are now the training set
-   
-   if (!allNumeric(x)) {
-      x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      factorsInfo <- attr(x,'factorsInfo') 
-   } else factorsInfo <- NULL
-
-   xm <- as.matrix(x)
-
-   if (scaleX) {
-      xm <- scale(xm)
-      ctr <- attr(xm,'scaled:center')
-      scl <- attr(xm,'scaled:scale')
-      scalePars <- list(ctr=ctr,scl=scl)
-   } else scalePars <- NULL
-  
-   if (!is.null(expandVars)) {
-      # convert expandVars, expandVals according to possible creation of
-      # dummies
-      dta <- xm[,expandVars,drop=FALSE]
-      dta <- rbind(expandVals,dta)
-      dta <- as.data.frame(dta)
-      tmp <- regtools::factorsToDummies(dta,omitLast=TRUE)
-      expandVars <- colnames(tmp)
-      expandVals <- tmp[1,]
-      # convert expandVars from names to column numbers (not efficient, but
-      # quick anyway)
-      for (i in 1:length(expandVars)) {
-         j <- which(expandVars[i] == colnames(x))
-         expandVars[i] <- j
-      }
-      # col numbers are character strings, change to numbers
-      expandVars <- as.numeric(expandVars)
-   
-      xm <- newMultCols(xm,expandVars,expandVals)
-   }
-
-   # set scaleX to FALSE; scaling, if any, has already been done
-   knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=FALSE,classif=classif,
-      smoothingFtn=smoothingFtn)
-   knnout$classif <- classif
-   knnout$yesYVal <- yesYVal
-   knnout$noYVal <- noYVal
-   knnout$scalePars <- scalePars
-   knnout$factorsInfo <- factorsInfo
-   knnout$trainRow1 <- trainRow1
-   if (!is.null(expandVars)) {
-      knnout$expandVars <- expandVars
-      knnout$expandVals <- expandVals
-   }
-   class(knnout) <- c('qeKNN','kNN')
-   if (!is.null(holdout)) {
-      predictHoldout(knnout)
-      knnout$holdIdxs <- holdIdxs
-   } else knnout$holdIdxs <- NULL
-   knnout
-}
+### #########################  qeKNN()  #################################
+### 
+### # arguments:  see above, plus
+### 
+### #     k: number of nearest neighbors
+### #     scaleX: if TRUE, features will be centered and scaled; note that
+### #        this means the features must be numeric
+### #     smoothingFtn: as in kNN(); 'mean' or 'loclin'
+### #     expandVars,expandVals:  e.g. expandVars element = 3 and
+### #        expandVals = 0.2 means give variable 3 a weight of 0.2
+### #        instead of 1.0 in the distance function
+### 
+### # value:  see above
+### 
+### # see note in kNN() man pg
+###  
+### qeKNN <- function(data,yName,k=25,scaleX=TRUE,
+###    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
+###    holdout=floor(min(1000,0.1*nrow(data))))
+### {
+###    checkForNonDF(data)
+###    trainRow1 <- getRow1(data,yName)
+###    classif <- is.factor(data[[yName]])
+###    if (classif) {
+###       y <- data[,yName]
+###       yLevels <- levels(y)
+###       if (length(yLevels) > 2)
+###          stop('use regtools::kNN directly for multiclass case')
+###       if (is.null(yesYVal)) 
+###          stop('must specify yesYVal')
+###       whichYes <- which(yLevels == yesYVal)
+###       noYVal <- yLevels[3 - whichYes]
+###    } else noYVal <- NULL
+### 
+###    ycol <- which(names(data) == yName)
+###    if (classif) data[,ycol] <- as.integer(data[,ycol] == yesYVal)
+### 
+###    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+###    if (!is.null(holdout)) {
+###       splitData(holdout,data)
+###       y <- data[-holdIdxs,ycol]
+###       x <- data[-holdIdxs,-ycol]
+###    } else {
+###       x <- data[,-ycol]
+###       y <- data[,ycol]
+###    }
+###    # if holdout, x,y are now the training set
+###    
+###    if (!allNumeric(x)) {
+###       x <- regtools::factorsToDummies(x,omitLast=TRUE)
+###       factorsInfo <- attr(x,'factorsInfo') 
+###    } else factorsInfo <- NULL
+### 
+###    xm <- as.matrix(x)
+### 
+###    if (scaleX) {
+###       xm <- scale(xm)
+###       ctr <- attr(xm,'scaled:center')
+###       scl <- attr(xm,'scaled:scale')
+###       scalePars <- list(ctr=ctr,scl=scl)
+###    } else scalePars <- NULL
+###   
+###    if (!is.null(expandVars)) {
+###       # convert expandVars, expandVals according to possible creation of
+###       # dummies
+###       dta <- xm[,expandVars,drop=FALSE]
+###       dta <- rbind(expandVals,dta)
+###       dta <- as.data.frame(dta)
+###       tmp <- regtools::factorsToDummies(dta,omitLast=TRUE)
+###       expandVars <- colnames(tmp)
+###       expandVals <- tmp[1,]
+###       # convert expandVars from names to column numbers (not efficient, but
+###       # quick anyway)
+###       for (i in 1:length(expandVars)) {
+###          j <- which(expandVars[i] == colnames(x))
+###          expandVars[i] <- j
+###       }
+###       # col numbers are character strings, change to numbers
+###       expandVars <- as.numeric(expandVars)
+###    
+###       xm <- newMultCols(xm,expandVars,expandVals)
+###    }
+### 
+###    # set scaleX to FALSE; scaling, if any, has already been done
+###    knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=FALSE,classif=classif,
+###       smoothingFtn=smoothingFtn)
+###    knnout$classif <- classif
+###    knnout$yesYVal <- yesYVal
+###    knnout$noYVal <- noYVal
+###    knnout$scalePars <- scalePars
+###    knnout$factorsInfo <- factorsInfo
+###    knnout$trainRow1 <- trainRow1
+###    if (!is.null(expandVars)) {
+###       knnout$expandVars <- expandVars
+###       knnout$expandVals <- expandVals
+###    }
+###    class(knnout) <- c('qeKNN','kNN')
+###    if (!is.null(holdout)) {
+###       predictHoldout(knnout)
+###       knnout$holdIdxs <- holdIdxs
+###    } else knnout$holdIdxs <- NULL
+###    knnout
+### }
 
 newMultCols <- function (x,cols,vals) {
    partx <- x[,cols,drop=FALSE]
@@ -572,45 +573,45 @@ newMultCols <- function (x,cols,vals) {
    x
 }
 
-predict.qeKNN <- function(object,newx,newxK=1,...)
-{
-   class(object) <- 'kNN'
-   if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
-   classif <- object$classif
-
-   if (!is.null(object$factorsInfo)) 
-      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
-
-   if (is.data.frame(newx)) newx <- as.matrix(newx)
-
-   if (is.vector(newx)) {
-      nr <- 1
-   } else {
-      nr <- nrow(newx)
-   } 
-   newx <- matrix(newx,nrow=nr)
-
-   if (!is.null(object$scalePars)) {
-      ctr <- object$scalePars$ctr
-      scl <- object$scalePars$scl
-      newx <- scale(newx,ctr,scl)
-   }
-
-   if (!is.null(object$expandVars)) 
-      newx <- regtools::multCols(newx,object$expandVars,object$expandVals)
-
-   preds <- predict(object,newx,newxK)
-
-   if (!object$classif) return(preds)
-
-   probs <- preds
-   predClasses <- round(probs) 
-   yesYVal <- object$yesYVal
-   noYVal <- object$noYVal
-   predClasses[predClasses == 1] <- yesYVal
-   predClasses[predClasses == 0] <- noYVal
-   list(predClasses=predClasses,probs=probs)
-}
+### predict.qeKNN <- function(object,newx,newxK=1,...)
+### {
+###    class(object) <- 'kNN'
+###    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
+###    classif <- object$classif
+### 
+###    if (!is.null(object$factorsInfo)) 
+###       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
+### 
+###    if (is.data.frame(newx)) newx <- as.matrix(newx)
+### 
+###    if (is.vector(newx)) {
+###       nr <- 1
+###    } else {
+###       nr <- nrow(newx)
+###    } 
+###    newx <- matrix(newx,nrow=nr)
+### 
+###    if (!is.null(object$scalePars)) {
+###       ctr <- object$scalePars$ctr
+###       scl <- object$scalePars$scl
+###       newx <- scale(newx,ctr,scl)
+###    }
+### 
+###    if (!is.null(object$expandVars)) 
+###       newx <- regtools::multCols(newx,object$expandVars,object$expandVals)
+### 
+###    preds <- predict(object,newx,newxK)
+### 
+###    if (!object$classif) return(preds)
+### 
+###    probs <- preds
+###    predClasses <- round(probs) 
+###    yesYVal <- object$yesYVal
+###    noYVal <- object$noYVal
+###    predClasses[predClasses == 1] <- yesYVal
+###    predClasses[predClasses == 0] <- noYVal
+###    list(predClasses=predClasses,probs=probs)
+### }
 
 #########################  qeRF()  #################################
 
