@@ -2639,6 +2639,7 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
       yLevels <- levels(y)
       if (length(yLevels) > 2)
          stop('use xgboost::xgboost directly for multiclass case')
+stop('2-class case under construction')
       if (is.null(yesYVal)) 
          stop('must specify yesYVal')
       whichYes <- which(yLevels == yesYVal)
@@ -2696,6 +2697,9 @@ predict.qeXGBoost <- function(object,x,...)
 
 #######################  qeliquidSVM()()  ##############################
 
+# note: liquidSVM is no longer on CRAN, but old versions are archived
+# and the library is apparently maintained
+
 # liquidSVM
 
 # arguments:  see above, plus
@@ -2704,31 +2708,46 @@ predict.qeXGBoost <- function(object,x,...)
 #     params: R list of tuning parameters; see documentation fo
 #        xgboost::xgboost()
  
-qeliquidSVM <- function(data,yName,predict.prob=FALSE,
+qeliquidSVM <- function(data,yName,yesYVal=NULL,predict.prob=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    ycol <- which(names(data) == yName)
+   y <- data[,ycol]
+   if (classif) {
+      yLevels <- levels(y)
+      classif2 <- length(yLevels) == 2
+      if (classif2) {
+         if (is.null(yesYVal)) yesYVal <- yLevels[1]
+         whichYes <- which(yLevels == yesYVal)
+         noYVal <- yLevels[3 - whichYes]
+         y <- as.integer(y == yesYVal)
+         data[,ycol] <- as.factor(y)
+      }
+   } else classif2 <- FALSE
+   if (!classif2) {
+      yesYVal <- NULL
+      noYVal <- NULL
+   }
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    
-   browser()
-print('for 2-class case, will need to switch Y to 0,1 factor, then switch back in predict()')
    frml <- as.formula(paste0(yName,' ~ .'))
    dta <- if (is.null(holdout)) data else trn
-   svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob,)
+   svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob)
 
-   liqOut <- list(svmOut=svmOut,classif <- classif)
+   liqOut <- list(svmOut=svmOut,classif=classif,classif2=classif2,
+      yesY=yesYVal,noY=noYVal)
+   class(liqOut) <- c('qeliquidSVM')
 
    if (!is.null(holdout)) {
         predictHoldout(liqOut)
         liqOut$holdIdxs <- holdIdxs
     }
    else liqOut$holdIdxs <- NULL
-   class(liqOut) <- c('qeliquidSVM')
 
    liqOut
 
@@ -2736,7 +2755,11 @@ print('for 2-class case, will need to switch Y to 0,1 factor, then switch back i
 
 predict.qeliquidSVM <- function(object,x,...) 
 {
-   predict(object$svmOut,x)
+   preds <- predict(object$svmOut,x)
+   if (object$classif2) {
+      preds <- ifelse(preds=='1',object$yesY,object$noY)
+   }
+   preds
 }
 
 #######################  qeParallel()  ##############################
