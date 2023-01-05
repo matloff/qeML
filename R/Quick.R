@@ -2694,6 +2694,50 @@ predict.qeXGBoost <- function(object,x,...)
 # z <- qeXGBoost(pef1,'wageinc',holdout=NULL,nRounds=250)
 # predict(z,pef1[1:28,-4])
 
+#######################  qeliquidSVM()()  ##############################
+
+# liquidSVM
+
+# arguments:  see above, plus
+
+#     nRounds: number of boosting rounds
+#     params: R list of tuning parameters; see documentation fo
+#        xgboost::xgboost()
+ 
+qeliquidSVM <- function(data,yName,predict.prob=FALSE,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   ycol <- which(names(data) == yName)
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) splitData(holdout,data)
+   
+   browser()
+print('for 2-class case, will need to switch Y to 0,1 factor, then switch back in predict()')
+   frml <- as.formula(paste0(yName,' ~ .'))
+   dta <- if (is.null(holdout)) data else trn
+   svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob,)
+
+   liqOut <- list(svmOut=svmOut,classif <- classif)
+
+   if (!is.null(holdout)) {
+        predictHoldout(liqOut)
+        liqOut$holdIdxs <- holdIdxs
+    }
+   else liqOut$holdIdxs <- NULL
+   class(liqOut) <- c('qeliquidSVM')
+
+   liqOut
+
+}
+
+predict.qeliquidSVM <- function(object,x,...) 
+{
+   predict(object$svmOut,x)
+}
 
 #######################  qeParallel()  ##############################
 
