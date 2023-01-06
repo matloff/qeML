@@ -2639,7 +2639,6 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
       yLevels <- levels(y)
       if (length(yLevels) > 2)
          stop('use xgboost::xgboost directly for multiclass case')
-stop('2-class case under construction')
       if (is.null(yesYVal)) 
          stop('must specify yesYVal')
       whichYes <- which(yLevels == yesYVal)
@@ -2669,6 +2668,8 @@ stop('2-class case under construction')
 
    xgbOut$classif <- classif
    xgbOut$factorsInfo <- factorsInfo
+   xgbOut$yesYVal <- yesYVal
+   xgbOut$noYVal <- noYVal
 
    if (!is.null(holdout)) {
         predictHoldout(xgbOut)
