@@ -2759,7 +2759,7 @@ predict.qeliquidSVM <- function(object,x,...)
    if (object$classif2) {
       preds <- ifelse(preds=='1',object$yesY,object$noY)
    }
-   preds
+   list(predClasses=preds)
 }
 
 #######################  qeParallel()  ##############################
