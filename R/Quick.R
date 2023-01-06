@@ -2634,17 +2634,28 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    ycol <- which(names(data) == yName)
-   if (classif) {
-      y <- data[,yName]
+   y <- data[,yName]
       yLevels <- levels(y)
-      if (length(yLevels) > 2)
-         stop('use xgboost::xgboost directly for multiclass case')
-      if (is.null(yesYVal)) 
-         stop('must specify yesYVal')
-      whichYes <- which(yLevels == yesYVal)
-      noYVal <- yLevels[3 - whichYes]
-      data[,ycol] <- as.integer(y == yesYVal)
-   } else noYVal <- NULL
+   if (classif) {
+stop('under constructiop')
+      yLevels <- levels(y)
+      classic2 <- length(yLevels) == 2
+      if (classic2) {
+         yesYVal <- yLevels[1]
+         whichYes <- which(yLevels == yesYVal)
+         noYVal <- yLevels[3 - whichYes]
+         data[,ycol] <- as.integer(y == yesYVal)
+         objective <- 'binary:logistic'
+      } else objective <- 'multi:softprob'
+   } else {
+      classic2 <- FALSE
+      objective='reg:squarederror'
+   }
+   
+   if (!classic2) {
+      yesYVal <- NULL
+      noYVal <- NULL
+   }
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
@@ -2663,7 +2674,8 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    } else factorsInfo <- NULL
 
    xm <- as.matrix(x)
-   xgbOut <- xgboost::xgboost(data=xm,label=y,nrounds=nRounds)
+   xgbOut <- xgboost::xgboost(data=xm,label=y,nrounds=nRounds,
+      objective=objective,num_class=length(yLevels))
    class(xgbOut) <- c('qeXGBoost','xgb.Booster')
 
    xgbOut$classif <- classif
@@ -2672,6 +2684,7 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    xgbOut$noYVal <- noYVal
 
    if (!is.null(holdout)) {
+   browser()
         predictHoldout(xgbOut)
         xgbOut$holdIdxs <- holdIdxs
     }
