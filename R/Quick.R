@@ -2634,21 +2634,23 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
    ycol <- which(names(data) == yName)
-   y <- data[,yName]
-      yLevels <- levels(y)
    if (classif) {
-stop('under constructiop')
+      y <- data[,yName]
       yLevels <- levels(y)
+      num_class <- length(yLevels)
+      tmp <- as.integer(y) - 1
+      data[,yName] <- tmp
       classic2 <- length(yLevels) == 2
       if (classic2) {
          yesYVal <- yLevels[1]
          whichYes <- which(yLevels == yesYVal)
          noYVal <- yLevels[3 - whichYes]
-         data[,ycol] <- as.integer(y == yesYVal)
          objective <- 'binary:logistic'
       } else objective <- 'multi:softprob'
    } else {
       classic2 <- FALSE
+      yLevels <- NULL
+      num_class <- NULL
       objective='reg:squarederror'
    }
    
@@ -2675,13 +2677,14 @@ stop('under constructiop')
 
    xm <- as.matrix(x)
    xgbOut <- xgboost::xgboost(data=xm,label=y,nrounds=nRounds,
-      objective=objective,num_class=length(yLevels))
+      objective=objective,num_class=num_class)
    class(xgbOut) <- c('qeXGBoost','xgb.Booster')
 
    xgbOut$classif <- classif
    xgbOut$factorsInfo <- factorsInfo
    xgbOut$yesYVal <- yesYVal
    xgbOut$noYVal <- noYVal
+   xgbOut$yLevels <- yLevels
 
    if (!is.null(holdout)) {
    browser()
@@ -2698,10 +2701,18 @@ predict.qeXGBoost <- function(object,x,...)
 {
    if (!allNumeric(x)) 
       x <- regtools::factorsToDummies(x,omitLast=TRUE,
-         factorsInfo=object$ffactorsInfo)
+         factorsInfo=object$factorsInfo)
    else x <- as.matrix(x)
    class(object) <- class(object)[-1]
-   predict(object,x)
+   preds <- predict(object,x)
+   if (object$classif) {
+      preds <- t(matrix(preds,ncol=nrow(x)))
+      colnames(preds) <- object$yLevels
+      predClassIdxs <- apply(preds,1,which.max)
+      predClasses <- object$yLevels[predClassIdxs]
+      preds <- list(predClasses=predClasses,probs=preds)
+   }
+   preds
 }
 
 # data(pef)
