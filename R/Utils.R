@@ -181,6 +181,34 @@ predictHoldoutKNN <- defmacro(res,
    }  # end of expr= for the macro
 )
 
+predictHoldoutXGB <- defmacro(res,
+   expr={
+      tstx <- tst[,-ycol,drop=FALSE]
+      trnx <- trn[,-ycol,drop=FALSE]
+      trny <- trn[,ycol,drop=FALSE]
+      tsty <- tst[,ycol]
+      preds <- predict(res,tstx)
+      if (!classif) preds <- preds[1,]
+      listPreds <- is.list(preds)
+      res$holdoutPreds <- preds
+
+      if (classif) {
+         predClasses <- preds$predClasses
+         probs <- preds$probs
+         preds <- list(predClasses=predClasses,probs=probs)
+         charTsty <- yLevels[tsty]
+         res$testAcc <- mean(predClasses != charTsty,na.rm=TRUE)
+      }
+
+      if (!classif) {
+         res$testAcc <- mean(abs(preds-tsty),na.rm=TRUE)
+         meantrny <- mean(trny,na.rm=TRUE)
+         res$baseAcc <- mean(abs(meantrny-tsty),na.rm=TRUE)
+      }
+      # res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)
+   }  # end of expr= for the macro
+)
+
 # lm() balks if a label begins with a digit; check to see if we have any
 checkNumericNames <- function(nms)
 {

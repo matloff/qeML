@@ -2674,9 +2674,9 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
    xgbOut$yLevels <- yLevels
 
    if (!is.null(holdout)) {
-   browser()
       tst[,ycol] <- tst[,ycol] + 1
-      predictHoldout(xgbOut)
+      # predictHoldout(xgbOut)
+      predictHoldoutXGB(xgbOut)
       xgbOut$holdIdxs <- holdIdxs
     }
    else xgbOut$holdIdxs <- NULL
