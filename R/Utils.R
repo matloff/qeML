@@ -188,7 +188,6 @@ predictHoldoutXGB <- defmacro(res,
       trny <- trn[,ycol,drop=FALSE]
       tsty <- tst[,ycol]
       preds <- predict(res,tstx)
-      if (!classif) preds <- preds[1,]
       listPreds <- is.list(preds)
       res$holdoutPreds <- preds
 
@@ -202,7 +201,7 @@ predictHoldoutXGB <- defmacro(res,
 
       if (!classif) {
          res$testAcc <- mean(abs(preds-tsty),na.rm=TRUE)
-         meantrny <- mean(trny,na.rm=TRUE)
+         meantrny <- mean(trny[,1],na.rm=TRUE)
          res$baseAcc <- mean(abs(meantrny-tsty),na.rm=TRUE)
       }
       # res$confusion <- regtools::confusion(tst[,ycol],preds$predClasses)

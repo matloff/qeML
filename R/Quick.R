@@ -2675,7 +2675,6 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
 
    if (!is.null(holdout)) {
       tst[,ycol] <- tst[,ycol] + 1
-      # predictHoldout(xgbOut)
       predictHoldoutXGB(xgbOut)
       xgbOut$holdIdxs <- holdIdxs
     }
