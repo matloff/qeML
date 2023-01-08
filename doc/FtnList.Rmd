@@ -1,0 +1,62 @@
+
+---
+title: "Categorized Function List"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FCategorized unction List}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+# The qeML package:  Categorized function list
+
+# Predictive Methods
+
+## Tree-based
+
+* qeAdaBoost: AdaBoost
+* qeDT: one tree; has plot function
+* qeGBoost: gbm package
+* qeLightGBoost: LightGBoost; fast
+* qeRF: random forests; has plot function
+* qeRFgrf: random forests; bias correction
+* qeRFranger: random forests
+
+## Nearest neighbors
+
+* qeKNN: k-NN; bias correction; can give different weights
+* qeKNNna: k-NN, dealing with NAs
+* qeLinKNN: linear model with kNN correction
+
+## Neural networks
+
+* qeNeural: neural networks, using Keras
+
+## Linear/generalized linear
+
+* qeLASSO: LASSO; has plot function
+* qeLin: wrapper for lm(), with additions
+* qeLogit: wrapper for glm(), logit case
+* qePolyLASSO: polynomial terms added, then LASSO
+* qePolyLin: polynomial terms added, then linear model
+* qePolyLog: polynomial terms added, then logit
+
+## Special data
+
+* qeText
+* qeTS
+
+# Model Fitting, parameter tuning, dimension reduction
+
+* qeCompare
+* qeFOCI
+* qeFOCIrand
+* qeFT
+* qeParallel
+* qePCA
+* qeROC
+* qeSVM
+
+# Other
+
+* doubleD
