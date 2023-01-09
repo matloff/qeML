@@ -29,6 +29,7 @@ S3method(predict,qePolyLog)
 S3method(predict,qeLASSO)
 S3method(predict,qeDT)
 S3method(predict,qeParallel)
+S3method(predict,qeDeepnet)
 S3method(plot,qeLASSO)
 S3method(plot,qeRF)
 S3method(plot,qeDT)
@@ -53,4 +54,4 @@ export(
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
    qeParallel,qeTS,qeText,
    qeLightGBoost, qeXGBoost, qeliquidSVM,
-   doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN)
+   doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,qeDeepnet)

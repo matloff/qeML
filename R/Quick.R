@@ -939,7 +939,7 @@ predict.qeSVM <- function (object, newx,...)
 #    plot(object,object$data,formula)
 # }
 
-## ## liquidSVM apparently no longer available
+## ## liquidSVM apparently no longer availabl
 ## ## #########################  qeSVMliquid()  #################################
 ## ## 
 ## ## # uses liquidSVM package
@@ -2773,6 +2773,85 @@ predict.qeliquidSVM <- function(object,x,...)
    }
    list(predClasses=preds)
 }
+
+#######################  qeDeepnet()()  ##############################
+
+# Deepnet
+
+# using almost all available arguments from the wrappee, but not
+# allowing regression cases, on which the package seems to behave
+# erraticly
+ 
+qeDeepnet <- function(data,yName,hidden=c(10),activationfun='sigm',
+   learningrate=0.8,momentum=0.5,learningrate_scale=1,
+   numepochs=3,batchsize=100,hidden_dropout=0,
+   yesYVal=NULL,holdout=floor(min(1000,0.1*nrow(data))))
+{
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   if (!classif) stop('set up for classification problems only')
+   ycol <- which(names(data) == yName)
+   x <- data[,-ycol,drop=FALSE]
+   y <- data[,yName]
+   yLevels <- levels(y)
+   y <- factorsToDummies(y,omitLast=FALSE)
+   output <- 'sigm'
+   
+   if (!allNumeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo') 
+   } else factorsInfo <- NULL
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      holdIdxs <- sample(1:nrow(data),holdout)
+      tsty <- y[holdIdxs]
+      tstx <- x[holdIdxs,,drop=FALSE]
+      trny <- y[-holdIdxs]
+      trnx <- x[-holdIdxs,,drop=FALSE]
+   } else {
+      trnx <- x
+      trny <- y
+   }
+   # if holdout, x,y are now the training set
+
+   xm <- as.matrix(x)
+   nnOut <- deepnet::nn.train(x=xm,y=y,hidden=hidden, 
+      activationfun=activationfun,learningrate=learningrate, 
+      momentum=momentum,learningrate_scale=learningrate_scale,
+      output=output,numepochs=numepochs,batchsize=batchsize, 
+      hidden_dropout=hidden_dropout) 
+   class(nnOut) <- c('qeDeepnet')
+
+   nnOut$classif <- classif
+   nnOut$factorsInfo <- factorsInfo
+   nnOut$yLevels <- yLevels
+
+   if (!is.null(holdout)) {
+      preds <- predict(nnOut,tstx)
+      nnOut$testAcc <- mean(preds$predClasses != data[holdIdxs,ycol])
+      nnOut$holdIdxs <- holdIdxs
+    }
+   else nnOut$holdIdxs <- NULL
+
+   nnOut
+
+}
+
+predict.qeDeepnet <- function(object,x,...) 
+{
+   if (!allNumeric(x)) 
+      x <- regtools::factorsToDummies(x,omitLast=TRUE,
+         factorsInfo=object$factorsInfo)
+   else x <- as.matrix(x)
+   probs <- deepnet::nn.predict(object,x)
+   colnames(probs) <- object$yLevels
+   predClassIdxs <- apply(probs,1,which.max)
+   predClasses <- object$yLevels[predClassIdxs]
+   list(predClasses=predClasses,probs=probs)
+}
+
 
 #######################  qeParallel()  ##############################
 
