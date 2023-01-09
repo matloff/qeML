@@ -30,6 +30,7 @@
 \alias{qeXGBoost}
 \alias{qeCompare}
 \alias{qeFT}
+\alias{qeDeepnet}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
@@ -50,6 +51,7 @@
 \alias{predict.qeUMAP}
 \alias{predict.qeskRF}
 \alias{predict.qeskSVM}
+\alias{predict.qeDeepnet}
 \alias{predict.qeParallel}
 \alias{plot.qePoly}
 \alias{plot.qeRF}
@@ -120,6 +122,10 @@ qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
 qeROC(dataIn,qeOut,yName,yLevelName)
 qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
    holdout=floor(min(1000,0.1*nrow(data))))
+qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
+   learningrate=0.8,momentum=0.5,learningrate_scale=1,
+   numepochs=3,batchsize=100,hidden_dropout=0,yesYVal=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))))
 \method{predict}{qeLogit}(object,newx,...)
 \method{predict}{qeLin}(object,newx,useTrainRow1=TRUE,...)
 \method{predict}{qeKNN}(object,newx,newxK=1,...)
@@ -134,12 +140,21 @@ qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
 \method{predict}{qePoly}(object,newx)
 \method{predict}{qePCA}(object,newx,...)
 \method{predict}{qeUMAP}(object,newx,...)
+\method{predict}{qeDeepnet}(object,newx,...)
 \method{plot}{qeLASSO}(x,...)
 \method{plot}{qeRF}(x,...)
 }
 
 \arguments{
   \item{...}{Further arguments.}
+  \item{hidden_dropout}{Drop out fraction for hidden layer.}
+  \item{batchsize}{Batch size.}
+  \item{numepochs}{Number of iterations to conduct.}
+  \item{learningrate}{Learning rate.}
+  \item{momemtum}{Momemtum}
+  \item{learningrate_scale}{Learning rate will be multiplied by this at
+     each iteration, allowing for decay.}
+  \item{activationfun}{Can be 'sigm', 'tanh' or 'linear'.}
   \item{newNTree}{Number of trees to use in prediction.}
   \item{newxK}{If predicting new cases, number of nearest neighbors to
      smooth in the object returned by \code{qeKNN}.}
