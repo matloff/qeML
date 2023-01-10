@@ -2,12 +2,14 @@
 \alias{forest500}
 
 \title{
-Subset of the Million Song 
+Subset of the Covertype data.
 }
 
 \description{
 
-Random subset of 500 songs from the UCI ML Repository dataset.
+Random subset of 500 records.
+
+\url{https://archive.ics.uci.edu/ml/datasets/covertype}
 
 }
 
