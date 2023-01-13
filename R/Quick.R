@@ -91,10 +91,11 @@ qeLogit <-
    checkForNonDF(data)
    dataY <- data[[yName]]
    classif <- is.factor(dataY)
-   if (classif && length(levels(dataY)) == 2)
-      if (is.null(yesYVal)) 
-         stop('must specify yesYVal in 2-class problems')
    if (!classif) {print('for classification problems only'); return(NA)}
+   yLevels <- levels(dataY)
+   if (classif && length(yLevels == 2))
+      if (is.null(yesYVal)) 
+         yesYVal <- yLevels[1]
    yLevels <- levels(dataY)
    if(length(yLevels) == 2) {
       whichYes <- which(yLevels == yesYVal)
@@ -309,7 +310,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       classif2 <- length(yLevels) == 2
       if (classif2) {
          if (is.null(yesYVal)) 
-            stop('must specify yesYVal')
+            yesYVal <- yLevels[1]
          whichYes <- which(yLevels == yesYVal)
          noYVal <- yLevels[3 - whichYes]
       } else noYVal <- NULL
@@ -681,7 +682,7 @@ plot.qeRF <- function(x,...)
 
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),yesYVal='')
+   holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
@@ -690,6 +691,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    yvec <- data[,ycol]
    if (is.factor(yvec)) {
       if (length(levels(yvec)) == 2) {
+         if (is.null(yesYVal)) yesYVal <- levels(yvec)[1]
          if (length(yesYVal) > 0) {
             whichYes <- which(yvec == yesYVal)
             yvec <- as.character(yvec)
@@ -2627,7 +2629,7 @@ predict.qeKNNna <- function(object,newx,kPred=1,...)
 #     params: R list of tuning parameters; see documentation fo
 #        xgboost::xgboost()
  
-qeXGBoost <- function(data,yName,nRounds=250,params=list(),yesYVal,
+qeXGBoost <- function(data,yName,nRounds=250,params=list(),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    checkForNonDF(data)
