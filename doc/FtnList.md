@@ -24,7 +24,8 @@
 
 ## Neural networks
 
-* qeNeural: neural networks, using Keras
+* qeNeural: neural networks, using Keras, CNN included, Python needed
+* qeDeepnet: neural networks, basic, Python-free
 
 ## Linear/generalized linear
 
