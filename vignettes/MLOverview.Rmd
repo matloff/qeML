@@ -30,7 +30,7 @@ statistical/machine learning (ML).  For each one, we present
 
 * function in the R package, **qeML** (readers without R background or
   who simply wish to acquire an overview of ML may skip the R code
-without loss of comprehehnsion of the text).
+without loss of comprehehnsion of the text)
 
 We'll also discuss the overfitting issue.
 
@@ -93,10 +93,11 @@ Here is a glimpse of the data:
 
 ## The  R package's **qe***-series functions
 
-Here "qe" stands for **"quick and easy."**  The functions have a simple,
-uniform interface, and most importantly, **require no setup.**  To fit
-an SVM model, say, one simply calls **qeSVM()**, no preparation calls to
-define the model etc.
+Here "qe" stands for **"quick and easy,"** and we really mean that!
+
+The functions have a simple, uniform interface, and most importantly,
+**require no setup.**  To fit an SVM model, say, one simply calls
+**qeSVM()**, no preparation calls to define the model etc.
 
 The call form is
 
@@ -109,7 +110,8 @@ As noted, no prior calls are needed to define the model, etc.
 ## Example
 
 Let's predict weight from height and age, using two methods, k-Nearest
-Neighbor and random forests.
+Neighbor and random forests.  (Details of the methods will be explained
+shortly; for now, let's just see how to invoke them.)
 
 ``` r
 mlb <- mlb[,4:6]  # columns for height, weight and age
@@ -117,20 +119,26 @@ knnout <- qeKNN(mlb,'Weight')  # fit k-Nearest Neighbor model
 rfout <- qeRF(mlb,'Weight')  # fit random forests model
 ```
 
-Default values of hyperparameters are used but can be overridden.
+Most methods have *hyperparameters*, values that can be used to tweak
+the analysis in various ways.  In qeML, default values of
+hyperparameters are used but can be overridden.
+
 Prediction of new cases is equally easy, in the form
 
 ``` r
 predict(<model fit>, <new X value>)
 ```
 
-E.g. to predict the weight of a new player of height 70 and age 28, run
+E.g. to predict the weight of a new player of height 70 and age 28, 
+using our random forests model created above, run
 
 ``` r
 > predict(rfout,c(70,28))
        2 
 184.1626 
 ```
+
+Such a player would be predicted to weigh about 184 pounds.
 
 The model is automatically assessed on a holdout set (the concept is
 discussed later in this document):
@@ -139,6 +147,17 @@ discussed later in this document):
 > rfout$testAcc  # mean absolute prediction error
 [1] 15.16911
 ```
+
+So, on average, our predictions are off by about 15 pounds.  What about
+the k-NN model?
+
+``` r
+> knnout$testAcc
+[1] 13.20277
+```
+
+Seems to be better, though we should try other values of the
+hyperparameters.
 
 (The formation of a holdout set can be suppressed.)
 
@@ -191,7 +210,8 @@ and 60s.
 It's very intuitive.  To predict, say, the weight of a new
 player of height 72 and age 25, we find the k closest players in our 
 training data to (72,25), and average their weights.  This is our
-estimate of m(72,25), and we use it as our prediction.
+estimate of m(72,25), and we use it as our prediction.  The default
+value of k in **qeKNN()** is 25.
 
 The **qeKNN()** function wraps **kNN()** in **regtools**.  The main
 hyperparameter is the number of neighbors k.  As with any
@@ -200,6 +220,19 @@ not too small.  Setting k too small will result in our taking the
 average of just a few Y values, too small a sample.  On the other hand,
 too large a value for k will some distant data points may be used that
 are not representative.
+
+To choose k, we could try various values, run **qeKNN()** on each one,
+then use the value that produced the best (i.e. smallest) **testAcc**.
+
+If Y is an indicator variable, its average is the proportion of 1s.
+This will then be the estimated probability that Y = 1 for a new case.
+If that is greater than 0.5 in the neighborhood of the new case, we guess 
+Y = 1 for the new case, otherwise 0.  
+
+If Y is categorical, i.e. an R factor as in the case of predicting
+player position in the **mlb** dataset, we then find a probability for
+each category in this manner, and guess Y to be whichever category has
+the highest prbb.
 
 ### Random forests
 
@@ -210,11 +243,11 @@ This is a natural extension of k-NN, in that it too creates a
 neighborhood and averages Y values within the neighborhood.  However, it
 does so in a different way, creating tree structures.
 
-Say we are predicting blood pressure from height, weight and age.  We
-first ask whether the height is above or below a certain threshold.
-After that, we ask whether weight is above or below a certain
-(different) threshold.  This partitions height-weight space into 4
-sectors.  We then might subdivide each sector according to whether age
+Say in some dataset we are predicting blood pressure from height, weight
+and age.  We first ask whether the height is above or below a certain
+threshold.  After that, we ask whether weight is above or below a
+certain (different) threshold.  This partitions height-weight space into
+4 sectors.  We then might subdivide each sector according to whether age
 is above or below a threshold, now creating 8 sectors of
 height-weight-age space.  Each sector is now a "neighborhood."  To
 predict a new case, we see which neighborhood it belongs to, then take
@@ -222,27 +255,31 @@ our prediction to be the average Y value among training set points in
 that neighborhood.
 
 The word *might* in the above paragraph alludes to the fact that the
-process may stop early, if the current subdivision is judged fine enough
-to produce good accuracy.  And one generally wants to avoid having
-neighborhoods (*nodes* in the tree) that don't have many data points;
-this is controlled by a hyperparameter, say setting a minimum number of
-data points per node; if a split would violate that rule, then don't
-split.  Of course, if we set out threshold too high, we won't do enough
-splits, so again we need to try to find a "Goldilocks" level.
+process may stop early, if the current subdivision is judged by the
+algorithm to be fine enough to produce good accuracy.  So we might end
+up using only height and weight, not age.
+
+And one generally wants to avoid having neighborhoods (*nodes* in the
+tree) that don't have many data points; this is controlled by a
+hyperparameter, say setting a minimum number of data points per node; if
+a split would violate that rule, then don't split.  Of course, if we set
+out threshold too high, we won't do enough splits, so again we need to
+try to find a "Goldilocks" level.
 
 Here is an example using the UCI Vertebrae dataset.  There are 6
-predictor variables, named V1 through V6 consisting of various bone
+predictor variables, named V1 through V6, consisting of various bone
 measurements.  There are 3 classes, DH (Disk Hernia), Spondylolisthesis
-(SL), Normal (NO).  A single tree is shown.
+(SL), and Normal (NO).  A single tree is shown.
 
 ![alt text](RpartVert.png)
 
-At the root, if the predictor variable V6 in our new case to be
+At the root, if the variable V6 in our new case to be
 predicted is < 16, we go left, otherwise right.  Say we go left.
 Then if V4 < 28 in the new case, we go left again, getting to a leaf, in
 which we guess DH.  The 0.74 etc. mean that for the training data that
 happen to fall into that leaf, 74% of them are in class DH, 26% are NO
-and 0% are SL.  So we gues DH.
+and 0% are SL.  So we gues DH, based on there being an estimated 74%
+chance that this new case is of type DH..
 
 Clearly, the order in which the predictor variables are evaluated (e.g.
 height, weight and age in the **mlb** data) can matter a lot.  So, more
@@ -256,7 +293,8 @@ The thresholds used at each node are determined through a complicated
 process, depending on which implemented of RF one uses.
 
 The **qeRF()** function wraps the function of the same name in the
-**randomForests** package.
+**randomForests** package.  The package also offers other
+implementations of RF.
 
 ### Boosting
 
@@ -264,14 +302,16 @@ This method has been developed both by CS and statistics people.  The
 latter have been involved mainly in *gradient* boosting, the technique
 used here.
 
-The basic idea is to iteratively build up a sequence of trees, each of which
-is focused on the data points on which the last predicted poorly.  At
-the end, all the trees are combined.
+The basic idea is to iteratively build up a sequence of trees, each of
+which is an improved update of the last.  At the end, all the trees are
+combined.
 
 The **qeGBoost()** wraps **gbm()** in the package of the same name.  It
 is tree-based, with hyperparameters similar to the random forests case,
 plus a *learning rate*.  The latter controls the size of iteration
 steps.
+
+The package also offers other implementations of boosting.
 
 ### Linear model
 
