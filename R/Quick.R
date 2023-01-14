@@ -410,6 +410,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    if (!is.null(holdout)) {
       yName <- 'yTst'
       predictHoldoutKNN(knnout)
+      knnout$holdIdxs <- holdIdxs
    } else knnout$holdIdxs <- NULL
    knnout
 }

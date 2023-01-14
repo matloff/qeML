@@ -120,7 +120,7 @@ rfout <- qeRF(mlb,'Weight')  # fit random forests model
 ```
 
 Most methods have *hyperparameters*, values that can be used to tweak
-the analysis in various ways.  In qeML, default values of
+the analysis in various ways.  In **qeML**, default values of
 hyperparameters are used but can be overridden.
 
 Prediction of new cases is equally easy, in the form
@@ -309,7 +309,7 @@ combined.
 The **qeGBoost()** wraps **gbm()** in the package of the same name.  It
 is tree-based, with hyperparameters similar to the random forests case,
 plus a *learning rate*.  The latter controls the size of iteration
-steps.
+steps; more on this  below.
 
 The package also offers other implementations of boosting.
 
@@ -318,8 +318,9 @@ The package also offers other implementations of boosting.
 This of course is the classical linear regression model, invented
 200 years ago (!) and developed by statisticians.
 
-For motivation, here is a graph of mean weight vs. height for the 
-**mlb** data:
+For motivation, below is a graph of mean weight vs. height for the 
+**mlb** data.  (There are many players for each height level, and we
+find and plot the mean weight at each height.)
 
 ![alt text](WtVsHt.png)
 
@@ -366,12 +367,13 @@ just calls the latter, but does some little fixess.
 This is a generalization of the linear model, developed by statisticians
 and economists.
 
-This model is only for classification settings.  Since m(t) is now a
+This model is only for classification settings.  As noted, since Y is
+now 1 or 0, its mean becomes the probability of 1.  Since m(t) is now a
 probability, we need it to have values in the interval [0,1].  This is
 achieved by feeding a linear model into the *logistic function*,
-l(u) = (1 + exp(-u))<sup>-1</sup>.  So for instance, to predict whether a
-player is a catcher (Y = 1 if yes, Y = 0 if no),  Again, there are no
-hyperparameters here.
+l(u) = (1 + exp(-u))<sup>-1</sup>, which does take values in (0,1).  
+So for instance, to predict whether a player is a catcher (Y = 1 if 
+yes, Y = 0 if no), we fit the model 
 
 P(catcher | height, weight, age) = m(height,weight,age) = 
 1 / [1 + exp{-(&beta;<sub>0</sub> +
@@ -389,6 +391,50 @@ situation by calling **glm()** one class at a time, generating c
 **glm()** outputs.  When a new case is to be predicted, it is fed into
 each of the c **glm()** outputs, yielding c probabilities.  It then
 predicts the new case as whichever class has the highest probability.
+
+Here is an example, using the **phoneme** dataset that is included with 
+**qeML**.  The aim is to predict whether a spoken sound is nasal or not.
+(In the dataset, Y takes on the values 1 and 2, not 1 and 0, but the
+software converts internally.)
+
+``` r
+> w <- qeLogit(phoneme,'lbl')
+holdout set has  540 rows
+> w$testAcc
+[1] 0.2462963
+> w$baseAcc
+[1] 0.2911184
+```
+
+We had about a 25% error rate on new data (i.e. the holdout set).  If we
+were to simply guess all new cases to have Y = 1 (since it is the
+majority value in the overall data), we would have a 29% error rate.  So
+we achieved a modest improvement by using the predictor variables.
+
+As an example of prediction, consider a case that is like the first row
+in the dataset, but with **V1**:
+
+``` r
+> newx <- phoneme[1,-6]  # omit the value to be predicted
+> newx[1] <- 0.32
+> predict(w,newx)
+$predClasses
+     [,1]
+[1,] "1"
+
+$probs
+          [,1]
+[1,] 0.9055212
+```
+
+We predict Y = 1, which, given the values in **newx**, has a 91% chance
+of being true.
+
+Some presentations describe the logistic model as "modeling the
+logarithm of the odds of Y = 1 vs. Y = 0 as linear."  While this is
+correct, it is less informative, in our opinion.  Why would we care
+about a logarithm being linear?  The central issue is that the logistic
+function models a probability, just what we need.
 
 ### Polynomial-linear models
 
