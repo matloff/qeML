@@ -15,3 +15,12 @@ plotClassesUMAP <- function(data,classVar)
    ump <- uwot::umap(x)
    plot(ump[,1:2],col=classVar)
 }
+
+# plotting residuals against predictors, two at a time
+
+# qeOut: return object from the various 
+
+plotPairedResids <- function(data,qeOut) 
+{
+   
+}

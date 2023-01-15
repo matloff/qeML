@@ -145,6 +145,7 @@ qeLogit <-
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yName
    outlist
 }
 
@@ -249,6 +250,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
          lmout$holdoutR2 <- cor(preds,tst[,ycol])^2
       }
    }
+   lmout$yName <- yName
    lmout
 }
 
@@ -412,6 +414,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       predictHoldoutKNN(knnout)
       knnout$holdIdxs <- holdIdxs
    } else knnout$holdIdxs <- NULL
+   knnout$yName <- yName
    knnout
 }
 
@@ -648,6 +651,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
    }
+   rfout$yName <- yName
    rfout
 }
 
@@ -734,6 +738,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(rfrout)
       rfrout$holdIdxs <- holdIdxs
    }
+   rfrout$yName <- yName
    rfrout
 
 }
@@ -822,6 +827,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
    }
+   rfout$yName <- yName
    rfout
 }
 
@@ -918,6 +924,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
         predictHoldout(svmout)
         svmout$holdIdxs <- holdIdxs
     }
+    svmout$yName <- yName
     svmout
 }
 
@@ -1047,6 +1054,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yName
    outlist
 }
 
@@ -1163,6 +1171,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       outlist$baseAcc <- mean(abs(tsty - mean(tsty)))
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yName
    outlist
 }
 
@@ -1237,6 +1246,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yName
    outlist
 }
 
@@ -1336,6 +1346,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
       predictHoldout(krsout)
       krsout$holdIdxs <- holdIdxs
    }
+   krsout$yName <- yName
    krsout
 }
 
@@ -1485,6 +1496,7 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
+   qeout$yName <- yName
    qeout
 }
 
@@ -1532,6 +1544,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yName
    res
 }
 
@@ -1587,6 +1600,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
+   qeout$yName <- yName
    qeout
 }
 
@@ -1655,6 +1669,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
+   qeout$yName <- yName
    qeout
 }
 
@@ -1781,6 +1796,7 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    res$numPCs <- numPCs
    res$trainRow1 <- qeOut$trainRow1
    class(res) <- 'qePCA'
+   res$yName <- yName
    res
 }
 
@@ -1856,6 +1872,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    res$trainRow1 <- qeOut$trainRow1
    res$nColX <- ncol(x)
    class(res) <- 'qeUMAP'
+   knnout$yName <- yName
    res
 }
 
@@ -1986,6 +2003,7 @@ qeText <- function(data,yName,kTop=50,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yName
    res
 }
 
@@ -2056,6 +2074,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yName
    res
 }
 
@@ -2116,6 +2135,7 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yName
    res
 }
 
