@@ -571,9 +571,8 @@ activation function.  Most NN software also includes various other
 hyperparameters.
 
 The linear combination coefficients, shown as numeric labels in the
-picture, are known as *weights*.  (They are also called *parameters*,
-not to be confused with hyperparameters.) How are they calculated?
-Again least squares is used, minimizing 
+picture, are known as *weights*.  How are they calculated?  Again least
+squares is used, minimizing 
 
 &Sigma;<sub>i</sub> 
 (Y<sub>i</sub> - finaloutput<sub>i</sub>)
@@ -659,7 +658,7 @@ polynomial degree, optimal number of nearest neighbors, optimal *network
 architecture* (configuration of layers and neurons), and so on.  How do
 we find it?
 
-Alas, there are no magic answers here.  The general approach is
+Alas, **there are no magic answers here**.  The general approach is
 *cross-validation*.  Here is a simple version:  We set aside part of our
 training data as a *holdout set*; the remainder becomes our new training
 data.  For each of our candidate models, e.g. each polynomial degree, we
@@ -677,19 +676,31 @@ overfitting.
 
 Among other things, this means that if our training data have a very
 large number of predictor variables, we may wish to delete some, or
-possibly combine them, in order to reduce complexity.  
+possibly combine them, in order to reduce complexity; this is the
+*variable selection* or *feature selection* problem.
 
-One way to combine them is *Principal Components Analysis* (PCA).  One
+One way to approach this is *Principal Components Analysis* (PCA).  One
 creates new predictor variables as linear combinations of the original
-ones, then retains only the combinations that have a large variance.  As
-you may have guessed by now, "There's an app for that" -- **qePCA()**.
+ones, then retains only the combinations that have a large variance.
+Since small variance means a random quantity is essentially constant,
+thus having no predictive value, we discard to the PCs with small
+variance.  
+
+As you may have guessed by now, "There's an app for that" --
+**qePCA()**.  It finds the PCs, then applies the qe-series function of
+your choice, say **qeRF()** to the new data in the form of the PCs.
+The function **qeUMAP()** works similarly for UMAP, which is a kind of
+nonlinear analog of PCA.
+
+Needless to say, we once again encounter the Bias-Variance Tradeoff
+here, in choosing the number of PCs.
 
 Many people use the LASSO for predictor variable selection.  Since
 typically most of the LASSO coefficients are 0s, we use only the
 variables with nonzero coefficients.  One would then predict with that
 simplified LASSO model.
 
-## Which one to use?
+## Which ML method to use?
 
 With many datasets, all the above ML methods will give similar results.
 But for some other datasets, it really makes a difference which one we
