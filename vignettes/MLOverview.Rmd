@@ -510,13 +510,14 @@ if any other data point were to change, the margin would not change.
 In most cases, the two classes are not linearly separable.  So we allow
 curved boundaries, implemented through polynomial (or similar)
 transformations to the data.  The degree of the polynomial is a
-hyperparameter, named **gamma** here.
+hyperparameter. 
 
 Another hyperparameter is **cost:**  Here we allow some data points to
 be within the margin.  The cost variable is roughly saying how many
 exceptions we are willing to accept.
 
-The **qeSVM()** function wraps **svm()** in the **e1071** package.  
+The **qeSVM()** function wraps **svm()** in the **e1071** package.  The
+package also offers various other implementations.
 
 ### Neural networks
 
@@ -566,7 +567,8 @@ outputs are fed into A(t) and then to the third layer.
 
 Hyperparameters for NNs include the number of layers, the number of
 units per layer (which need not be the same in each layer), and the
-activation function.
+activation function.  Most NN software also includes various other
+hyperparameters.
 
 The linear combination coefficients, shown as numeric labels in the
 picture, are known as *weights*.  (They are also called *parameters*,
