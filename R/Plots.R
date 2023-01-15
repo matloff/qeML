@@ -22,5 +22,8 @@ plotClassesUMAP <- function(data,classVar)
 
 plotPairedResids <- function(data,qeOut) 
 {
-   
+   yName <- qeOut$yName
+   yCol <- which(names(data) == yName)  
+   x <- data[,-yCol,drop=FALSE
+   namesX <- names(x)
 }
