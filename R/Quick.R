@@ -722,6 +722,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       split.select.weights <- wts
    } else split.select.weights <- NULL
    rfrout <- ranger::ranger(frml,data=data,num.trees=nTree,mtry=mtry,
+      importance='impurity',
       split.select.weights=split.select.weights,probability=classif,
       min.node.size=minNodeSize)
    rfrout$classNames <- xyc$classNames
