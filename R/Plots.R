@@ -13,7 +13,7 @@ plotClassesUMAP <- function(data,classVar)
    if (!is.factor(classVar)) classVar <- as.factor(classVar)
    if (!allNumeric(x)) x <- factorsToDummies(x)
    ump <- uwot::umap(x)
-   plot(ump[,1:2],col=classVar)
+   plot(ump[,1:2],col=classVar,xlab='UMAP1',ylab='UMAP2')
 }
 
 # plotting residuals against predictors, two at a time
