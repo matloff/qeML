@@ -87,6 +87,7 @@
 qeLogit <- 
    function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
+   yNameSave <- yName
    data <- stats::na.exclude(data)
    checkForNonDF(data)
    dataY <- data[[yName]]
@@ -145,7 +146,7 @@ qeLogit <-
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
-   outlist$yName <- yName
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -218,6 +219,7 @@ predict.qeLogit <- function(object,newx,...)
 qeLin <- function(data,yName,noBeta0=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -250,7 +252,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
          lmout$holdoutR2 <- cor(preds,tst[,ycol])^2
       }
    }
-   lmout$yName <- yName
+   lmout$yName <- yNameSave
    lmout
 }
 
@@ -299,6 +301,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    ycol <- which(names(data) == yName)
@@ -414,7 +417,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       predictHoldoutKNN(knnout)
       knnout$holdIdxs <- holdIdxs
    } else knnout$holdIdxs <- NULL
-   knnout$yName <- yName
+   knnout$yName <- yNameSave
    knnout
 }
 
@@ -634,6 +637,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -651,7 +655,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
    }
-   rfout$yName <- yName
+   rfout$yName <- yNameSave
    rfout
 }
 
@@ -689,6 +693,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    # in binary Y case, change to 0,1
@@ -738,7 +743,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(rfrout)
       rfrout$holdIdxs <- holdIdxs
    }
-   rfrout$yName <- yName
+   rfrout$yName <- yNameSave
    rfrout
 
 }
@@ -773,6 +778,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
 
@@ -827,7 +833,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
    }
-   rfout$yName <- yName
+   rfout$yName <- yNameSave
    rfout
 }
 
@@ -893,6 +899,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
     degree = 2, allDefaults = FALSE, holdout = floor(min(1000,
         0.1 * nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
     classif <- is.factor(data[[yName]])
     if (!classif) {
@@ -924,7 +931,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
         predictHoldout(svmout)
         svmout$holdIdxs <- holdIdxs
     }
-    svmout$yName <- yName
+    svmout$yName <- yNameSave
     svmout
 }
 
@@ -1010,6 +1017,7 @@ predict.qeSVM <- function (object, newx,...)
 qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -1054,7 +1062,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
-   outlist$yName <- yName
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -1113,6 +1121,7 @@ plot.qeGBoost <- function(x,...)
 qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('lightgbm')
    classif <- is.factor(data[[yName]])
    if (classif) stop('classification cases not implemented yet')  
@@ -1171,7 +1180,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       outlist$baseAcc <- mean(abs(tsty - mean(tsty)))
       outlist$holdIdxs <- holdIdxs
    }
-   outlist$yName <- yName
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -1201,6 +1210,7 @@ predict.qeLightGBoost <- function(object,newx,...)
 qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    if (!is.factor(data[[yName]])) stop('for classification problems only')
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -1246,7 +1256,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
-   outlist$yName <- yName
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -1306,6 +1316,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
    acts=rep("relu",length(hidden)),learnRate=0.001,conv=NULL,xShape=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    # for use with qeRT(), hidden could be a string
    if (is.character(hidden)) 
@@ -1346,7 +1357,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
       predictHoldout(krsout)
       krsout$holdIdxs <- holdIdxs
    }
-   krsout$yName <- yName
+   krsout$yName <- yNameSave
    krsout
 }
 
@@ -1471,6 +1482,7 @@ predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
 qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    classif <- is.factor(data[[yName]])
    if (classif) {print('currently not for classification problems'); return(NA)}
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -1496,7 +1508,7 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
-   qeout$yName <- yName
+   qeout$yName <- yNameSave
    qeout
 }
 
@@ -1524,6 +1536,7 @@ predict.qePoly <- function()
 qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -1544,7 +1557,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
-   res$yName <- yName
+   res$yName <- yNameSave
    res
 }
 
@@ -1578,6 +1591,7 @@ predict.qePolyLASSO <- function(object,newx,...)
 qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    ycol <- which(names(data) == yName)
    xy <- data[,c(setdiff(1:ncol(data),ycol),ycol)]
    classif <- is.factor(data[[yName]])
@@ -1617,6 +1631,7 @@ predict.qePolyLog <- function(object,newx,...)
 
 qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('glmnet')
    ycol <- which(names(data) == yName)
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -1669,7 +1684,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
-   qeout$yName <- yName
+   qeout$yName <- yNameSave
    qeout
 }
 
@@ -1758,6 +1773,7 @@ plot.qeLASSO <- function(x,...)
 qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    # eventual return value
    res <- list()
    res$scaleX <- FALSE  # already scaled via prcomp()
@@ -1796,7 +1812,7 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    res$numPCs <- numPCs
    res$trainRow1 <- qeOut$trainRow1
    class(res) <- 'qePCA'
-   res$yName <- yName
+   res$yName <- yNameSave
    res
 }
 
@@ -1831,6 +1847,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
    nComps=NULL,nNeighbors=NULL)
 {
+   yNameSave <- yName
    requireNamespace('umap')
 
    # eventual return value
@@ -1872,7 +1889,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    res$trainRow1 <- qeOut$trainRow1
    res$nColX <- ncol(x)
    class(res) <- 'qeUMAP'
-   knnout$yName <- yName
+   res$yName <- yNameSave
    res
 }
 
@@ -1962,7 +1979,7 @@ qeText <- function(data,yName,kTop=50,
    stopWords=tm::stopwords('english'),qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-
+   yNameSave <- yName
    if (ncol(data) > 2) stop('must have only 1 text column and 1 label column')
 
    ycol <- which(names(data) == yName)
@@ -2003,7 +2020,7 @@ qeText <- function(data,yName,kTop=50,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
-   res$yName <- yName
+   res$yName <- yNameSave
    res
 }
 
@@ -2036,6 +2053,7 @@ predict.qeText <- function(object,newDocs,...)
 qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('reticulate')
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
@@ -2074,7 +2092,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
-   res$yName <- yName
+   res$yName <- yNameSave
    res
 }
 
@@ -2104,6 +2122,7 @@ predict.qeskRF <- function(object,newx,...)
 qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('reticulate')
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
@@ -2135,7 +2154,7 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
-   res$yName <- yName
+   res$yName <- yNameSave
    res
 }
 
