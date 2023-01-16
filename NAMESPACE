@@ -52,6 +52,6 @@ export(
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
-   qeParallel,qeTS,qeText,
-   qeLightGBoost, qeXGBoost, qeliquidSVM,
-   doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,qeDeepnet)
+   qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost qeliquidSVM,
+   doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,qeDeepnet,
+   plotClassesUMAP,plotPairedResids)
