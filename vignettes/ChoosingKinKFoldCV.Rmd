@@ -17,22 +17,26 @@ knitr::opts_chunk$set(
 
 
 
-#  Clearing the Confusion:  Choosing K in K-Fold Cross Validation
+#  Clearing the Confusion:  Choosing k in k-Fold Cross Validation
 
-In model selection, a key goal is avoidance of overfitting.
-Typically that is done by running the various models on a *training*
-dataset, then validating them on *test* data.  The two datasets are
-usually obtained by one of various kinds of partitioning of one's
-original data.  This process is known as *cross-validation* (CV).
+In model selection, a key goal is avoidance of overfitting.  Typically
+that is done by running the various models on a *training* dataset, then
+assessing them on *test* data.  The two datasets are usually obtained by
+one of various kinds of partitioning of one's original data.  This
+process is known as *cross-validation* (CV).  The most commonly used
+form of this is *k-fold cross-validation*.  Here k is the number of
+partitioned subsets.  Note that k must be chosen by the user. 
 
-The most commonly used form of this is *k-fold cross-validation*.  Here
-k is the number of partitioned subsets.  Note that k must be chosen by
-the user. 
+The models under consideration may vary in either the set of
+predictors/features and/or the combination of hyperparameters.
+
+## Caution:
 
 Note that if many models are fit in CV, say for many combinations of
 hyperparameters, even the test set performance will be optimistically
-biased, due to our choosing the model the minimizes test set loss.  In
-machine learning circles, it's common to partition one's data into
+biased, due to our choosing the model the minimizes test set loss.  
+
+In machine learning circles, it's common to partition one's data into
 *three* sets:  One chooses one's model by fitting several to the
 training set, often involving choosing values of several
 hyperparameters, and finally selecting the one with the best performance
@@ -41,8 +45,8 @@ get a realistic evaluation of the performance of the final model.
 
 ## Goals of this document
 
-1.  Explain the real motivations behind K-fold CV, and implications for
-    choosing K.
+1.  Explain the real motivations behind k-fold CV, and implications for
+    choosing k.
 
 2.  Explain the severe limitations of the related theoretical work.
 
@@ -53,12 +57,15 @@ get a realistic evaluation of the performance of the final model.
 
 Say we are using a vector of predictor variables/features X to predict
 Y.  The latter may be continuous, categorical or whatever.  Let n denote
-our number of data points, and let p be the number of predictors.
+our number of data points, and let p be the number of predictors.  There
+is some loss function, say mean absolute prediction error or overall
+misclassification rate, but not explicitly entering into the discussion
+here.
 
 If say we are predicting human weight from height and age, with a
 dataset consisting of 1000 people, then p = 2 and n = 1000.
 
-## What is K-fold CV?
+## What is k-fold CV?
 
 Let n denote the number of data points.  In the simplest form, we
 randomly split our data into two groups of n/2 points each.  We fit each
@@ -77,28 +84,34 @@ next fit to Groups 1 and 3, predicting Group 2, then finally predict
 Group 1 from Grups 2 and 3.  We would then select the model that had the
 best overall accuracy in this process.
 
-K-fold CV refers to this approach, in which we partition the data into K
-groups.  In the descriptions above, we first explained K = 2, then K = 3.  An 
-important special case is K = n, sometimes called the "leaving one out" method.
+K-fold CV refers to this approach, in which we partition the data into k
+groups.  In the descriptions above, we first explained k = 2, then k = 3.  An 
+important special case is k = n, sometimes called the "leaving one out" method.
 
-## How we might choose K: a first try
+The qeML package uses k = 2, but with a user-specified size of the test
+set, in the argument **holdout**.  It also has facilities for run any
+given model on many random holdout sets, instead of just one; this gives
+a more accurate estimate of test set accuracy.
 
-Why burden the user with choosing K?  She may already have many other
+## How we might choose k: a first try
+
+Why burden the user with choosing k?  She may already have many other
 tuning paramers to worry about, e.g. node size in random forests.  Here
 is the tradeoff:
 
-1.  Consider K = 2, perhaps the most "natural" choice of K.
+1.  Consider k = 2, perhaps the most "natural" choice of k.
     A problem is that our results won't be very representative.  After
 all, in the end, in order to use our final model in predicting future cases,
 we will want to use all n points in our dataset.  But 2-fold CV will
 only find the best model for n/2 amount of data.  In view of the fact
-that, the larger our dataset, the more detailed a model we can form, K=2
+that, the larger our dataset, the more detailed a model we can
+form--more predictors, more aggressive hyperparameter values--k=2
 is not really providing what we need.
 
-2.  Now consider the other extreme, K = n.  During CV, we will be
+2.  Now consider the other extreme, k = n.  During CV, we will be
     fitting models to data subsets of size n-1.  But since the best model for
     n-1 amount of data will essentially be the same as for n amount
-(though possibly not the case if p is large), this choice of K seems best.  But 
+(though possibly not the case if p is large), this choice of k seems best.  But 
 there are two problems.
 
 - Now we are facing a seriously large amount of computation -- for each
@@ -109,17 +122,17 @@ fold.
   n anyway, i.e. the probability of choosing the best model will
 actually decrease as n grows.
 
-Thus a "good" value of K would seem to be somewhere between 2 and n.
+Thus a "good" value of k would seem to be somewhere between 2 and n.
 Well, then, where?
 
 ## Role of the theory
 
 There has been much theoretical math done in answering the question of
-how one should choose K, beginning with Shao in 1993.  A nice, updated
+how one should choose k, beginning with Shao in 1993.  A nice, updated
 account is in the book by Clark, Fokoue and Zhang (2009).  See also the
 recent paper by Lei (2019).  
 
-There has has been theoretical work aimed at deciding how large
+There has also been theoretical work aimed at deciding how large
 p can be, relative to n, for statistical estimators to have desired
 properties.  The major work on this issue continues to be that of
 Portnoy (1988); see for instance Anirban DasGupta (2008).
@@ -145,6 +158,10 @@ values, a very different setting than what is covered by the theory.
 
 Unfortunately, **there is no magic solution here**.  But a reasonable
 approach is to limit model complexity (measured by p) in the first place.  
+
+**Focus:**  Our discussion here will be on choosing the value of p, the
+number of predictors.  The points made below do not apply to the
+question of which parameter combination is best.
 
 Here is the central issue:  We do CV because of the optimistic bias that
 occurs when we assess a model by fitting and predicting on the same
@@ -173,6 +190,10 @@ approaches:
 
 - Do some kind of forward selection in linear regression, analysis,
   limiting the number of steps to sqrt(n).  
+
+- In the case of a linear model, use the LASSO, which will automatically
+  choose one's predictor set.  Note that the function **qeLASSO()**
+  wraps the glmnet package, which does internal cross-validation.
 
 So for example in the PCA approach, say we have 100 candidate
 predictors.  We would run PCA, then fit our model to the first 10
