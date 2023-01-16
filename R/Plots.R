@@ -22,8 +22,22 @@ plotClassesUMAP <- function(data,classVar)
 
 plotPairedResids <- function(data,qeOut) 
 {
-   yName <- qeOut$yName
+   qo <- qeOut
+   if (qo$classif) stop('not for classification problems')
+   yName <- qo$yName
    yCol <- which(names(data) == yName)  
-   x <- data[,-yCol,drop=FALSE
+   predErrs <- data[qo$holdIdxs,yCol] - qo$holdoutPreds
+   x <- data[,-yCol,drop=FALSE]
+   xF <- which(sapply(x,is.factor))
+   if (length(xF) > 0) x <- x[,-xF,drop=FALSE]
+   x <- x[qo$holdIdxs,]
    namesX <- names(x)
+   nX <- ncol(x)
+   while (1) {
+      ij <- sample(1:nX,2)
+      i <- ij[1]; j <- ij[2]
+      autoimage::autopoints(x[,i],x[,j],predErrs,xlab=namesX[i],ylab=namesX[j])
+      ans <- readline('hit Enter for next plot, "q" for quit ')
+      if (ans == 'q') break
+   }
 }
