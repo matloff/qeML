@@ -315,3 +315,36 @@ second U over the first.
 
 ## How could it be possible?
 
+The argument generally made by researchers in this field is actually
+similar to the argument I made for the "overfitting with impunity"
+analysis above.  Below is the intuition behind the double descent
+phenomenon in the case of linear models.
+
+Let b denote the estimated &beta; vector in a linear
+model, where b is calculated by minimizing the usual sum of squares.
+
+* Using calculus, the minimization amounts to solving a set of p
+  equations in p unknowns.
+
+* Recall that in the usual setting, p < n, there is a unique solution to
+  those equations, the famous formula b = (X'X)<sup>-1</sup> (X'Y).
+
+* If we fit a model whose complexity is beyond p, e.g. using more than
+  p-1 predictors in the song data, the matrix inverse (X'X)<sup>-1</sup> 
+  does not exist, and there are infinitely many solutions to the
+  equations.
+
+* Among these infinitely solutions for b, we might speculate that some
+  of them do better on the test set than do the standard ones.  As
+  noted, this has been confirmed empirically.
+
+* One common way to choose b among those infinitely many solutions is to
+  choose the one that has minimum L<sub>2</sub> norm ||b||<sub>2</sub>,
+  i.e. minimum Euclidean vector length.  In other words, this is a
+  shrinkage estimator, analogous to the LASSO.  But smaller quantities
+  have small variance, and meanwhile, if the bias doesn't increase much,
+  we attain a smaller Mean Squared Error.
+
+By the way, the function **penroseLin()** in the regtools package (on
+top of which qeML is buld) does find the minimum-norm b in the case of
+overfitting.
