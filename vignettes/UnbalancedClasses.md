@@ -9,11 +9,13 @@ presented.
 ## Outline
 
 * Why is imbalance a problem? Our ML algorithm may never predict the
-  small class, making the algorithm rather useless.
+  small class, making the algorithm rather meaningless.
 
 * A popular solution is to artificially balance the data.
 
 * This changes the class probabilities, with undesirable consequences.
+The class probabilities do factor into our prediction, so changing them
+distorts our analysis.
 
 * Related problem: the class probabilities may be wrong to begin with,
   either due to the original sampling scheme or because the
@@ -28,8 +30,7 @@ probabilities may change.
 * Solutions:
 
     - Regarding imbalance, we consider but reject ROC, and instead argue
-      that informal use of conditional probabilities is the best
-solution.
+      that informal use of conditional probabilities is best.
 
     - Regarding incorrect class probabilities, we develop an adjustment
       formula.
@@ -121,15 +122,15 @@ The dataset is conveniently available in the `mlbench` package.
 
 ### Mt. Sinai Hospital X-ray study
 
-In an X-ray 
-[classification tudy](https://www.scientificamerican.com/article/rise-of-robot-radiologists)
-from Mount Sinai Hospital
-the classification method worked well on the original hospital data,
-but not in prediction of new cases at other locations.  The study's
-authors found that an important factor underlying the discrepancy was
-that the p<sub>i</sub> vary from one hospital to another.  Here the class
-probabilities really do change, not artificially, but the issues are
-the same, and again an adjustment procedure would be desirable.
+In an X-ray [classification
+tudy](https://www.scientificamerican.com/article/rise-of-robot-radiologists)
+from Mount Sinai Hospital, the classification method worked well on the
+original hospital data, but not in prediction of new cases at other
+locations.  The study's authors found that an important factor
+underlying the discrepancy was that the class probabilities p<sub>i</sub>
+vary from one hospital to another.  Here the class probabilities really
+do change, not artificially, but the issues are the same, and again an
+adjustment procedure would be desirable.
 
 ### Cell phone fraud
 
