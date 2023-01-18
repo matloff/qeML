@@ -8,6 +8,14 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
 # Clearing the Confusion:  A closer look at overfitting
 
 # Preparation
