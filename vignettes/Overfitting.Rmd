@@ -334,17 +334,27 @@ model, where b is calculated by minimizing the usual sum of squares.
   does not exist, and there are infinitely many solutions to the
   equations.
 
-* Among these infinitely solutions for b, we might speculate that some
-  of them do better on the test set than do the standard ones.  As
-  noted, this has been confirmed empirically.
+* As p increases, starting from 1, the model bias (see the "Bias"
+  section above) will decrease.  However, the variance will increase, as
+  also noted.
+
+* Among the infinitely solutions for b in the case p >n-1, , we might
+  speculate that some of them do better on the test set than do the
+  standard ones.  As noted, this has been confirmed empirically.
 
 * One common way to choose b among those infinitely many solutions is to
   choose the one that has minimum L<sub>2</sub> norm ||b||<sub>2</sub>,
   i.e. minimum Euclidean vector length.  In other words, this is a
-  shrinkage estimator, analogous to the LASSO.  But smaller quantities
-  have small variance, and meanwhile, if the bias doesn't increase much,
-  we attain a smaller Mean Squared Error.
+  shrinkage estimator, analogous to the LASSO.  Smaller quantities
+  have small variance, which is good, but the shrinking induces its own
+  bias; its expected value will be smaller than the true &beta;.
 
-By the way, the function **penroseLin()** in the regtools package (on
+* So, once again, we have a Bias-Variance Tradeoff. But if the induced
+  bias is not too large, we win, attaining a smaller Mean Squared Error.
+
+By the way, the function **penroseLM()** in the regtools package (on
 top of which qeML is buld) does find the minimum-norm b in the case of
-overfitting.
+overfitting a linear model.  As mentioned, this has been observed
+empirically, and some theoretical work has proved it.
+
+
