@@ -2479,13 +2479,15 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    requireNamespace('pROC')
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
-   ys <- as.factor(holdY == yLevelName)
+   # ys <- as.factor(holdY == yLevelName)
+   ys <- as.numeric(holdY == yLevelName)
    probs <- qeOut$holdoutPreds$probs
    if (is.null(probs)) stop('no holdoutPreds$probs')
    if (ncol(probs) == 1) probs <- probs[,1]
-   else probs <- probs[,yLevelName]
+   else probs <- probs[,paste0('dfr.',yLevelName)]
    probs <- probs/sum(probs)
-   pROC::roc(ys,probs,plot=T,aug=T)
+   # pROC::roc(ys,probs,plot=T,aug=T)
+   pROC::roc(ys,probs,plot=T)
 }
 
 ######################  qeToweranNA()  #############################
