@@ -180,6 +180,9 @@ estimate from our training data.
 * p: P(Y = 1) (probability of class 1)
 * r<sub>i</sub>: estimated q<sub>1</sub>(X<sub>i</sub>)    
 
+Note that for a given case, i.e. a given value of the feature vector X,
+the r<sub>i</sub> will sum to 1, as i ranges across all our classess.
+
 ## Key issue:  How were the data generated?
 
 The examples above illustrate two important cases:
@@ -237,9 +240,9 @@ from fitting a logistic model, for instance.
 
 The rule that minimizes the overall probability of misclassification is:
 
-Y<sub>pred</sub> = 1 if r<sub>i</sub> >= 0.5
+Y<sub>pred</sub> = 1 if r<sub>1</sub> >= 0.5
 
-Y<sub>pred</sub> = 0 if r<sub>i</sub> < 0.5
+Y<sub>pred</sub> = 0 if r<sub>1</sub> < 0.5
 
 But note the criterion here, minimizing the overall probability of
 misclassification.  Other criteria are possible.  It may be, for
@@ -341,7 +344,7 @@ FPR(h) = P(Y<sub>pred</sub> = 1 | Y = 0)
 
 The ROC curve is then a graph of TPR vs. FPR.  As we vary h, it traces
 out the ROC curve.  Some R packages, such as ROCR, colorize the curve,
-with the color showing the value of h.
+with the color showing the value of h.  The qeML funcit
 
 The idea here is that even if we cannot quantity l<sub>01</sub>, we can
 at least explore various values of h to produce a decision rule that
