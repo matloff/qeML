@@ -2483,15 +2483,14 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    if (is.null(probs)) stop('no holdoutPreds$probs')
    if (nrow(probs) == 1) probs <- probs[1,]
    else probs <- probs[,paste0('dfr.',yLevelName)]
-   probs <- probs/sum(probs)
    # pROC::roc(ys,probs,plot=T)
    pred <- ROCR::prediction(probs,ys)
    perf <- performance(pred,"tpr","fpr",colorkey.relwidth=1.0)
    alphVals <- perf@alpha.values[[1]]
    print(alphVals)
-   expand <- 1 / min(alphVals)
-   print(expand)
-   perf@alpha.values[[1]]<- expand*perf@alpha.values[[1]]
+   # expand <- 1 / min(alphVals)
+   # perf@alpha.values[[1]] <- expand*perf@alpha.values[[1]]
+   # perf@alpha.name <- paste('Cutoffs expansion factor =',expand)
    plot(perf,colorize=TRUE)
    perf
 }
