@@ -2462,8 +2462,6 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 ######################  qeROC()  #############################
 
-# wrapper for pROC::roc()
-
 # will plot ROC, print AUC
 
 # arguments:
@@ -2476,7 +2474,7 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
-   requireNamespace('pROC')
+   # requireNamespace('pROC')
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    # ys <- as.factor(holdY == yLevelName)
@@ -2486,8 +2484,16 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    if (nrow(probs) == 1) probs <- probs[1,]
    else probs <- probs[,paste0('dfr.',yLevelName)]
    probs <- probs/sum(probs)
-   # pROC::roc(ys,probs,plot=T,aug=T)
-   pROC::roc(ys,probs,plot=T)
+   # pROC::roc(ys,probs,plot=T)
+   pred <- ROCR::prediction(probs,ys)
+   perf <- performance(pred,"tpr","fpr",colorkey.relwidth=1.0)
+   alphVals <- perf@alpha.values[[1]]
+   print(alphVals)
+   expand <- 1 / min(alphVals)
+   print(expand)
+   perf@alpha.values[[1]]<- expand*perf@alpha.values[[1]]
+   plot(perf,colorize=TRUE)
+   perf
 }
 
 ######################  qeToweranNA()  #############################
