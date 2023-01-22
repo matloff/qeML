@@ -2903,6 +2903,51 @@ predict.qeDeepnet <- function(object,x,...)
    list(predClasses=predClasses,probs=probs)
 }
 
+#######################  qeNCVreg()  ##############################
+
+# wrappers for ncvreg package, "nonconves regularization"
+
+qeNCVreg <- function(data,yName,
+   family=c("gaussian","binomial","poisson"),
+   penalty=c("MCP","SCAD","lasso"),
+   gamma=switch(penalty, SCAD=3.7,3),alpha=1,
+   lambda.min=ifelse(n>p, 0.001,0.05),nlambda=100,lambda,eps=1e-04,
+   max.iter=10000,
+   holdout=floor(min(1000,0.1*nrow(data)))) 
+{
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   if (family=='binomial' && !classif) 
+      stop('binomial case needs factor Y')
+   ycol <- which(names(data) == yName)
+   if (classif) {
+      y <- data[,yName]
+      yLevels <- levels(y)
+      tmp <- as.integer(y) - 1
+      data[,yName] <- tmp
+   } else {
+      yLevels <- NULL
+   }
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      splitData(holdout,data)
+      y <- data[-holdIdxs,ycol]
+      x <- data[-holdIdxs,-ycol]
+   } else {
+      x <- data[,-ycol]
+      y <- data[,ycol]
+   }
+   # if holdout, x,y are now the training set
+   
+   if (!allNumeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo')
+   } else factorsInfo <- NULL
+
+}
+
 
 #######################  qeParallel()  ##############################
 
