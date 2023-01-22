@@ -2907,14 +2907,19 @@ predict.qeDeepnet <- function(object,x,...)
 
 # wrappers for ncvreg package, "nonconves regularization"
 
-qeNCVreg <- function(data,yName,
-   family=c("gaussian","binomial","poisson"),
-   penalty=c("MCP","SCAD","lasso"),
+# qeNCVreg <- function(data,yName,
+qeNCVregCV <- function(data,yName,
+   family="gaussian",
+   penalty="MCP",
    gamma=switch(penalty, SCAD=3.7,3),alpha=1,
-   lambda.min=ifelse(n>p, 0.001,0.05),nlambda=100,lambda,eps=1e-04,
+   lambda.min=0.001,nlambda=100,lambda,eps=1e-04,
    max.iter=10000,
+   cluster=NULL,
+   nfolds=10,
    holdout=floor(min(1000,0.1*nrow(data)))) 
 {
+   if (!is.null(cluster)) 
+      stop('currently cluster computation is not implemented')
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
@@ -2946,6 +2951,45 @@ qeNCVreg <- function(data,yName,
       factorsInfo <- attr(x,'factorsInfo')
    } else factorsInfo <- NULL
 
+   xm <- as.matrix(x)
+   if (!is.null(holdout)) {
+      trnx <- xm
+      trny <- y
+      tstx <- regtools::factorsToDummies(data[holdIdxs,-ycol],omitLast=TRUE,
+         factorsInfo=factorsInfo)
+      tsty <- data[holdIdxs,ycol]
+   }
+
+   cvout <- ncvreg::cv.ncvreg(xm,y,
+      family=family,
+      penalty=penalty,
+      gamma=gamma,
+      lambda.min=lambda.min,
+      max.iter=max.iter,
+      # cluster=cluster,
+      nfolds=nfolds,
+      seed=9999,
+      holdout=floor(min(1000,0.1*nrow(data)))) 
+
+   if (!is.null(holdout)) {
+       predictHoldoutNCV(cvout)
+       cvout$holdIdxs <- holdIdxs
+   }
+   else cvout$holdIdxs <- NULL
+
+   class(cvout) <- c('qeNCVregCV',class(cvout))
+   cvout
+}
+
+predict.qeNCVregCV <- function(object,newx) 
+{
+   if (!is.matrix(x)) {
+      x <- regtools::factorsToDummies(x,omitLast = TRUE, 
+         factorsInfo = object$factorsInfo)
+   }
+
+   cvout <- object$cvout
+   predict(cvout,newx)
 }
 
 
