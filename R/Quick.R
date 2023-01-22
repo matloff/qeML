@@ -2977,6 +2977,9 @@ qeNCVregCV <- function(data,yName,
    }
    else cvout$holdIdxs <- NULL
 
+   i <- which(cvout$fit$lambda == cvout$lambda.min)
+   cvout$finalBetaHat <- cvout$fit$beta[,i]
+
    class(cvout) <- c('qeNCVregCV',class(cvout))
    cvout
 }
@@ -2991,6 +2994,8 @@ predict.qeNCVregCV <- function(object,newx)
    cvout <- object$cvout
    predict(cvout,newx)
 }
+
+qencvregcv <- qeNCVregCV
 
 
 #######################  qeParallel()  ##############################
