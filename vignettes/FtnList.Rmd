@@ -34,11 +34,12 @@ The qeML package:  Categorized Function List
 * qeNeural: neural networks, using Keras, CNN included, Python needed
 * qeDeepnet: neural networks, basic, Python-free
 
-## Linear/generalized linear
+## Linear/generalized/regularized linear
 
 * qeLASSO: LASSO; has plot function
 * qeLin: wrapper for lm(), with additions
 * qeLogit: wrapper for glm(), logit case
+* qeNCVregCV: wrapper for ncvreg::cv.ncvreg(); has plot function
 * qePolyLASSO: polynomial terms added, then LASSO
 * qePolyLin: polynomial terms added, then linear model
 * qePolyLog: polynomial terms added, then logit
@@ -61,9 +62,13 @@ The qeML package:  Categorized Function List
 * qeFOCIrand: multiple random runs of qeFOCI
 * qeFT: grid search, and qe-series function, including standard errors,
    has plot function
+* qeLASSO: feature selection, including "importance" in the form
+   of whenEntered component in output
+* qeNCVregCV: feature selection similar to LASSO
 * qeParallel: parallel run of qe-series function, multiple holdout sets
 * qePCA: PCA, followed by qe-series function on result
 * qeUMAP: UMAP, followed by qe-series function on result
+* qeRFranger: variable.importance component of output
 * qeROC: ROC computed on output of qe-series function
 * plotClassesUMAP: 2-D plot of UMAP applied to any dataset
 
