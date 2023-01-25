@@ -97,7 +97,7 @@ Here "qe" stands for **"quick and easy,"** and we really mean that!
 
 The functions have a simple, uniform interface, and most importantly,
 **require no setup.**  To fit an SVM model, say, one simply calls
-**qeSVM()**, no preparation calls to define the model etc.
+**qeSVM**, no preparation calls to define the model etc.
 
 The call form is
 
@@ -211,9 +211,9 @@ It's very intuitive.  To predict, say, the weight of a new
 player of height 72 and age 25, we find the k closest players in our 
 training data to (72,25), and average their weights.  This is our
 estimate of m(72,25), and we use it as our prediction.  The default
-value of k in **qeKNN()** is 25.
+value of k in **qeKNN** is 25.
 
-The **qeKNN()** function wraps **kNN()** in **regtools**.  The main
+The **qeKNN** function wraps **kNN** in **regtools**.  The main
 hyperparameter is the number of neighbors k.  As with any
 hyperparameter, the user aims to set a "Goldilocks" level, not too big,
 not too small.  Setting k too small will result in our taking the
@@ -221,7 +221,7 @@ average of just a few Y values, too small a sample.  On the other hand,
 too large a value for k will some distant data points may be used that
 are not representative.
 
-To choose k, we could try various values, run **qeKNN()** on each one,
+To choose k, we could try various values, run **qeKNN** on each one,
 then use the value that produced the best (i.e. smallest) **testAcc**.
 
 If Y is an indicator variable, its average is the proportion of 1s.
@@ -232,7 +232,18 @@ Y = 1 for the new case, otherwise 0.
 If Y is categorical, i.e. an R factor as in the case of predicting
 player position in the **mlb** dataset, we then find a probability for
 each category in this manner, and guess Y to be whichever category has
-the highest prbb.
+the highest probability.
+
+One potential problem is bias at the edge of a neighborhood.  Say we are
+predict weight from height, and a new case involving a very tall person.
+Most data points in the neighborhood of this particular height value
+will be for people who are shorter than the new case.  Those neighbors
+are thus likely to be lighter than the new case, making our predicted
+value for that case biased downward.
+
+Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
+Setting the argument **smoothingFtn = loclin** removes a linear trend
+within the neighborhood.
 
 ### Random forests
 
@@ -292,9 +303,16 @@ class was predicted most often among all those trees.
 The thresholds used at each node are determined through a complicated
 process, depending on which implemented of RF one uses.
 
-The **qeRF()** function wraps the function of the same name in the
+The **qeRF** function wraps the function of the same name in the
 **randomForests** package.  The package also offers other
-implementations of RF.
+implementations of RF, notably **qeRFgrf**, as follows.  
+
+The leaves in any tree method, such as random forests and boosting, are
+essentially neighborhoods, different in structure from those of k-NN,
+but with similar properties.  In particular, they have an "edge bias"
+problem similar to that described for k-NN above.  In the case of random
+forests, the **qeRFgrf** function (which wraps the **grf** package)
+deals with the same bias problem via removal of a linear trend.
 
 ### Boosting
 
@@ -306,7 +324,7 @@ The basic idea is to iteratively build up a sequence of trees, each of
 which is an improved update of the last.  At the end, all the trees are
 combined.
 
-The **qeGBoost()** wraps **gbm()** in the package of the same name.  It
+The **qeGBoost** wraps **gbm** in the package of the same name.  It
 is tree-based, with hyperparameters similar to the random forests case,
 plus a *learning rate*.  The latter controls the size of iteration
 steps; more on this  below.
@@ -359,7 +377,7 @@ it in classification.  If used in conjunction with polynomials (see
 below), this may work as well or better than the logistic model (see
 below).
 
-The function **qeLin()** wraps the ordinary **lm()**.  It mainly
+The function **qeLin** wraps the ordinary **lm**.  It mainly
 just calls the latter, but does some little fixess.
 
 ### Logistic model
@@ -384,12 +402,12 @@ P(catcher | height, weight, age) = m(height,weight,age) =
 The &beta;<sub>i</sub> are estimated from the sample data, using a
 technique called *iteratively reweighted least squares*.
 
-The function **qeLogit()** wraps the ordinary R function **glm()**, but
-adds an important feature:  **glm()** only handles the 2-class setting,
-e.g.  catcher vs. non-catcher.  The **qeLlogit()** handles the c-class
-situation by calling **glm()** one class at a time, generating c
-**glm()** outputs.  When a new case is to be predicted, it is fed into
-each of the c **glm()** outputs, yielding c probabilities.  It then
+The function **qeLogit** wraps the ordinary R function **glm**, but
+adds an important feature:  **glm** only handles the 2-class setting,
+e.g.  catcher vs. non-catcher.  The **qeLlogit** handles the c-class
+situation by calling **glm** one class at a time, generating c
+**glm** outputs.  When a new case is to be predicted, it is fed into
+each of the c **glm** outputs, yielding c probabilities.  It then
 predicts the new case as whichever class has the highest probability.
 
 Here is an example, using the **phoneme** dataset that is included with 
@@ -457,19 +475,21 @@ of degree is a hyperparameter.
 This would seem nonlinear, but that would be true only in the sense of
 being nonlinear in age.  It is still linear in the &beta;<sub>i</sub> --
 e.g. if we double each &beta;<sub>i</sub> in the above expression, the
-value of the expression is doubled -- so **qeLin()** can be used, or
-**qeLogit()** for classification settings.
+value of the expression is doubled -- so **qeLin** can be used, or
+**qeLogit** for classification settings.
 
 Forming the polynomial terms by hand would be tedious, especially since
 we would also have to do this for predicting new cases.  Instead, we use
-**qePolyLin()** (regression setting) and **qePolyLog()**
+**qePolyLin** (regression setting) and **qePolyLog**
 (classification).  They make use of the package **polyreg**.
 
 Polynomial models can in many applications hold their own with the fancy
 ML methods.  One must be careful, though, about overfitting, just as
-with any ML method.  
+with any ML method.  In particular, polynomial functions tend to grow
+rapidly near the edges of one's dataset, causing both bias and variance
+problems.
 
-### The LASSO
+### Shrinkage methods for linear/generalized linear models
 
 Some deep mathematical theory implies that in linear models it may be
 advantageous to shrink the estimated b<sub>i</sub>.  The LASSO
@@ -477,8 +497,12 @@ method does this in a mathematically rigorous manner.  The LASSO is
 especially popular as a tool for predictor variable selection (see
 below).
 
-The function **qeLASSO()** wraps **cvglmnet()** in the **glmnet**
+The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
 package.  The main hyperparameter controls the amount of shrinkage.
+
+There are various other shrinkage methods, such as Minimax Convex
+Penalty (MCP).  This and some others are available via **qeNCVregCV**,
+which wraps the **ncvreg** package.
 
 ### Support Vector Machines
 
@@ -516,7 +540,7 @@ Another hyperparameter is **cost:**  Here we allow some data points to
 be within the margin.  The cost variable is roughly saying how many
 exceptions we are willing to accept.
 
-The **qeSVM()** function wraps **svm()** in the **e1071** package.  The
+The **qeSVM** function wraps **svm** in the **e1071** package.  The
 package also offers various other implementations.
 
 ### Neural networks
@@ -593,7 +617,7 @@ to 0s.  So, we are finding roots of a very complicated function in
 n<sub>w</sub> dimensions, and we need to do so iteratively. 
 
 A simplified version of the iteration process is as follows.  Consider
-the function f() graphed below:
+the function f graphed below:
 
 ![alt text](ObjFtnPlusTangent.png)
 
@@ -624,10 +648,16 @@ the *learning rate*.  And, this is yet another hyperparameter.
 So, NNs are arguably the most complex of all the methods described here,
 and tend to use huge amounts of computing time, even weeks!
 
-The **qeNeural()** function allows specifying the numbers of layers and
-neurons per layer, and the number of iterations.  It wraps **krsFit()**
+The **qeNeural** function allows specifying the numbers of layers and
+neurons per layer, and the number of iterations.  It wraps **krsFit**
 from the **regtools** package, which in turn wraps the R **keras**
 package (and there are further wraps involved after that).
+
+Since any continuous activation function can be approximated by a
+polynomial, the outputs of the layers are approximately polynomials, of
+higher and higher degree with each layer.  Thus they are subject to the
+same issues on the edges of the dataset as were described for polynomial
+models above.
 
 ## Overfitting
 
@@ -687,9 +717,9 @@ thus having no predictive value, we discard to the PCs with small
 variance.  
 
 As you may have guessed by now, "There's an app for that" --
-**qePCA()**.  It finds the PCs, then applies the qe-series function of
-your choice, say **qeRF()** to the new data in the form of the PCs.
-The function **qeUMAP()** works similarly for UMAP, which is a kind of
+**qePCA**.  It finds the PCs, then applies the qe-series function of
+your choice, say **qeRF** to the new data in the form of the PCs.
+The function **qeUMAP** works similarly for UMAP, which is a kind of
 nonlinear analog of PCA.
 
 Needless to say, we once again encounter the Bias-Variance Tradeoff
@@ -702,11 +732,27 @@ simplified LASSO model.
 
 ## Which ML method to use?
 
-With many datasets, all the above ML methods will give similar results.
-But for some other datasets, it really makes a difference which one we
-use.
+The usual answer given for this question is, "The best method is very
+dependent on which dataset you have."  True, but are there some general
+principles?
 
-So, we should try all of methods of interest with holdout data, then
-compare.  Well, "there's an app" for this too, **qeCompare()**.
+ML people often distinguish between "tabular" and "nontabular" data.
+A disease diagnosis application may be considered tabular--rows of
+patients, and columns of measurements such as blood glucose, body
+temperature and so on.  On the other hand, a facial recognition
+application is considered nontabular, which is confusing, since it too
+has the form of a table--one row per picture, and one column per pixel
+position.
 
+Where the two kinds of applications may differ, though, is whether there
+are general monotonic relationships between Y and the features.  In
+predicting diabetes, say, the higher the clucose level, the more likely
+the patient is diabetic.  Though monotonic relations may exist in image
+classification, they maybe more localized.
+
+The point then, is that generally "monotonic" applications may be best
+served by ML methods that have either linear components or low-degree
+polynomials, such as linear or generalized linear models, SVM and
+polynomial versions of these.  For other applications, one might try
+k-NN, NNs etc.
 
