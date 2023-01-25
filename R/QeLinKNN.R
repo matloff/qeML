@@ -54,3 +54,44 @@ predict.qeLinKNN <- function(object,newx,newxK=1,...)
    linPreds + knnPreds
 }
 
+qePolyLinKNN <- function (data, yName, deg = 2, maxInteractDeg = deg, k = 25, 
+   scaleX = TRUE, smoothingFtn = mean, 
+   expandVars = NULL, expandVals = NULL, holdout = floor(min(1000, 
+        0.1 * nrow(data)))) 
+{
+    classif <- is.factor(data[[yName]])
+    if (classif) 
+        stop("not set up for classification problems")
+    linout <- qePolyLin(data = data, yName = yName, 
+       deg = deg, maxInteractDeg = maxInteractDeg, holdout = holdout)
+    hIdxs <- linout$holdIdxs
+    trn <- data[-hIdxs, ]
+    tst <- data[hIdxs, ]
+    dataForKNN <- trn
+    # qePolyLin does not compute residuals, so get them here
+    ycol <- which(names(data) == yName)
+    resids <- trn[,ycol] - predict(linout,trn[,-ycol])[,1] 
+    dataForKNN[[yName]] <- resids
+    knnout <- qeKNN(dataForKNN, yName, k = k, holdout = NULL)
+    linknnout <- list(linout = linout, knnout = knnout, classif = classif)
+    class(linknnout) <- "qePolyLinKNN"
+    if (!is.null(holdout)) {
+        predictHoldout(linknnout)
+        linknnout$holdIdxs <- hIdxs
+    }
+    else linknnout$holdIdxs <- NULL
+    linknnout
+}
+
+predict.qePolyLinKNN <- function (object, newx, newxK = 1, ...) 
+{
+    classif <- object$classif
+    if (classif) 
+        stop("not set up for classification problems")
+    linout <- object$linout
+    linPreds <- predict(linout, newx)
+    knnout <- object$knnout
+    knnPreds <- predict(knnout, newx, newxK = newxK)
+    as.vector(linPreds) + as.vector(knnPreds)
+}
+

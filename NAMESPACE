@@ -45,6 +45,7 @@ S3method(predict,qeText)
 S3method(predict,qeKNNna)
 S3method(predict,qeLightGBoost)
 S3method(predict,qeLinKNN)
+S3method(predict,qePolyLinKNN)
 S3method(predict,qeXGBoost)
 S3method(predict,qeliquidSVM)
 S3method(predict,qeNCVregCV)
@@ -53,7 +54,7 @@ export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,qeNCVregCV,
-   qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,
+   qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,qePolyLinKNN,
    qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,qeliquidSVM,
    doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,qeDeepnet,
    plotClassesUMAP,plotPairedResids)
