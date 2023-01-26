@@ -48,7 +48,7 @@ qeLogitKNN <- function(data,yName,k=25,scaleX=TRUE,
    logitout <- glm(frml,data=trn,family=binomial)
    dataForKNN <- trn
    dataForKNN[ycol] <- logitout$y - logitout$fitted.values
-   knnout <- qeKNN(dataForKNN,yName,k=k,holdout=NULL)
+   knnout <- qeKNN(dataForKNN,yName,k=k,holdout=NULL,yesYVal=yesYVal)
    linknnout <- list(logitout=logitout,knnout=knnout,classif=classif,
       yesYVal=yesYVal,noYVal=noYVal)
    class(linknnout) <- 'qeLogitKNN'
@@ -65,9 +65,9 @@ predict.qeLogitKNN <- function(object,newx,newxK=1,...)
    classif <- object$classif
    if (!classif) stop('for classification problems')
    logitout <- object$logitout
-   logitPreds <- predict(logitout,newx)
+   logitPreds <- predict(logitout,newx,type='response')
    knnout <- object$knnout
-   knnPreds <- predict(knnout,newx,newxK=newxK,type='response')
+   knnPreds <- predict(knnout,newx,newxK=newxK)
    probs <- logitPreds + knnPreds
    probs <- pmin(probs,1)
    probs <- pmax(probs,0)
