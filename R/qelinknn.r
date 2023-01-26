@@ -50,7 +50,7 @@ qeLogitKNN <- function(data,yName,k=25,scaleX=TRUE,
    dataForKNN[ycol] <- logitout$y - logitout$fitted.values
    knnout <- qeKNN(dataForKNN,yName,k=k,holdout=NULL)
    linknnout <- list(logitout=logitout,knnout=knnout,classif=classif,
-      yesYVal=yesYVal,noYVal)
+      yesYVal=yesYVal,noYVal=noYVal)
    class(linknnout) <- 'qeLogitKNN'
 
    if (!is.null(holdout)) {
@@ -67,7 +67,7 @@ predict.qeLogitKNN <- function(object,newx,newxK=1,...)
    logitout <- object$logitout
    logitPreds <- predict(logitout,newx)
    knnout <- object$knnout
-   knnPreds <- predict(knnout,newx,newxK=newxK)
+   knnPreds <- predict(knnout,newx,newxK=newxK,type='response')
    probs <- logitPreds + knnPreds
    probs <- pmin(probs,1)
    probs <- pmax(probs,0)
@@ -75,7 +75,7 @@ predict.qeLogitKNN <- function(object,newx,newxK=1,...)
    predClasses <- y01s
    predClasses[probs >= 0.5] <- object$yesYVal
    predClasses[probs < 0.5] <- object$noYVal
-   lists(predClasses=predClasses,probs=probs)
+   list(predClasses=predClasses,probs=probs)
 
 }
 
