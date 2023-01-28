@@ -2919,7 +2919,6 @@ qeNCVregCV <- function(data,yName,
    nfolds=10,
    holdout=floor(min(1000,0.1*nrow(data)))) 
 {
-stop('under construction')
    if (!is.null(cluster)) 
       stop('currently cluster computation is not implemented')
    checkForNonDF(data)
@@ -2975,17 +2974,17 @@ stop('under construction')
       seed=9999,
       holdout=floor(min(1000,0.1*nrow(data)))) 
 
+
+   cvoutBig <- list(cvout=cvout,classif=classif)
+
    if (!is.null(holdout)) {
-       predictHoldoutNCV(cvout)
-       cvout$holdIdxs <- holdIdxs
+       predictHoldoutNCV(cvoutBig)
+       cvoutBig$holdIdxs <- holdIdxs
    }
-   else cvout$holdIdxs <- NULL
+   else cvoutBig$holdIdxs <- NULL
 
    i <- which(cvout$fit$lambda == cvout$lambda.min)
-   cvout$finalBetaHat <- cvout$fit$beta[,i]
-
-   cvoutBig <- list(cvout=cvout,classif=classif,
-      testAcc=testAcc,baseAcc=baseAcc)
+   cvoutBig$finalBetaHat <- cvout$fit$beta[,i]
    class(cvoutBig) <- 'qeNCVregCV'
    cvoutBig
 }
