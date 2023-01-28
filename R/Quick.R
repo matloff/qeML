@@ -2919,6 +2919,7 @@ qeNCVregCV <- function(data,yName,
    nfolds=10,
    holdout=floor(min(1000,0.1*nrow(data)))) 
 {
+stop('under construction')
    if (!is.null(cluster)) 
       stop('currently cluster computation is not implemented')
    checkForNonDF(data)
@@ -2930,6 +2931,8 @@ qeNCVregCV <- function(data,yName,
    if (classif) {
       y <- data[,yName]
       yLevels <- levels(y)
+      if (length(yLevels) != 2) 
+         stop('only 2-class problems are handled as of now')
       tmp <- as.integer(y) - 1
       data[,yName] <- tmp
    } else {
@@ -2981,19 +2984,23 @@ qeNCVregCV <- function(data,yName,
    i <- which(cvout$fit$lambda == cvout$lambda.min)
    cvout$finalBetaHat <- cvout$fit$beta[,i]
 
-   class(cvout) <- c('qeNCVregCV',class(cvout))
-   cvout
+   cvoutBig <- list(cvout=cvout,classif=classif,
+      testAcc=testAcc,baseAcc=baseAcc)
+   class(cvoutBig) <- 'qeNCVregCV'
+   cvoutBig
 }
 
 predict.qeNCVregCV <- function(object,newx) 
 {
-   if (!is.matrix(x)) {
-      x <- regtools::factorsToDummies(x,omitLast = TRUE, 
+   if (!is.matrix(newx)) {
+      newx <- regtools::factorsToDummies(newx,omitLast = TRUE, 
          factorsInfo = object$factorsInfo)
    }
 
    cvout <- object$cvout
-   predict(cvout,newx)
+   classif <- object$classif
+   type <- if (!classif) 'link' else 'response'
+   predict(cvout,newx,type=type)
 }
 
 qencvregcv <- qeNCVregCV
