@@ -2916,7 +2916,7 @@ qeNCVregCV <- function(data,yName,
    lambda.min=0.001,nlambda=100,lambda,eps=1e-04,
    max.iter=10000,
    cluster=NULL,
-   nfolds=10,
+   nfolds=10,yesYVal=NULL,
    holdout=floor(min(1000,0.1*nrow(data)))) 
 {
    if (!is.null(cluster)) 
@@ -2934,6 +2934,13 @@ qeNCVregCV <- function(data,yName,
          stop('only 2-class problems are handled as of now')
       tmp <- as.integer(y) - 1
       data[,yName] <- tmp
+      if (is.null(yesYVal)) {
+         yesYVal <- yLevels[1]
+         noYVal <- yLevels[2]
+      } else {
+         yesyval <- which(yLevels == yesYVal)
+         noYVal <- yLevels[3-yesyval]
+      }
    } else {
       yLevels <- NULL
    }
@@ -2976,6 +2983,7 @@ qeNCVregCV <- function(data,yName,
 
 
    cvoutBig <- list(cvout=cvout,classif=classif)
+   class(cvoutBig) <- 'qeNCVregCV'
 
    if (!is.null(holdout)) {
        predictHoldoutNCV(cvoutBig)
@@ -2985,7 +2993,6 @@ qeNCVregCV <- function(data,yName,
 
    i <- which(cvout$fit$lambda == cvout$lambda.min)
    cvoutBig$finalBetaHat <- cvout$fit$beta[,i]
-   class(cvoutBig) <- 'qeNCVregCV'
    cvoutBig
 }
 
@@ -2999,7 +3006,7 @@ predict.qeNCVregCV <- function(object,newx)
    cvout <- object$cvout
    classif <- object$classif
    type <- if (!classif) 'link' else 'response'
-   predict(cvout,newx,type=type)
+   as.numeric(predict(cvout,newx,type=type))
 }
 
 qencvregcv <- qeNCVregCV
