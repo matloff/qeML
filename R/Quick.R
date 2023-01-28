@@ -1642,6 +1642,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    makeAllNumeric(x,data)
    
    classif <- is.factor(y)
+   if (classif) stop('currently not handling classification case')
    fam <- if (classif) 'multinomial' else 'gaussian'
    ym <- as.matrix(y)
    qeout <- glmnet::cv.glmnet(x=xm,y=ym,alpha=alpha,family=fam)
