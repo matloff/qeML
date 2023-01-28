@@ -2928,12 +2928,12 @@ qeNCVregCV <- function(data,yName,
       stop('binomial case needs factor Y')
    ycol <- which(names(data) == yName)
    if (classif) {
+      stop('classification case under construction')
+      family <- 'binomial'
       y <- data[,yName]
       yLevels <- levels(y)
       if (length(yLevels) != 2) 
          stop('only 2-class problems are handled as of now')
-      tmp <- as.integer(y) - 1
-      data[,yName] <- tmp
       if (is.null(yesYVal)) {
          yesYVal <- yLevels[1]
          noYVal <- yLevels[2]
@@ -2941,6 +2941,8 @@ qeNCVregCV <- function(data,yName,
          yesyval <- which(yLevels == yesYVal)
          noYVal <- yLevels[3-yesyval]
       }
+      tmp <- as.integer(y == yesYVal)
+      data[,yName] <- tmp
    } else {
       yLevels <- NULL
    }
@@ -2982,7 +2984,8 @@ qeNCVregCV <- function(data,yName,
       holdout=floor(min(1000,0.1*nrow(data)))) 
 
 
-   cvoutBig <- list(cvout=cvout,classif=classif)
+   cvoutBig <- list(cvout=cvout,classif=classif,
+      yesYVal=yesYVal,noYVal=noYVal)
    class(cvoutBig) <- 'qeNCVregCV'
 
    if (!is.null(holdout)) {
@@ -3006,7 +3009,12 @@ predict.qeNCVregCV <- function(object,newx)
    cvout <- object$cvout
    classif <- object$classif
    type <- if (!classif) 'link' else 'response'
-   as.numeric(predict(cvout,newx,type=type))
+   preds <- as.numeric(predict(cvout,newx,type=type))
+   if (!object$classif) return(preds)
+   tmp <- list(probs=preds)
+   predYs <- round(preds)
+   predClasses <- ifelse(predYs,object$yesYVal,object$noYVal)
+   list(probs=preds,predClasses=predClasses)
 }
 
 qencvregcv <- qeNCVregCV
