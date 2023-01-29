@@ -1,0 +1,70 @@
+
+---
+title: "Feature Selection"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FeatureSelection}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Clearing the Confusion: Feature Selection 
+
+In many applications we may have many features---dozens, hundreds or
+even more.  In machine learning contexts, where we are interested primarily in
+prediction, we typically don't want to use all the features, for a couple of
+reasons:
+
+* Avoiding overfitting.
+
+    As we add more and more features to a model, bias is reduced but
+    variance increases.  At some point, variance overwhelms bias, and our
+    predictive ability declines.
+
+* Avoiding large computation time and/or memory usage.
+
+    Depending on the solution method used, computation time for a linear
+    model increases with the cube, or at least the square, of the number
+    of features.  Modern ML models can be even worse in terms of
+    computational burden.
+
+# There Are No Magic Solutions
+
+## Which Method to Use?
+
+Many, many methods for feature selection have been developed over the
+years, and you will often hear someone claim that their favorite is *the*
+one to use, The Best.  As you may guess, the fact that there are
+conflicting claims as to "best" reflects the fact that no such Best exists.
+
+We will cover a few feature selection methods here, to explain their
+rationales and how to use them in qeML.
+
+## How Many Is Too Many?
+
+We will use standard notation here, with n and p denoting the number of
+points in our dataset (i.e. number of rows) and the number of features,
+respectively.  Important points to remember:
+
+* The larger n is, then the larger a value of p that can be used before
+  variance increase overwhelms bias reduction.
+
+* However, that bias-variance tradeoff transition depends on the
+  application. There is no magic formula for best p as a function of n.
+
+* Nevertheless, a commonly-used rule of thumb is to limit p to at most
+  n<sup>0.5</sup>.  Some theoretical analyses even suggest the more
+  conservative rule p < log(n).  Again, these are oversimplifications,
+  but some find them useful as guides to intuition.
+
+* The value of p depends on "expanded" versions of any categorical features.
+
+Note that last point.carefully.  Consider 
