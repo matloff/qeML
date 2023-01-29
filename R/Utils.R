@@ -218,8 +218,11 @@ predictHoldoutNCV <- defmacro(res,
          predClasses <- preds$predClasses
          probs <- preds$probs
          preds <- list(predClasses=predClasses,probs=probs)
-         charTsty <- yLevels[tsty]
+         # charTsty <- yLevels[tsty]
+         charTsty <- ifelse(tsty,yesYVal,noYVal)
          res$testAcc <- mean(predClasses != charTsty,na.rm=TRUE)
+         prop1 <- mean(trny == yesYVal)
+         res$baseAcc <- min(prop1,1-prop1)
       }
 
       if (!classif) {

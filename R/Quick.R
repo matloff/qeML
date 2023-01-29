@@ -2928,15 +2928,20 @@ qeNCVregCV <- function(data,yName,
       stop('binomial case needs factor Y')
    ycol <- which(names(data) == yName)
    if (classif) {
-      stop('classification case under construction')
+      # stop('classification case under construction')
       family <- 'binomial'
       y <- data[,yName]
       yLevels <- levels(y)
       if (length(yLevels) != 2) 
          stop('only 2-class problems are handled as of now')
       if (is.null(yesYVal)) {
-         yesYVal <- yLevels[1]
-         noYVal <- yLevels[2]
+         if (setequal(yLevels,c(0,1))) {
+            yesYVal <- '1'
+            noYVal <- '0'
+         } else {
+            yesYVal <- yLevels[1]
+            noYVal <- yLevels[2]
+         }
       } else {
          yesyval <- which(yLevels == yesYVal)
          noYVal <- yLevels[3-yesyval]
@@ -2945,6 +2950,8 @@ qeNCVregCV <- function(data,yName,
       data[,yName] <- tmp
    } else {
       yLevels <- NULL
+      yesYVal <- NULL
+      noYVal <- NULL
    }
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
