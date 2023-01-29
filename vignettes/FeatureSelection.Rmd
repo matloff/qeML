@@ -34,11 +34,10 @@ reasons:
     Depending on the solution method used, computation time for a linear
     model increases with the cube, or at least the square, of the number
     of features.  Modern ML models can be even worse in terms of
-    computational burden.
+    computational burden.  In addition, large models may result in lack
+    of convergence or instability of the output.
 
-# There Are No Magic Solutions
-
-## Which Method to Use?
+# Which Method to Use?
 
 Many, many methods for feature selection have been developed over the
 years, and you will often hear someone claim that their favorite is *the*
@@ -48,7 +47,7 @@ conflicting claims as to "best" reflects the fact that no such Best exists.
 We will cover a few feature selection methods here, to explain their
 rationales and how to use them in qeML.
 
-## How Many Is Too Many?
+# How Many Is Too Many?
 
 We will use standard notation here, with n and p denoting the number of
 points in our dataset (i.e. number of rows) and the number of features,
@@ -67,4 +66,140 @@ respectively.  Important points to remember:
 
 * The value of p depends on "expanded" versions of any categorical features.
 
-Note that last point.carefully.  Consider 
+# Impact of Categorical Variables
+
+Note that last point.carefully.  Consider the dataset **nycdata**
+included in qeML, which is derived from taxi trip data made publicly
+available by the New York City government.  Many public analyses have
+been made on various versions of the NYC taxi data, frequently with the
+goal of predicting trip time.  Let's take a look:
+
+``` r
+> data(nyctaxi)
+> dim(nyctaxi)
+[1] 10000     5
+> head(nyctaxi)
+        passenger_count trip_distance PULocationID DOLocationID PUweekday
+2969561               1          1.37          236           43         1
+7301968               2          0.71          238          238         4
+3556729               1          2.80          100          263         3
+7309631               2          2.62          161          249         4
+3893911               1          1.20          236          163         5
+4108506               5          2.40          161          164         5
+        DOweekday tripTime
+2969561         1      598
+7301968         4      224
+3556729         3      761
+7309631         4      888
+3893911         5      648
+4108506         5      977
+```
+
+So n = 10000, p = 5.  At first glance, one might guess that we could use
+all 5 features.  Let's try a linear model:
+
+``` r
+> z <- qeLin(nyctaxi,'tripTime')
+holdout set has  1000 rows
+Warning messages:
+1: In eval(tmp, parent.frame()) :
+  7 rows removed from test set, due to new factor levels
+2: In predict.lm(object, newx) :
+  prediction from a rank-deficient fit may be misleading
+3: In predict.lm(object, newx) :
+  prediction from a rank-deficient fit may be misleading
+```
+
+The term "rank-deficient" is referring to multicollinearity in the data,
+i.e. strong relations among the features, producing a possibly unstable
+result.
+
+Let's look at the estimated beta coefficients:
+
+``` r
+> summary(z)
+
+Call:
+lm(formula = cbind(tripTime) ~ ., data = xy)
+
+Residuals:
+    Min      1Q  Median      3Q     Max
+-3807.5  -186.0   -49.8   131.8  3179.2
+
+Coefficients: (4 not defined because of singularities)
+                 Estimate Std. Error t value Pr(>|t|)
+(Intercept)     -2125.474    351.347  -6.049 1.51e-09 ***
+trip_distance     163.056      1.670  97.628  < 2e-16 ***
+PULocationID4    1424.775    345.770   4.121 3.81e-05 ***
+PULocationID7    1212.331    349.196   3.472 0.000520 ***
+PULocationID10    655.251    371.870   1.762 0.078097 .
+PULocationID12   1829.276    408.229   4.481 7.52e-06 ***
+PULocationID13   1271.201    338.220   3.758 0.000172 ***
+PULocationID17   1167.109    477.898   2.442 0.014619 *
+PULocationID24   1356.014    342.706   3.957 7.66e-05 ***
+PULocationID25   1381.439    354.736   3.894 9.92e-05 ***
+PULocationID26   1282.229    506.842   2.530 0.011429 *
+PULocationID33   1353.187    363.058   3.727 0.000195 ***
+PULocationID35    726.147    474.147   1.531 0.125687
+PULocationID36    972.828    391.276   2.486 0.012927 *
+...
+PULocationID260   972.537    375.500   2.590 0.009614 **
+PULocationID261  1334.116    340.437   3.919 8.97e-05 ***
+PULocationID262  1362.842    337.713   4.036 5.50e-05 ***
+PULocationID263  1343.784    337.113   3.986 6.77e-05 ***
+PULocationID264  1378.455    341.150   4.041 5.38e-05 ***
+PULocationID265  2163.796    370.248   5.844 5.27e-09 ***
+DOLocationID3     869.664    339.996   2.558 0.010549 *
+DOLocationID4     913.146    108.088   8.448  < 2e-16 ***
+DOLocationID7    1065.241    105.990  10.050  < 2e-16 ***
+DOLocationID10   1703.133    211.081   8.069 8.06e-16 ***
+...
+DOLocationID119  1077.036    274.406   3.925 8.74e-05 ***
+DOLocationID121  1515.904    340.850   4.447 8.80e-06 ***
+DOLocationID123        NA         NA      NA       NA
+DOLocationID124  2707.981    339.513   7.976 1.70e-15 ***
+DOLocationID125  1123.702    105.203  10.681  < 2e-16 ***
+...
+DOLocationID262   933.146     96.473   9.673  < 2e-16 ***
+DOLocationID263   885.520     94.578   9.363  < 2e-16 ***
+DOLocationID264   960.527    108.120   8.884  < 2e-16 ***
+DOLocationID265   169.068    123.391   1.370 0.170666
+DayOfWeek2         44.691     15.004   2.979 0.002903 **
+DayOfWeek3        100.480     14.188   7.082 1.53e-12 ***
+DayOfWeek4        105.223     13.990   7.522 5.95e-14 ***
+DayOfWeek5        133.312     13.775   9.678  < 2e-16 ***
+DayOfWeek6         97.030     14.461   6.710 2.07e-11 ***
+DayOfWeek7         57.133     14.579   3.919 8.97e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 327.2 on 8663 degrees of freedom
+Multiple R-squared:  0.7128,	Adjusted R-squared:  0.7017
+F-statistic:    64 on 336 and 8663 DF,  p-value: < 2.2e-16
+
+```
+
+There were 266 pickup/dropoff locations.  That means 530
+dummy-variable features.  Similarly, 6 more dummies for day of the week.
+R's **lm** function, which qeLin wraps, automatically converts factors
+to dummies.
+
+So, p is not 5 after all; it's 5 + 529 + 6 = 540!
+
+We are assuming no interactions here.  But if some pickup/dropoff
+location combinations behave quite differently from others, we ought to
+consider it--but greatly increasing p.
+
+Note too that the model was so unstable that the coefficient for
+DOLocationID123 turned out to be NA.
+
+Time-of-day data is available but not in this particular dataset.
+Inclusion, say by discretizing, would complicate things even more.
+
+# Remedies
+
+## Dimension reduction
+
+Rather than doing feature selection *per se*, we might transform the
+data to summary variables.
+
