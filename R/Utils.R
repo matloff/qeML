@@ -297,3 +297,19 @@ checkForNonDF <- defmacro(data,
    }
 ) 
 
+# simplify a factor to its top levels; input f, output f but with only
+# only the most-frequent m levels explicit, with all others combined to
+# 'other'; m = 0 means to print freqs and input m from user
+factorToTopLevels <- function(f,m=0) 
+{
+   freqs <- table(f)
+   freqsSorted <- sort(freqs)
+   if (m == 0) {
+      print(freqsSorted)
+      m <- as.integer(readline('enter m: '))
+   }
+   nFLevels <- length(levels(f))
+   newLevels <- names(freqsSorted)[(nFLevels-m+1):nFLevels]
+   fNew <- ifelse(f %in% newLevels,as.character(f),'other')
+   as.factor(fNew)
+}

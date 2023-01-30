@@ -57,4 +57,4 @@ export(
    qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,qePolyLinKNN,
    qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,qeliquidSVM,
    doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,qeDeepnet,
-   plotClassesUMAP,plotPairedResids)
+   plotClassesUMAP,plotPairedResids,factorToTopLevels)
