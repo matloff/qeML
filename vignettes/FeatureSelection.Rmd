@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 # Clearing the Confusion: Feature Selection 
 
 In many applications we may have many features---dozens, hundreds or
@@ -66,7 +65,7 @@ respectively.  Important points to remember:
 
 * The value of p depends on "expanded" versions of any categorical features.
 
-# Impact of Categorical Variables
+## Impact of categorical variables
 
 Note that last point.carefully.  Consider the dataset **nycdata**
 included in qeML, which is derived from taxi trip data made publicly
@@ -94,6 +93,8 @@ goal of predicting trip time.  Let's take a look:
 3893911         5      648
 4108506         5      977
 ```
+
+(Time-of-day, month etc. data is available but not in this particular dataset.)
 
 So n = 10000, p = 5.  At first glance, one might guess that we could use
 all 5 features.  Let's try a linear model:
@@ -188,13 +189,12 @@ So, p is not 5 after all; it's 5 + 529 + 6 = 540!
 
 We are assuming no interactions here.  But if some pickup/dropoff
 location combinations behave quite differently from others, we ought to
-consider it--but greatly increasing p.
+consider interaction terms.  These will have their own dummy variables,
+hugely increasing p if we include them all.
 
 Note too that the model was so unstable that the coefficient for
 DOLocationID123 turned out to be NA.
 
-Time-of-day data is available but not in this particular dataset.
-Inclusion, say by discretizing, would complicate things even more.
 
 # Remedies
 
@@ -203,11 +203,98 @@ Inclusion, say by discretizing, would complicate things even more.
 What should we look for in a "good" feature selection method?  We take
 the following as goals:
 
-* The method should have predictive ability as a central goal.
+* **Desired Property A:** The method should have predictive ability as a central goal.
 
-* The method should be easily explainable.
+* **Desired Property B:** The method should be reasonably easy to explain.
 
-* Preferably, the method should not be computationally intensive. 
+* **Desired Property C:** The method should produce an ordered sequence of
+candidate models: Best single predictor; best pair of predictors; best
+triplet etc. This means we will have at most p feature sets to check,
+say running cross-validation on each one.  In *best subset selection*,
+by contrast, one looks at all the 2<sup>p</sup> possible feature sets, a
+prohibitively large number computationally.
+
+## Methods based on p-values
+
+A classic approach for linear and generalized linear models is to first
+fit a full model, then retain only those features that are
+"statistically significant".  In the **nyctaxi** taxi data shown above,
+we would retain, for instance **PULocationID33** but not **PULocationID35**.
+
+This would violate our Desired Property A above.  Use of p-values in
+geneeral is problematic (see the "NoPVals" vignette), and this is no
+exception.  Just because &beta;<sub>i</sub> is nonzero does not mean
+that Feature i has strong predictive power; what if  &beta;<sub>i</sub>
+is nonzero but tiny?
+
+A common variation is to use a *stepwise* method.  In the *forward*
+version, one starts with no features, but adds them one at a time.  At
+each step, one tests for the &beta; coefficient being 0.  When no new
+feature is found to be "significant," the process stops, and we use
+whatever features managed to make it in to the model so far.  The
+*backward* version starts with a full model, and removes features one at
+a time.  Though this one may seem to be an improvement, in that it does
+take into account that a feature may be useful individually but not if
+similar features are already in the equation, it still suffers from
+the fundamental problems of p-values.
+
+## The LASSO
+
+Here we fit a linear model, subject to the constraint that no estimated
+&beta;<sub>i</sub> is larger than &lambda;, a hyperparameter.  Starting
+at 0, we increase &lambda; to ever-larger values, having the effect that
+one &beta;<sub>i</sub> becomes nonzero at a time.  This gives us a
+linear sequence of candidate features, which is essentially a forward
+stepwise method, but NOT based on p-values; instead, the decision of
+which feature to use next is based on cross-validated mean squared
+prediction error.  
+
+In the end, one could use the final estimated &beta; vector
+formed by the LASSO, or one could simply view the process as a means of
+choosing a feature set for some other ML algorithm.
+
+Here is the LASSO approach on the **nyctaxi** data:
+
+``` r
+> lassout <- qeLASSO(nyctaxi,'tripTime') 
+> lassout$lambda.whichmin
+[1] 51
+> lassout$whenEntered
+  trip_distance PULocationID.132 PULocationID.186      DayOfWeek.1
+               2               29               31               31
+DOLocationID.132 DOLocationID.124      DayOfWeek.5  DOLocationID.33
+              33               34               34               35
+DOLocationID.189 DOLocationID.225 PULocationID.213  PULocationID.76
+              35               35               37               38
+PULocationID.263   DOLocationID.1 DOLocationID.177      DayOfWeek.2
+              38               38               38               38
+PULocationID.124  DOLocationID.35  DOLocationID.36  DOLocationID.89
+              39               39               39               39
+DOLocationID.231 DOLocationID.263 PULocationID.239 DOLocationID.155
+              39               39               40               40
+ PULocationID.40  PULocationID.43 PULocationID.146 PULocationID.161
+              41               41               41               41
+PULocationID.230  DOLocationID.22  DOLocationID.37 DOLocationID.161
+              41               41               41               41
+DOLocationID.162 DOLocationID.251 PULocationID.163 PULocationID.211
+              41               41               42               42
+PULocationID.257  DOLocationID.49  DOLocationID.81 DOLocationID.179
+              42               42               42               42
+...
+```
+
+For each value of &lamda; run by the code, one or more features joined the
+model.  The cross-valued mean squared prediction error reached its
+minimum at the 51st &lamda;.  Along the way, **trip_distance** was the
+first feature added, at the 2nd &lambda;, followed 
+by PULocationID132 (29th), PULocationID186 (31st), 
+DayOfWeek.1 (31st) and so o.
+
+
+## Methods based on measures of feature importance
+
+
+RF, Shapley
 
 ## Non-selection dimension reduction
 
@@ -215,16 +302,66 @@ Rather than doing feature selection *per se*, we might transform the
 data to summary variables.  We could group the pickup/dropoff locations
 by ZIP Code, for instance.  
 
-Or, we might try Principal Components Analysis (PCA), say
+Or, we could consider only the more frequently used locations.  The qeML
+function **factorToTopLevels** would help here:
 
 ``` r
-> pcaOut <- qePCA(nyctaxi,'tripTime','qeLin',pcaProp=0.8)
+> newPUlocs <- factorToTopLevels(nyctaxi$PULocationID,m=0)
+f
+  3   8   9  14  15  16  18  19  20  22  23  28  29  32  34  47  53  55  56  59
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 60  63  64  66  67  69  72  73  77  78  80  81  85  86  89  91  92  98 101 102
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0 
+111 119 122 133 136 139 147 149 150 154 159 165 167 169 174 177 180 185 188 190 
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0 
+...
+
+ 75 211  50 144  13 148 158 151 137 114 233 262 143 113 231  43 246 249  90 229
+ 71  74  78  81  88  96  98 104 116 119 129 129 131 136 140 146 148 181 187 195
+164 238 140  68 141 100 138 264 163 107 263 239  79 132 234 142 170  48 230 162
+204 207 208 212 213 215 223 237 240 244 245 256 259 281 303 318 320 321 325 328
+186 161 236 237
+362 397 407 432
+enter m: 40
+> head(newPUlocs)
+[1] 236 238 100 161 236 161
+41 Levels: 100 107 113 114 13 132 137 138 140 141 142 143 148 151 158 ... other
+```
+
+Here, the option **m = 0** is interactive.  After looking at the
+frequencies, we decided to take the most-frequent 40 locations.  Let's
+take that number for the dropoffs too:
+
+``` r
+> newDOlocs <- factorToTopLevels(nyctaxi$DOLocationID,m=40)
+```
+
+Now use the new data:
+
+``` r
+> nyct$PULocationID <- newPUlocs
+> nyct$DOLocationID <- newDOlocs
+> head(nyct)
+        trip_distance PULocationID DOLocationID tripTime DayOfWeek
+2969561          1.37          236           43      598         1
+7301968          0.71          238          238      224         4
+3556729          2.80          100          263      761         3
+7309631          2.62          161          249      888         4
+3893911          1.20          236          163      648         5
+4108506          2.40          161          164      977         5
+> linout <- qeLin(nyct,'tripTime')
+etc.
+
+```
+
+We might try further dimension reduction via
+Principal Components Analysis (PCA), say
+
+``` r
+> pcaOut <- qePCA(nyct,'tripTime','qeLin',pcaProp=0.8)
 ```
 
 This would apply PCA to the features, tranforming them to PCs.  It would
-retain the most-varaible PCs, up to the point at which they formed 80%
+retain the most-variable PCs, up to the point at which they formed 80%
 of the total variance, and then apply **qeLin** to the new variables.
 
-(We would need to do a bit more.  R's PCA code would balk at a data
-columns that are all 0s, or nearly so, so we'd need to remove these
-locations from the feature list.)
