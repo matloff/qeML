@@ -198,8 +198,33 @@ Inclusion, say by discretizing, would complicate things even more.
 
 # Remedies
 
-## Dimension reduction
+## Desiderata
+
+What should we look for in a "good" feature selection method?  We take
+the following as goals:
+
+* The method should have predictive ability as a central goal.
+
+* The method should be easily explainable.
+
+* Preferably, the method should not be computationally intensive. 
+
+## Non-selection dimension reduction
 
 Rather than doing feature selection *per se*, we might transform the
-data to summary variables.
+data to summary variables.  We could group the pickup/dropoff locations
+by ZIP Code, for instance.  
 
+Or, we might try Principal Components Analysis (PCA), say
+
+``` r
+> pcaOut <- qePCA(nyctaxi,'tripTime','qeLin',pcaProp=0.8)
+```
+
+This would apply PCA to the features, tranforming them to PCs.  It would
+retain the most-varaible PCs, up to the point at which they formed 80%
+of the total variance, and then apply **qeLin** to the new variables.
+
+(We would need to do a bit more.  R's PCA code would balk at a data
+columns that are all 0s, or nearly so, so we'd need to remove these
+locations from the feature list.)
