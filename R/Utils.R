@@ -299,27 +299,20 @@ checkForNonDF <- defmacro(data,
 
 # simplify a factor to its top levels; input f, output f but with only
 # only the most-frequent levels explicit, with all others combined to
-# 'other'; propRetaini in (0,1) means to retain the levels corresponding
-# to a fraction propRetaini of the data; propRetaini = 0 means to plot
-# freqs and then input propRetaini from user
+# 'other'; any f level for which there lowCountThresh or fewer data points
+# becomes 'other', with all other f levels retaining their names
 
-factorToTopLevels <- function(f,propRetain=0) 
+factorToTopLevels <- function(f,lowCountThresh=0) 
 {
-stop('under construction')
-   counts <- table(f)
-   if (propRetain == 0) {
-      hist(counts)
-      propRetain <- as.numeric(readline('enter propRetain: '))
+   levelCounts <- table(f)
+   if (lowCountThresh==0) {
+      hist(levelCounts,xlab='counts per level',
+         ylab='number of levels having a given count')
+      lowCountThresh <- readline('enter lowCountThresh: ')
    }
-   countsSorted <- sort(counts,decreasing=TRUE)
-   csums <- cumsum(countsSorted)
-   targetTopN <- ceiling(propRetain*length(f))
-   m <- which.min(csums >= targetTopN)
-
-
-   m <- ceiling(propRetain*length(f))  # will retain
-   nFLevels <- length(levels(f))
-   newLevels <- names(countsSorted)[(nFLevels-m+1):nFLevels]
+   lowCounts <- which(levelCounts <= lowCountThresh)
+   newLevels <- names(levelCounts)[-lowCounts]
+   newLevels <- c(sort(newLevels),'other')
    fNew <- ifelse(f %in% newLevels,as.character(f),'other')
    as.factor(fNew)
 }
