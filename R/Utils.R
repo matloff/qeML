@@ -315,11 +315,8 @@ stop('under construction')
    csums <- cumsum(countsSorted)
    targetTopN <- ceiling(propRetain*length(f))
    m <- which.min(csums >= targetTopN)
-
-
-   m <- ceiling(propRetain*length(f))  # will retain
    nFLevels <- length(levels(f))
-   newLevels <- names(countsSorted)[(nFLevels-m+1):nFLevels]
+   newLevels <- c(names(countsSorted)[1:m],'other')
    fNew <- ifelse(f %in% newLevels,as.character(f),'other')
    as.factor(fNew)
 }
