@@ -305,7 +305,6 @@ checkForNonDF <- defmacro(data,
 
 factorToTopLevels <- function(f,propRetain=0) 
 {
-stop('under construction')
    counts <- table(f)
    if (propRetain == 0) {
       hist(counts)
@@ -314,7 +313,7 @@ stop('under construction')
    countsSorted <- sort(counts,decreasing=TRUE)
    csums <- cumsum(countsSorted)
    targetTopN <- ceiling(propRetain*length(f))
-   m <- which.min(csums >= targetTopN)
+   m <- which.max(csums >= targetTopN)
    nFLevels <- length(levels(f))
    newLevels <- c(names(countsSorted)[1:m],'other')
    fNew <- ifelse(f %in% newLevels,as.character(f),'other')
