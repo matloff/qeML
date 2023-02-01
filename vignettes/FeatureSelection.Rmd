@@ -41,7 +41,8 @@ the features, for a couple of reasons:
 Many, many methods for feature selection have been developed over the
 years, and you will often hear someone claim that their favorite is *the*
 one to use, The Best.  As you may guess, the fact that there are
-conflicting claims as to "best" reflects the fact that no such Best exists.
+conflicting claims as to "best" reflects the fact that no such Best 
+method exists.  Indeed, much of the feature selection process is *ad hoc*.
 
 We will cover a few feature selection methods here, to explain their
 rationales and how to use them in qeML.  You may typically use two or
@@ -52,6 +53,8 @@ more of them in any given application.
 We will use standard notation here, with n and p denoting the number of
 points in our dataset (i.e. number of rows) and the number of features
 (i.e. number of columns), respectively.  Important points to remember:
+
+## General principles
 
 * The larger n is, then the larger a value of p that can be used before
   variance increase overwhelms bias reduction.
@@ -66,15 +69,12 @@ points in our dataset (i.e. number of rows) and the number of features
 
 * The value of p depends on "expanded" versions of any categorical features.
 
-# First, a Special Look at Categorical Features
-
-In many large-p datasets, the culprit is primarily categorical
-variables.  Let's see why, and how to remedy the situation.
-
 ## Impact of categorical variables on p
 
-Note that last point, regarding expanded versions of features,
-carefully.  Consider the dataset **nycdata** included in qeML, which is
+In many large-p datasets, the culprit is primarily categorical
+variables.  Let's see why. 
+
+Consider the dataset **nycdata** included in qeML, which is
 derived from taxi trip data made publicly available by the New York City
 government.  Many public analyses have been made on various versions of
 the NYC taxi data, frequently with the goal of predicting trip time.
@@ -211,7 +211,235 @@ be in the holdout set.  Then the **lm** function would say, "Wait, I've
 never heard of these factor levels before," so **qeLin** removes them.
 If many rows are removed, our predictive ability suffers.
 
-## Direct dimension reduction
+# Desiderata
+
+What should we look for in a "good" feature selection method?  We take
+the following as goals:
+
+* **Desired Property A:** The method should have predictive ability as a central goal.
+
+* **Desired Property B:** The method should be reasonably easy to explain.
+
+* **Desired Property C:** The method should produce an ordered sequence of
+candidate models. 
+
+    All the methods discussed here will have this property. 
+    This is so important that we will give it its own subsection:
+
+## Feature selection methods should produce an ordered sequence of candidate models
+
+A nethod should produce some kind of ordered list, for instance, best
+single predictor; best pair of predictors; best triplet etc.  We can
+evaluate each of the p feature sets via cross-validation, then choose
+the one that peforms best.  (A method may simply rank features according
+to importance, but we still would assess the performance of the first
+feature, the first two features together, the first three features
+together and so on.)
+
+In the *all possible subsets* (APS) approach, by contrast, one looks at all
+the 2<sup>p</sup> possible feature sets, a prohibitively large number
+computationally.  
+
+Moreover, remember, we are working with randomness.  We choose holdout
+sets randomly, and usually the dataset itself is considered to be a
+random sample from some (real or conceptual) population.  Due to this
+randomness, it's possible that some combination of features will appear
+to perform well, just by accident.  The more feature sets we look at,
+the greater the chance of this occurring.  This consideration really
+makes APS infeasible, and even with a linear sequence of candidate
+feature sets, this can be problematic with large p.
+
+Note that some of the methods discussed below do their own internal
+cross-validation, and ultimately give us the "best" feature set
+according to that criterion.  Nevertheless, they still provide an
+ordered feature set.
+
+This last point is important because we may wish to use the selected
+feature set sequence as input to a different ML method.  There is no
+theoretical reason to believe the best feature set for one ML method is
+also best for another, but as noted, feature selection is an *ad hoc*
+business.
+
+# Feature Selection Methodology Overview
+
+## Methods based on p-values
+
+A classic approach for linear and generalized linear models is to first
+fit a full model, then retain only those features that are
+"statistically significant".  In the **nyctaxi** taxi data shown above,
+we would retain, for instance **PULocationID33** but not **PULocationID35**.
+
+This would violate our Desired Property A above.  Use of p-values in
+geneeral is problematic (see the "NoPVals" vignette), and this is no
+exception.  Just because &beta;<sub>i</sub> is nonzero does not mean
+that Feature i has strong predictive power; what if  &beta;<sub>i</sub>
+is nonzero but tiny?
+
+One could generate an ordered sequence of feature sets in the above
+manner by first setting the threshold for a p-value very low, then
+progressively higher  This is similar to  *stepwise regression*:  In the
+*forward* version, one starts with no features, but adds them one at a
+time.  At each step, one tests for the &beta; coefficient being 0.  When
+no new feature is found to be "significant," the process stops, and we
+use whatever features managed to make it in to the model so far.  The
+*backward* version starts with a full model, and removes features one at
+a time.  Though this one may seem to be an improvement, in that it does
+take into account that a feature may be useful individually but not if
+similar features are already in the equation, it still suffers from the
+fundamental problems of p-values.
+
+## The LASSO
+
+Here we fit a linear model, subject to the constraint that no estimated
+&beta;<sub>i</sub> is larger than &lambda;, a hyperparameter.  Starting
+at 0, we increase &lambda; to ever-larger values, having the effect that
+one estimated &beta;<sub>i</sub> becomes nonzero at a time.  This gives
+us an ordered sequence of candidate features, as desired.
+
+This is similar to a forward stepwise method, but NOT based on p-values;
+instead, the decision of which feature to use next is based on
+cross-validated mean squared prediction error.  
+
+Here is the LASSO approach on the **nyctaxi** data:
+
+``` r
+> lassout <- qeLASSO(nyctaxi,'tripTime') 
+> lassout$lambda.whichmin
+[1] 51
+> lassout$whenEntered
+  trip_distance PULocationID.132 PULocationID.186      DayOfWeek.1
+               2               29               31               31
+DOLocationID.132 DOLocationID.124      DayOfWeek.5  DOLocationID.33
+              33               34               34               35
+DOLocationID.189 DOLocationID.225 PULocationID.213  PULocationID.76
+              35               35               37               38
+PULocationID.263   DOLocationID.1 DOLocationID.177      DayOfWeek.2
+              38               38               38               38
+PULocationID.124  DOLocationID.35  DOLocationID.36  DOLocationID.89
+              39               39               39               39
+DOLocationID.231 DOLocationID.263 PULocationID.239 DOLocationID.155
+              39               39               40               40
+ PULocationID.40  PULocationID.43 PULocationID.146 PULocationID.161
+              41               41               41               41
+PULocationID.230  DOLocationID.22  DOLocationID.37 DOLocationID.161
+              41               41               41               41
+DOLocationID.162 DOLocationID.251 PULocationID.163 PULocationID.211
+              41               41               42               42
+PULocationID.257  DOLocationID.49  DOLocationID.81 DOLocationID.179
+              42               42               42               42
+...
+```
+
+For each value of &lambda; run by the code, one or more features joined the
+model.  The cross-valued mean squared prediction error reached its
+minimum at the 51st &lambda;.  Along the way, **trip_distance** was the
+first feature added, at the 2nd &lambda;, followed 
+by PULocationID132 (29th), PULocationID186 (31st), 
+DayOfWeek.1 (31st) and so o.
+
+## Methods based on measures of feature importance
+
+Consider the Random Forests (RF) ML method.  It has various
+hyperparameters, such as maximum number of levels in a tree, and we wish
+to find a "good" combination of those settings.  As a byproduct, though,
+the fact that at each level RF is entering a new feature, many RF
+implemntations compute some kind of *variable importance* ranking--thus
+giving us our desired ordered sequence.  
+
+We can then run RF on each feature set in the sequence, or as mentioned,
+try the sequence on some other ML method.  We would then use whichever
+feature set yielded the best cross-validated performance.
+
+Here is an example with the **nyctaxi** data:
+
+``` r
+> z <- qeRFranger(nyctaxi,'tripTime')
+holdout set has  1000 rows
+Loading required namespace: ranger
+Warning message:
+In eval(tmp, parent.frame()) :
+  9 rows removed from test set, due to new factor levels
+> z$variable.importance
+trip_distance  PULocationID  DOLocationID     DayOfWeek
+   2447411690     212569502     201650058      85733194
+```
+
+So, our feature set sequence might be:
+
+<pre>
+trip_distance
+trip_distance and PULocationID
+trip_distance and PULocationID and DOLocationID
+trip_distance and PULocationID and DOLocationID
+trip_distance and PULocationID and DOLocationID and DayOfWeek
+</pre>
+
+Note that the algorithm chose the categorical variables as a whole here,
+not breaking down into their dummy variable components.
+
+Another example is  Prnciple Components Analysis (PCA).  Here our p
+features are replaced by p linear combinations (the "principle
+components," PCs) of the original features.  The PCs are uncorrelated.
+
+The PCs form our new features, and are ordered by variance, largest to
+smallest.  Since a variable with small variance is essentially constant
+and thus has little predictive value, we take only the PCs with larger
+variance.  
+
+For the first m PCs, say, we compare the sum of their variances 
+(which is also the variance of their sum) to the total variance of the
+response variable Y (i.e. the variable we are trying to predict).  By
+varying the proportion, we produce an ordered sequence of feature sets,
+as desired.
+
+The **qeML** function **qePCA** first finds the PCs, then applies
+whatever ML method is specified by the user.  The function **qeUMAP**
+does the same for UMAP, a kind of nonlinear analog of PCA.
+
+One more measure of variable importance is *Shapley values*.  This
+concept describes an attempt to use game theory to apportion credit for
+a win among several players in a team; the "players" here are the
+features.  While it is a clever idea, it has been the subject of much
+criticism in terms of practical value.
+
+## Feature Ordering by Conditional Independence (FOCI)
+
+This is my personal "go to" method for feature selection.  Its
+theoretical foundations are complex, but it boils down to measuring the
+reduction in variance in predicting Y from X, versus predicting Y simply
+from its mean.  
+
+FOCI is implemented in a CRAN package of the same name, and **qeML**'s
+**qeFOCI** function provides a convenient interface.  Example:
+
+``` r
+> w <- qeFOCI(nyctaxi,'tripTime')
+> w$selectedVar
+   index            names
+1:     1    trip_distance
+2:   202  DOLocationID.75
+3:   348      DayOfWeek.1
+4:    78 PULocationID.151
+
+```
+
+Trip distance, dropoff location 72, Mondays and pickup location 151 were
+chosen, in that order, after which the algorithm decided that adding any
+further features was counterproductive.  Again, we could simply take
+that 4-feature set for whatever ML method we wish, or we could use the
+above to set up an ordered sequence of feature sets,
+
+<pre>
+trip_distance
+trip_distance and DOLocationID.75
+trip_distance and DOLocationID.75 and DayOfWeek.1
+trip_distance and DOLocationID.75 and DayOfWeek.1 and PULocationID.151
+</pre>
+
+running our desired ML method on each feature set, then choosing the one
+with best cross-validation performance.
+
+## Direct dimension reduction for categorical data
 
 Rather than doing feature selection *per se*, we might transform the
 data to summary variables.  We could group the pickup/dropoff locations
@@ -233,7 +461,7 @@ We invoke the function as follows:
 
 Ah, yes, lots of locations have small counts, less than 50 and probably
 many in the single-digits range.  So, **PULocationID** is a prime
-candidate for simplication.  Let's for a cutoff of 75.
+candidate for simplication.  Let's go for a cutoff of 75.
 
 ``` r
 > newPUlocs <- factorToTopLevels(nyctaxi$PULocationID,lowCountThresh=75)
@@ -292,118 +520,6 @@ well?
 Mean Absolute Prediction Error is much less than what one would have by
 simply guessing all cases to be the overall mean trip time.
 
-We could then try other ML methods.
-
-Or, we might try further dimension reduction via
-Principal Components Analysis (PCA), say
-
-``` r
-> pcaOut <- qePCA(nyctaxi,'tripTime','qeLin',pcaProp=0.8)
-```
-
-This would apply PCA to the features, tranforming them to PCs.  It would
-retain the most-variable PCs, up to the point at which they formed 80%
-of the total variance, and then apply **qeLin** to the new variables.
-
-# Overview of Feature Selection Mothods
-
-## Desiderata
-
-What should we look for in a "good" feature selection method?  We take
-the following as goals:
-
-* **Desired Property A:** The method should have predictive ability as a central goal.
-
-* **Desired Property B:** The method should be reasonably easy to explain.
-
-* **Desired Property C:** The method should produce an ordered sequence of
-candidate models: Best single predictor; best pair of predictors; best
-triplet etc. This means we will have at most p feature sets to check,
-say running cross-validation on each one.  In *best subset selection*,
-by contrast, one looks at all the 2<sup>p</sup> possible feature sets, a
-prohibitively large number computationally.
-
-Desired Property C will be of key importance.
-
-## Methods based on p-values
-
-A classic approach for linear and generalized linear models is to first
-fit a full model, then retain only those features that are
-"statistically significant".  In the **nyctaxi** taxi data shown above,
-we would retain, for instance **PULocationID33** but not **PULocationID35**.
-
-This would violate our Desired Property A above.  Use of p-values in
-geneeral is problematic (see the "NoPVals" vignette), and this is no
-exception.  Just because &beta;<sub>i</sub> is nonzero does not mean
-that Feature i has strong predictive power; what if  &beta;<sub>i</sub>
-is nonzero but tiny?
-
-A common variation is to use a *stepwise* method.  In the *forward*
-version, one starts with no features, but adds them one at a time.  At
-each step, one tests for the &beta; coefficient being 0.  When no new
-feature is found to be "significant," the process stops, and we use
-whatever features managed to make it in to the model so far.  The
-*backward* version starts with a full model, and removes features one at
-a time.  Though this one may seem to be an improvement, in that it does
-take into account that a feature may be useful individually but not if
-similar features are already in the equation, it still suffers from
-the fundamental problems of p-values.
-
-## The LASSO
-
-Here we fit a linear model, subject to the constraint that no estimated
-&beta;<sub>i</sub> is larger than &lambda;, a hyperparameter.  Starting
-at 0, we increase &lambda; to ever-larger values, having the effect that
-one &beta;<sub>i</sub> becomes nonzero at a time.  This gives us a
-linear sequence of candidate features, which is essentially a forward
-stepwise method, but NOT based on p-values; instead, the decision of
-which feature to use next is based on cross-validated mean squared
-prediction error.  
-
-In the end, one could use the final estimated &beta; vector
-formed by the LASSO, or one could simply view the process as a means of
-choosing a feature set for some other ML algorithm.
-
-Here is the LASSO approach on the **nyctaxi** data:
-
-``` r
-> lassout <- qeLASSO(nyctaxi,'tripTime') 
-> lassout$lambda.whichmin
-[1] 51
-> lassout$whenEntered
-  trip_distance PULocationID.132 PULocationID.186      DayOfWeek.1
-               2               29               31               31
-DOLocationID.132 DOLocationID.124      DayOfWeek.5  DOLocationID.33
-              33               34               34               35
-DOLocationID.189 DOLocationID.225 PULocationID.213  PULocationID.76
-              35               35               37               38
-PULocationID.263   DOLocationID.1 DOLocationID.177      DayOfWeek.2
-              38               38               38               38
-PULocationID.124  DOLocationID.35  DOLocationID.36  DOLocationID.89
-              39               39               39               39
-DOLocationID.231 DOLocationID.263 PULocationID.239 DOLocationID.155
-              39               39               40               40
- PULocationID.40  PULocationID.43 PULocationID.146 PULocationID.161
-              41               41               41               41
-PULocationID.230  DOLocationID.22  DOLocationID.37 DOLocationID.161
-              41               41               41               41
-DOLocationID.162 DOLocationID.251 PULocationID.163 PULocationID.211
-              41               41               42               42
-PULocationID.257  DOLocationID.49  DOLocationID.81 DOLocationID.179
-              42               42               42               42
-...
-```
-
-For each value of &lamda; run by the code, one or more features joined the
-model.  The cross-valued mean squared prediction error reached its
-minimum at the 51st &lamda;.  Along the way, **trip_distance** was the
-first feature added, at the 2nd &lambda;, followed 
-by PULocationID132 (29th), PULocationID186 (31st), 
-DayOfWeek.1 (31st) and so o.
-
-
-## Methods based on measures of feature importance
-
-
-RF, Shapley
+By varying **lowCountThresh**, we could generate an ordered sequence of
+feature sets, as before.
 
