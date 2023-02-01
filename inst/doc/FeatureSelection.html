@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Feature Selection</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Feature Selection</h1>
+
+
+
+<div id="clearing-the-confusion-feature-selection" class="section level1">
+<h1>Clearing the Confusion: Feature Selection</h1>
+<p>In many applications we may have a larger number of features—dozens, hundreds or even more. In machine learning contexts, where we are interested primarily in prediction, we typically don’t want to use all the features, for a couple of reasons:</p>
+<ul>
+<li><p>Avoiding overfitting.</p>
+<p>As we add more and more features to a model, bias is reduced but variance increases. At some point, variance overwhelms bias, and our predictive ability declines.</p></li>
+<li><p>Avoiding large computation time and/or memory usage.</p>
+<p>Depending on the solution method used, computation time for a linear model increases with the cube, or at least the square, of the number of features. Modern ML models can be even worse in terms of computational burden. In addition, large models may result in lack of convergence or instability of the output.</p></li>
+</ul>
+</div>
+<div id="which-method-to-use" class="section level1">
+<h1>Which Method to Use?</h1>
+<p>Many, many methods for feature selection have been developed over the years, and you will often hear someone claim that their favorite is <em>the</em> one to use, The Best. As you may guess, the fact that there are conflicting claims as to “best” reflects the fact that no such Best method exists. Indeed, much of the feature selection process is <em>ad hoc</em>.</p>
+<p>We will cover a few feature selection methods here, to explain their rationales and how to use them in qeML. You may typically use two or more of them in any given application.</p>
+</div>
+<div id="how-many-is-too-many" class="section level1">
+<h1>How Many Is Too Many?</h1>
+<p>We will use standard notation here, with n and p denoting the number of points in our dataset (i.e. number of rows) and the number of features (i.e. number of columns), respectively. Important points to remember:</p>
+<div id="general-principles" class="section level2">
+<h2>General principles</h2>
+<ul>
+<li><p>The larger n is, then the larger a value of p that can be used before variance increase overwhelms bias reduction.</p></li>
+<li><p>However, that bias-variance tradeoff transition point for p depends on the application. There is no magic formula for best p as a function of n.</p></li>
+<li><p>Nevertheless, a commonly-used rule of thumb is to limit p to at most n<sup>0.5</sup>. Some theoretical analyses even suggest the more conservative rule p &lt; log(n). Again, these are oversimplifications, but you may find them useful as guides to intuition.</p></li>
+<li><p>The value of p depends on “expanded” versions of any categorical features.</p></li>
+</ul>
+</div>
+<div id="impact-of-categorical-variables-on-p" class="section level2">
+<h2>Impact of categorical variables on p</h2>
+<p>In many large-p datasets, the culprit is primarily categorical variables. Let’s see why.</p>
+<p>Consider the dataset <strong>nycdata</strong> included in qeML, which is derived from taxi trip data made publicly available by the New York City government. Many public analyses have been made on various versions of the NYC taxi data, frequently with the goal of predicting trip time. Let’s take a look:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(nyctaxi)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dim</span>(nyctaxi)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">10000</span>     <span class="dv">5</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">head</span>(nyctaxi)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        passenger_count trip_distance PULocationID DOLocationID PUweekday</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2969561</span>               <span class="dv">1</span>          <span class="fl">1.37</span>          <span class="dv">236</span>           <span class="dv">43</span>         <span class="dv">1</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dv">7301968</span>               <span class="dv">2</span>          <span class="fl">0.71</span>          <span class="dv">238</span>          <span class="dv">238</span>         <span class="dv">4</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3556729</span>               <span class="dv">1</span>          <span class="fl">2.80</span>          <span class="dv">100</span>          <span class="dv">263</span>         <span class="dv">3</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dv">7309631</span>               <span class="dv">2</span>          <span class="fl">2.62</span>          <span class="dv">161</span>          <span class="dv">249</span>         <span class="dv">4</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dv">3893911</span>               <span class="dv">1</span>          <span class="fl">1.20</span>          <span class="dv">236</span>          <span class="dv">163</span>         <span class="dv">5</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dv">4108506</span>               <span class="dv">5</span>          <span class="fl">2.40</span>          <span class="dv">161</span>          <span class="dv">164</span>         <span class="dv">5</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        DOweekday tripTime</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2969561</span>         <span class="dv">1</span>      <span class="dv">598</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="dv">7301968</span>         <span class="dv">4</span>      <span class="dv">224</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dv">3556729</span>         <span class="dv">3</span>      <span class="dv">761</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dv">7309631</span>         <span class="dv">4</span>      <span class="dv">888</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dv">3893911</span>         <span class="dv">5</span>      <span class="dv">648</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dv">4108506</span>         <span class="dv">5</span>      <span class="dv">977</span></span></code></pre></div>
+<p>(Time-of-day, month etc. data is also available but not in this particular dataset.)</p>
+<p>So n = 10000, p = 5. At first glance, one might guess that we could use all 5 features. Let’s try a linear model:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z <span class="ot">&lt;-</span> <span class="fu">qeLin</span>(nyctaxi,<span class="st">&#39;tripTime&#39;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>holdout set has  <span class="dv">1000</span> rows</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Warning messages<span class="sc">:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span> In <span class="fu">eval</span>(tmp, <span class="fu">parent.frame</span>()) <span class="sc">:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">7</span> rows removed from test set, due to new factor levels</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">:</span> In <span class="fu">predict.lm</span>(object, newx) <span class="sc">:</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  prediction from a rank<span class="sc">-</span>deficient fit may be misleading</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span><span class="sc">:</span> In <span class="fu">predict.lm</span>(object, newx) <span class="sc">:</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  prediction from a rank<span class="sc">-</span>deficient fit may be misleading</span></code></pre></div>
+<p>To understand those warning messages, let’s look at the estimated beta coefficients:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(z)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Call<span class="sc">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(<span class="at">formula =</span> <span class="fu">cbind</span>(tripTime) <span class="sc">~</span> ., <span class="at">data =</span> xy)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>Residuals<span class="sc">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    Min      1Q  Median      3Q     Max</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span><span class="fl">3807.5</span>  <span class="sc">-</span><span class="fl">186.0</span>   <span class="sc">-</span><span class="fl">49.8</span>   <span class="fl">131.8</span>  <span class="fl">3179.2</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>Coefficients<span class="sc">:</span> (<span class="dv">4</span> not defined because of singularities)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                 Estimate Std. Error t value <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>t<span class="sc">|</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>(Intercept)     <span class="sc">-</span><span class="fl">2125.474</span>    <span class="fl">351.347</span>  <span class="sc">-</span><span class="fl">6.049</span> <span class="fl">1.51e-09</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>trip_distance     <span class="fl">163.056</span>      <span class="fl">1.670</span>  <span class="fl">97.628</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>PULocationID4    <span class="fl">1424.775</span>    <span class="fl">345.770</span>   <span class="fl">4.121</span> <span class="fl">3.81e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>PULocationID7    <span class="fl">1212.331</span>    <span class="fl">349.196</span>   <span class="fl">3.472</span> <span class="fl">0.000520</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>PULocationID10    <span class="fl">655.251</span>    <span class="fl">371.870</span>   <span class="fl">1.762</span> <span class="fl">0.078097</span> .</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>PULocationID12   <span class="fl">1829.276</span>    <span class="fl">408.229</span>   <span class="fl">4.481</span> <span class="fl">7.52e-06</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>PULocationID13   <span class="fl">1271.201</span>    <span class="fl">338.220</span>   <span class="fl">3.758</span> <span class="fl">0.000172</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>PULocationID17   <span class="fl">1167.109</span>    <span class="fl">477.898</span>   <span class="fl">2.442</span> <span class="fl">0.014619</span> <span class="sc">*</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>PULocationID24   <span class="fl">1356.014</span>    <span class="fl">342.706</span>   <span class="fl">3.957</span> <span class="fl">7.66e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>PULocationID25   <span class="fl">1381.439</span>    <span class="fl">354.736</span>   <span class="fl">3.894</span> <span class="fl">9.92e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>PULocationID26   <span class="fl">1282.229</span>    <span class="fl">506.842</span>   <span class="fl">2.530</span> <span class="fl">0.011429</span> <span class="sc">*</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>PULocationID33   <span class="fl">1353.187</span>    <span class="fl">363.058</span>   <span class="fl">3.727</span> <span class="fl">0.000195</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>PULocationID35    <span class="fl">726.147</span>    <span class="fl">474.147</span>   <span class="fl">1.531</span> <span class="fl">0.125687</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>PULocationID36    <span class="fl">972.828</span>    <span class="fl">391.276</span>   <span class="fl">2.486</span> <span class="fl">0.012927</span> <span class="sc">*</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>PULocationID260   <span class="fl">972.537</span>    <span class="fl">375.500</span>   <span class="fl">2.590</span> <span class="fl">0.009614</span> <span class="sc">**</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>PULocationID261  <span class="fl">1334.116</span>    <span class="fl">340.437</span>   <span class="fl">3.919</span> <span class="fl">8.97e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>PULocationID262  <span class="fl">1362.842</span>    <span class="fl">337.713</span>   <span class="fl">4.036</span> <span class="fl">5.50e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>PULocationID263  <span class="fl">1343.784</span>    <span class="fl">337.113</span>   <span class="fl">3.986</span> <span class="fl">6.77e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>PULocationID264  <span class="fl">1378.455</span>    <span class="fl">341.150</span>   <span class="fl">4.041</span> <span class="fl">5.38e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>PULocationID265  <span class="fl">2163.796</span>    <span class="fl">370.248</span>   <span class="fl">5.844</span> <span class="fl">5.27e-09</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>DOLocationID3     <span class="fl">869.664</span>    <span class="fl">339.996</span>   <span class="fl">2.558</span> <span class="fl">0.010549</span> <span class="sc">*</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>DOLocationID4     <span class="fl">913.146</span>    <span class="fl">108.088</span>   <span class="fl">8.448</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>DOLocationID7    <span class="fl">1065.241</span>    <span class="fl">105.990</span>  <span class="fl">10.050</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>DOLocationID10   <span class="fl">1703.133</span>    <span class="fl">211.081</span>   <span class="fl">8.069</span> <span class="fl">8.06e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>DOLocationID119  <span class="fl">1077.036</span>    <span class="fl">274.406</span>   <span class="fl">3.925</span> <span class="fl">8.74e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>DOLocationID121  <span class="fl">1515.904</span>    <span class="fl">340.850</span>   <span class="fl">4.447</span> <span class="fl">8.80e-06</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>DOLocationID123        <span class="cn">NA</span>         <span class="cn">NA</span>      <span class="cn">NA</span>       <span class="cn">NA</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>DOLocationID124  <span class="fl">2707.981</span>    <span class="fl">339.513</span>   <span class="fl">7.976</span> <span class="fl">1.70e-15</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>DOLocationID125  <span class="fl">1123.702</span>    <span class="fl">105.203</span>  <span class="fl">10.681</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>DOLocationID262   <span class="fl">933.146</span>     <span class="fl">96.473</span>   <span class="fl">9.673</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>DOLocationID263   <span class="fl">885.520</span>     <span class="fl">94.578</span>   <span class="fl">9.363</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>DOLocationID264   <span class="fl">960.527</span>    <span class="fl">108.120</span>   <span class="fl">8.884</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>DOLocationID265   <span class="fl">169.068</span>    <span class="fl">123.391</span>   <span class="fl">1.370</span> <span class="fl">0.170666</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>DayOfWeek2         <span class="fl">44.691</span>     <span class="fl">15.004</span>   <span class="fl">2.979</span> <span class="fl">0.002903</span> <span class="sc">**</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>DayOfWeek3        <span class="fl">100.480</span>     <span class="fl">14.188</span>   <span class="fl">7.082</span> <span class="fl">1.53e-12</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>DayOfWeek4        <span class="fl">105.223</span>     <span class="fl">13.990</span>   <span class="fl">7.522</span> <span class="fl">5.95e-14</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>DayOfWeek5        <span class="fl">133.312</span>     <span class="fl">13.775</span>   <span class="fl">9.678</span>  <span class="sc">&lt;</span> <span class="fl">2e-16</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>DayOfWeek6         <span class="fl">97.030</span>     <span class="fl">14.461</span>   <span class="fl">6.710</span> <span class="fl">2.07e-11</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>DayOfWeek7         <span class="fl">57.133</span>     <span class="fl">14.579</span>   <span class="fl">3.919</span> <span class="fl">8.97e-05</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>Signif. codes<span class="sc">:</span>  <span class="dv">0</span> ‘<span class="sc">**</span><span class="er">*</span>’ <span class="fl">0.001</span> ‘<span class="sc">**</span>’ <span class="fl">0.01</span> ‘<span class="sc">*</span>’ <span class="fl">0.05</span> ‘.’ <span class="fl">0.1</span> ‘ ’ <span class="dv">1</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>Residual standard error<span class="sc">:</span> <span class="fl">327.2</span> on <span class="dv">8663</span> degrees of freedom</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>Multiple R<span class="sc">-</span>squared<span class="sc">:</span>  <span class="fl">0.7128</span>,    Adjusted R<span class="sc">-</span>squared<span class="sc">:</span>  <span class="fl">0.7017</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>F<span class="sc">-</span>statistic<span class="sc">:</span>    <span class="dv">64</span> on <span class="dv">336</span> and <span class="dv">8663</span> DF,  p<span class="sc">-</span>value<span class="sc">:</span> <span class="er">&lt;</span> <span class="fl">2.2e-16</span></span></code></pre></div>
+<p>There were 266 pickup/dropoff locations. That means 265 dummy-variable features each for pickup and dropoff. Similarly, there 6 more dummies for day of the week. R’s <strong>lm</strong> function, which <strong>qeLin</strong> wraps, automatically converts factors to dummies.</p>
+<p>So, p is not 5 after all; it’s 5 + 530 + 6 = 541!</p>
+<p>We are assuming no interactions here. But if some pickup/dropoff location combinations behave quite differently from others, we ought to consider interaction terms. These will have their own dummy variables, hugely increasing p if we include them all.</p>
+<p>Now, in those warning messages, the term “rank-deficient” is referring to multicollinearity in the data, i.e. strong relations among the features, producing a possibly unstable result. Note that the model was so unstable that the coefficient for DOLocationID123 turned out to be NA.</p>
+<p>A more subtle problem is in the warning, “7 rows removed from test set, due to new factor levels.” By default, all <strong>qeML</strong> predictive functions split the data into training and holdout sets. Say some pickup location had only two rows in our data, both of which happen to be in the holdout set. Then the <strong>lm</strong> function would say, “Wait, I’ve never heard of these factor levels before,” so <strong>qeLin</strong> removes them. If many rows are removed, our predictive ability suffers.</p>
+</div>
+</div>
+<div id="desiderata" class="section level1">
+<h1>Desiderata</h1>
+<p>What should we look for in a “good” feature selection method? We take the following as goals:</p>
+<ul>
+<li><p><strong>Desired Property A:</strong> The method should have predictive ability as a central goal.</p></li>
+<li><p><strong>Desired Property B:</strong> The method should be reasonably easy to explain.</p></li>
+<li><p><strong>Desired Property C:</strong> The method should produce an ordered sequence of candidate models.</p>
+<p>All the methods discussed here will have this property. This is so important that we will give it its own subsection:</p></li>
+</ul>
+<div id="feature-selection-methods-should-produce-an-ordered-sequence-of-candidate-models" class="section level2">
+<h2>Feature selection methods should produce an ordered sequence of candidate models</h2>
+<p>A nethod should produce some kind of ordered list, for instance, best single predictor; best pair of predictors; best triplet etc. We can evaluate each of the p feature sets via cross-validation, then choose the one that peforms best. (A method may simply rank features according to importance, but we still would assess the performance of the first feature, the first two features together, the first three features together and so on.)</p>
+<p>In the <em>all possible subsets</em> (APS) approach, by contrast, one looks at all the 2<sup>p</sup> possible feature sets, a prohibitively large number computationally.</p>
+<p>Moreover, remember, we are working with randomness. We choose holdout sets randomly, and usually the dataset itself is considered to be a random sample from some (real or conceptual) population. Due to this randomness, it’s possible that some combination of features will appear to perform well, just by accident. The more feature sets we look at, the greater the chance of this occurring. This consideration really makes APS infeasible, and even with a linear sequence of candidate feature sets, this can be problematic with large p.</p>
+<p>Note that some of the methods discussed below do their own internal cross-validation, and ultimately give us the “best” feature set according to that criterion. Nevertheless, they still provide an ordered feature set.</p>
+<p>This last point is important because we may wish to use the selected feature set sequence as input to a different ML method. There is no theoretical reason to believe the best feature set for one ML method is also best for another, but as noted, feature selection is an <em>ad hoc</em> business.</p>
+</div>
+</div>
+<div id="feature-selection-methodology-overview" class="section level1">
+<h1>Feature Selection Methodology Overview</h1>
+<div id="methods-based-on-p-values" class="section level2">
+<h2>Methods based on p-values</h2>
+<p>A classic approach for linear and generalized linear models is to first fit a full model, then retain only those features that are “statistically significant”. In the <strong>nyctaxi</strong> taxi data shown above, we would retain, for instance <strong>PULocationID33</strong> but not <strong>PULocationID35</strong>.</p>
+<p>This would violate our Desired Property A above. Use of p-values in geneeral is problematic (see the “NoPVals” vignette), and this is no exception. Just because β<sub>i</sub> is nonzero does not mean that Feature i has strong predictive power; what if β<sub>i</sub> is nonzero but tiny?</p>
+<p>One could generate an ordered sequence of feature sets in the above manner by first setting the threshold for a p-value very low, then progressively higher This is similar to <em>stepwise regression</em>: In the <em>forward</em> version, one starts with no features, but adds them one at a time. At each step, one tests for the β coefficient being 0. When no new feature is found to be “significant,” the process stops, and we use whatever features managed to make it in to the model so far. The <em>backward</em> version starts with a full model, and removes features one at a time. Though this one may seem to be an improvement, in that it does take into account that a feature may be useful individually but not if similar features are already in the equation, it still suffers from the fundamental problems of p-values.</p>
+</div>
+<div id="the-lasso" class="section level2">
+<h2>The LASSO</h2>
+<p>Here we fit a linear model, subject to the constraint that no estimated β<sub>i</sub> is larger than λ, a hyperparameter. Starting at 0, we increase λ to ever-larger values, having the effect that one estimated β<sub>i</sub> becomes nonzero at a time. This gives us an ordered sequence of candidate features, as desired.</p>
+<p>This is similar to a forward stepwise method, but NOT based on p-values; instead, the decision of which feature to use next is based on cross-validated mean squared prediction error.</p>
+<p>Here is the LASSO approach on the <strong>nyctaxi</strong> data:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> lassout <span class="ot">&lt;-</span> <span class="fu">qeLASSO</span>(nyctaxi,<span class="st">&#39;tripTime&#39;</span>) </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> lassout<span class="sc">$</span>lambda.whichmin</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">51</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> lassout<span class="sc">$</span>whenEntered</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  trip_distance PULocationID<span class="fl">.132</span> PULocationID<span class="fl">.186</span>      DayOfWeek<span class="fl">.1</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>               <span class="dv">2</span>               <span class="dv">29</span>               <span class="dv">31</span>               <span class="dv">31</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>DOLocationID<span class="fl">.132</span> DOLocationID<span class="fl">.124</span>      DayOfWeek<span class="fl">.5</span>  DOLocationID<span class="fl">.33</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>              <span class="dv">33</span>               <span class="dv">34</span>               <span class="dv">34</span>               <span class="dv">35</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>DOLocationID<span class="fl">.189</span> DOLocationID<span class="fl">.225</span> PULocationID<span class="fl">.213</span>  PULocationID<span class="fl">.76</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>              <span class="dv">35</span>               <span class="dv">35</span>               <span class="dv">37</span>               <span class="dv">38</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>PULocationID<span class="fl">.263</span>   DOLocationID<span class="fl">.1</span> DOLocationID<span class="fl">.177</span>      DayOfWeek<span class="fl">.2</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>              <span class="dv">38</span>               <span class="dv">38</span>               <span class="dv">38</span>               <span class="dv">38</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>PULocationID<span class="fl">.124</span>  DOLocationID<span class="fl">.35</span>  DOLocationID<span class="fl">.36</span>  DOLocationID<span class="fl">.89</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>              <span class="dv">39</span>               <span class="dv">39</span>               <span class="dv">39</span>               <span class="dv">39</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>DOLocationID<span class="fl">.231</span> DOLocationID<span class="fl">.263</span> PULocationID<span class="fl">.239</span> DOLocationID<span class="fl">.155</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>              <span class="dv">39</span>               <span class="dv">39</span>               <span class="dv">40</span>               <span class="dv">40</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a> PULocationID<span class="fl">.40</span>  PULocationID<span class="fl">.43</span> PULocationID<span class="fl">.146</span> PULocationID<span class="fl">.161</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>              <span class="dv">41</span>               <span class="dv">41</span>               <span class="dv">41</span>               <span class="dv">41</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>PULocationID<span class="fl">.230</span>  DOLocationID<span class="fl">.22</span>  DOLocationID<span class="fl">.37</span> DOLocationID<span class="fl">.161</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>              <span class="dv">41</span>               <span class="dv">41</span>               <span class="dv">41</span>               <span class="dv">41</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>DOLocationID<span class="fl">.162</span> DOLocationID<span class="fl">.251</span> PULocationID<span class="fl">.163</span> PULocationID<span class="fl">.211</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>              <span class="dv">41</span>               <span class="dv">41</span>               <span class="dv">42</span>               <span class="dv">42</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>PULocationID<span class="fl">.257</span>  DOLocationID<span class="fl">.49</span>  DOLocationID<span class="fl">.81</span> DOLocationID<span class="fl">.179</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>              <span class="dv">42</span>               <span class="dv">42</span>               <span class="dv">42</span>               <span class="dv">42</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
+<p>For each value of λ run by the code, one or more features joined the model. The cross-valued mean squared prediction error reached its minimum at the 51st λ. Along the way, <strong>trip_distance</strong> was the first feature added, at the 2nd λ, followed by PULocationID132 (29th), PULocationID186 (31st), DayOfWeek.1 (31st) and so o.</p>
+</div>
+<div id="methods-based-on-measures-of-feature-importance" class="section level2">
+<h2>Methods based on measures of feature importance</h2>
+<p>Consider the Random Forests (RF) ML method. It has various hyperparameters, such as maximum number of levels in a tree, and we wish to find a “good” combination of those settings. As a byproduct, though, the fact that at each level RF is entering a new feature, many RF implemntations compute some kind of <em>variable importance</em> ranking–thus giving us our desired ordered sequence.</p>
+<p>We can then run RF on each feature set in the sequence, or as mentioned, try the sequence on some other ML method. We would then use whichever feature set yielded the best cross-validated performance.</p>
+<p>Here is an example with the <strong>nyctaxi</strong> data:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z <span class="ot">&lt;-</span> <span class="fu">qeRFranger</span>(nyctaxi,<span class="st">&#39;tripTime&#39;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>holdout set has  <span class="dv">1000</span> rows</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>Loading required namespace<span class="sc">:</span> ranger</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>Warning message<span class="sc">:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>In <span class="fu">eval</span>(tmp, <span class="fu">parent.frame</span>()) <span class="sc">:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">9</span> rows removed from test set, due to new factor levels</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z<span class="sc">$</span>variable.importance</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>trip_distance  PULocationID  DOLocationID     DayOfWeek</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>   <span class="dv">2447411690</span>     <span class="dv">212569502</span>     <span class="dv">201650058</span>      <span class="dv">85733194</span></span></code></pre></div>
+<p>So, our feature set sequence might be:</p>
+<pre>
+trip_distance
+trip_distance and PULocationID
+trip_distance and PULocationID and DOLocationID
+trip_distance and PULocationID and DOLocationID
+trip_distance and PULocationID and DOLocationID and DayOfWeek
+</pre>
+<p>Note that the algorithm chose the categorical variables as a whole here, not breaking down into their dummy variable components.</p>
+<p>Another example is Prnciple Components Analysis (PCA). Here our p features are replaced by p linear combinations (the “principle components,” PCs) of the original features. The PCs are uncorrelated.</p>
+<p>The PCs form our new features, and are ordered by variance, largest to smallest. Since a variable with small variance is essentially constant and thus has little predictive value, we take only the PCs with larger variance.</p>
+<p>For the first m PCs, say, we compare the sum of their variances (which is also the variance of their sum) to the total variance of the response variable Y (i.e. the variable we are trying to predict). By varying the proportion, we produce an ordered sequence of feature sets, as desired.</p>
+<p>The <strong>qeML</strong> function <strong>qePCA</strong> first finds the PCs, then applies whatever ML method is specified by the user. The function <strong>qeUMAP</strong> does the same for UMAP, a kind of nonlinear analog of PCA.</p>
+<p>One more measure of variable importance is <em>Shapley values</em>. This concept describes an attempt to use game theory to apportion credit for a win among several players in a team; the “players” here are the features. While it is a clever idea, it has been the subject of much criticism in terms of practical value.</p>
+</div>
+<div id="feature-ordering-by-conditional-independence-foci" class="section level2">
+<h2>Feature Ordering by Conditional Independence (FOCI)</h2>
+<p>This is my personal “go to” method for feature selection. Its theoretical foundations are complex, but it boils down to measuring the reduction in variance in predicting Y from X, versus predicting Y simply from its mean.</p>
+<p>FOCI is implemented in a CRAN package of the same name, and <strong>qeML</strong>’s <strong>qeFOCI</strong> function provides a convenient interface. Example:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w <span class="ot">&lt;-</span> <span class="fu">qeFOCI</span>(nyctaxi,<span class="st">&#39;tripTime&#39;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> w<span class="sc">$</span>selectedVar</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>   index            names</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span>     <span class="dv">1</span>    trip_distance</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">:</span>   <span class="dv">202</span>  DOLocationID<span class="fl">.75</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span><span class="sc">:</span>   <span class="dv">348</span>      DayOfWeek<span class="fl">.1</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span><span class="sc">:</span>    <span class="dv">78</span> PULocationID<span class="fl">.151</span></span></code></pre></div>
+<p>Trip distance, dropoff location 72, Mondays and pickup location 151 were chosen, in that order, after which the algorithm decided that adding any further features was counterproductive. Again, we could simply take that 4-feature set for whatever ML method we wish, or we could use the above to set up an ordered sequence of feature sets,</p>
+<pre>
+trip_distance
+trip_distance and DOLocationID.75
+trip_distance and DOLocationID.75 and DayOfWeek.1
+trip_distance and DOLocationID.75 and DayOfWeek.1 and PULocationID.151
+</pre>
+<p>running our desired ML method on each feature set, then choosing the one with best cross-validation performance.</p>
+</div>
+<div id="direct-dimension-reduction-for-categorical-data" class="section level2">
+<h2>Direct dimension reduction for categorical data</h2>
+<p>Rather than doing feature selection <em>per se</em>, we might transform the data to summary variables. We could group the pickup/dropoff locations by ZIP Code, for instance.</p>
+<p>Or, we could consider only the more frequently used locations. The qeML function <strong>factorToTopLevels</strong> would help here. We will use it to reduce pickup location to just a few places that appear a lot in our data; all others will be lumped together as ‘other’.</p>
+<p>We invoke the function as follows:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">factorToTopLevels</span>(nyctaxi<span class="sc">$</span>PULocationID,<span class="at">lowCountThresh=</span><span class="dv">0</span>)</span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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u1JAAQUUUKAUsAGXEk4VUEABBRToooANuIvY3pUCCiiggAKlgA24lHCqgAIKKKBAFwVswF3E9q4UUEABBRQoBWzApYRTBRRQQAEFuiiwbBfvy7tSQIH2BFZcY401vrf88suv0N7NR/9WjzzyyI1z5sx51+jfk/egwOAI2IAH57F0TwZXYK2NNtrohQceeOC6vbqL+++//829um1ulwK9KmAD7tVHZhjbdccdd0xbddVVf7PCCis8MIybde2q999//4wFCxaMZxvndO1Oh3FH99133/TJkye/45577jllGDfr6lWXXXbZJ9ddt2f777gJEyY82VUQ70yBARCwAQ/Agzh+/PhlZ8+evcr666+/Wi/uzsEHH/zYbrvtttw222yzUi9u3+9+97txn/3sZ1/AtvVsA+5FN7dJAQU6E7ABd+bXU7emEffU9jRuTK9vX+P2uqyAAgqMpoCvgh5NXcdWQAEFFFCghYANuAWMqxVQQAEFFBhNARvwaOo6tgIKKKCAAi0EbMAtYFytgAIKKKDAaAr4IqzR1HVsBRToCYGZM2e+gbdKvZ483hMb1LARjz/++LJ33nnne1h9X8NFLg6wgA14gB9cd00BBRYLLLfccu/k7XA7Mu1JkrPOOuuBE044YWs27rSe3EA3alQEbMCjwuqgCijQSwK8BW7BaqutNm699dbrpc36+7acf/75C/++4MyYEfA54DHzULujCiiggAK9JGAD7qVHw21RQAEFFBgzAp6CHjMPtTtaJ/C3v/1tdS7fou46S/GydRcuXNjTfyzPnz9/Qg/7jcOvZ79Jain+XHnXS1nABryUHwDvfukL3HTTTeP4Iou3bbvttrst/a15+hbccssty/NlFr356qFicx966KG1+Lzvnzx963tjzWWXXTajN7bErVDgKQEb8FMWzo1RAb7LdtyrX/3qhfvuu+/avUhwwQUXjDvppJMe7cVtK7dp6tSpCz/xiU/0pF+2cZ999ulpP84gZDNfRlbMTI9WNrKXe8a5bN+dPWrXdLN6GbPpBrtSAQUUGDSBq6++evLWW2/9oa222mpRJ+61/TvttNMmchZmIX+o9uT2cZZomXPOOeeCOXPmvLzX7Oq2pxcbcLZpZXJv3YZ7mQIKKDAoAvmmsD322GPZl73sZb34O3kc35U9jvdQ/23PPffsyadC8jTSxRdf3JPfh173M9or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" alt />
+<p class="caption">alt text</p>
+</div>
+<p>Ah, yes, lots of locations have small counts, less than 50 and probably many in the single-digits range. So, <strong>PULocationID</strong> is a prime candidate for simplication. Let’s go for a cutoff of 75.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> newPUlocs <span class="ot">&lt;-</span> <span class="fu">factorToTopLevels</span>(nyctaxi<span class="sc">$</span>PULocationID,<span class="at">lowCountThresh=</span><span class="dv">75</span>)</span></code></pre></div>
+<p>So, now we have a new, simpler version of the pickup location data. Let’s take a look at old versus new.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">head</span>(newPUlocs,<span class="dv">50</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a> [<span class="dv">1</span>] <span class="dv">236</span>   <span class="dv">238</span>   <span class="dv">100</span>   <span class="dv">161</span>   <span class="dv">236</span>   <span class="dv">161</span>   <span class="dv">238</span>   <span class="dv">107</span>   <span class="dv">170</span>   other <span class="dv">170</span>   <span class="dv">137</span>  </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">13</span>] <span class="dv">239</span>   <span class="dv">143</span>   <span class="dv">164</span>   <span class="dv">164</span>   <span class="dv">151</span>   <span class="dv">239</span>   <span class="dv">161</span>   <span class="dv">100</span>   <span class="dv">142</span>   <span class="dv">107</span>   <span class="dv">238</span>   <span class="dv">43</span>   </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">25</span>] <span class="dv">237</span>   <span class="dv">170</span>   <span class="dv">238</span>   <span class="dv">238</span>   <span class="dv">236</span>   <span class="dv">161</span>   <span class="dv">236</span>   other <span class="dv">230</span>   <span class="dv">138</span>   other <span class="dv">79</span>   </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">37</span>] <span class="dv">186</span>   <span class="dv">132</span>   other <span class="dv">100</span>   <span class="dv">234</span>   <span class="dv">142</span>   <span class="dv">151</span>   <span class="dv">263</span>   <span class="dv">236</span>   <span class="dv">142</span>   <span class="dv">142</span>   <span class="dv">144</span>  </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>[<span class="dv">49</span>] <span class="dv">236</span>   <span class="dv">230</span>  </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span> Levels<span class="sc">:</span> <span class="dv">100</span> <span class="dv">107</span> <span class="dv">113</span> <span class="dv">114</span> <span class="dv">13</span> <span class="dv">132</span> <span class="dv">137</span> <span class="dv">138</span> <span class="dv">140</span> <span class="dv">141</span> <span class="dv">142</span> <span class="dv">143</span> <span class="dv">144</span> <span class="dv">148</span> <span class="dv">151</span> ... other</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">head</span>(nyctaxi<span class="sc">$</span>PULocationID,<span class="dv">50</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a> [<span class="dv">1</span>] <span class="dv">236</span> <span class="dv">238</span> <span class="dv">100</span> <span class="dv">161</span> <span class="dv">236</span> <span class="dv">161</span> <span class="dv">238</span> <span class="dv">107</span> <span class="dv">170</span> <span class="dv">211</span> <span class="dv">170</span> <span class="dv">137</span> <span class="dv">239</span> <span class="dv">143</span> <span class="dv">164</span> <span class="dv">164</span> <span class="dv">151</span> <span class="dv">239</span> <span class="dv">161</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>[<span class="dv">20</span>] <span class="dv">100</span> <span class="dv">142</span> <span class="dv">107</span> <span class="dv">238</span> <span class="dv">43</span>  <span class="dv">237</span> <span class="dv">170</span> <span class="dv">238</span> <span class="dv">238</span> <span class="dv">236</span> <span class="dv">161</span> <span class="dv">236</span> <span class="dv">41</span>  <span class="dv">230</span> <span class="dv">138</span> <span class="dv">261</span> <span class="dv">79</span>  <span class="dv">186</span> <span class="dv">132</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>[<span class="dv">39</span>] <span class="dv">152</span> <span class="dv">100</span> <span class="dv">234</span> <span class="dv">142</span> <span class="dv">151</span> <span class="dv">263</span> <span class="dv">236</span> <span class="dv">142</span> <span class="dv">142</span> <span class="dv">144</span> <span class="dv">236</span> <span class="dv">230</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="dv">224</span> Levels<span class="sc">:</span> <span class="dv">1</span> <span class="dv">3</span> <span class="dv">4</span> <span class="dv">7</span> <span class="dv">8</span> <span class="dv">9</span> <span class="dv">10</span> <span class="dv">11</span> <span class="dv">12</span> <span class="dv">13</span> <span class="dv">14</span> <span class="dv">15</span> <span class="dv">16</span> <span class="dv">17</span> <span class="dv">18</span> <span class="dv">19</span> <span class="dv">20</span> <span class="dv">21</span> <span class="dv">22</span> <span class="dv">23</span> <span class="dv">24</span> <span class="dv">25</span> ... <span class="dv">265</span></span></code></pre></div>
+<p>So for example pickup location in row 10 of our data was location 211, but it was one of the “rare” locations, so it was recoded to “other”.</p>
+<p>How much dimension reduction did we accomplish?</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">length</span>(<span class="fu">levels</span>(newPUlocs))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">43</span></span></code></pre></div>
+<p>That’s much less than the original 265. Of course, we could reduce even further by using a larger threshold.</p>
+<p>So, let’s try out the new data:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> newDOlocs <span class="ot">&lt;-</span> <span class="fu">factorToTopLevels</span>(nyctaxi<span class="sc">$</span>DOLocationID,<span class="at">lowCountThresh=</span><span class="dv">75</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> nyctaxi<span class="sc">$</span>PULocationID <span class="ot">&lt;-</span> newPUlocs</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> nyctaxi<span class="sc">$</span>DOLocationID <span class="ot">&lt;-</span> newDOlocs</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z <span class="ot">&lt;-</span> <span class="fu">qeLin</span>(nyctaxi,<span class="st">&#39;tripTime&#39;</span>)</span></code></pre></div>
+<p>Dimension reduction at least got us a stable solution. Does it predict well?</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z<span class="sc">$</span>testAcc</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">240.5642</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> z<span class="sc">$</span>baseAcc</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">430.4696</span></span></code></pre></div>
+<p>Mean Absolute Prediction Error is much less than what one would have by simply guessing all cases to be the overall mean trip time.</p>
+<p>By varying <strong>lowCountThresh</strong>, we could generate an ordered sequence of feature sets, as before.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

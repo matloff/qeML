@@ -1,4 +1,245 @@
-<h1 id="clearing-the-confusion-the-case-against-significance-tests">Clearing the Confusion: the Case Against Significance Tests</h1>
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>No P Values</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">No P Values</h1>
+
+
+
+<div id="clearing-the-confusion-the-case-against-significance-tests" class="section level1">
+<h1>Clearing the Confusion: the Case Against Significance Tests</h1>
 <p>In March 2016, the august American Statistical Association (ASA) issued the first <a href="https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf">position paper</a> in its 177-year history. It called into question one of core concepts in statistical methodology, <em>significance testing</em> (ST):</p>
 <blockquote>
 <p>“The p-value was never intended to be a substitute for scientific reasoning,” said Ron Wasserstein, the ASA’s executive director. “Well-reasoned statistical arguments contain much more than the value of a single number and whether that number exceeds an arbitrary threshold. The ASA statement is intended to steer research into a ‘post p&lt;0.05 era.’”</p>
@@ -7,22 +248,26 @@
 <p>As the paper points out, these concerns about ST were not new. They were, for instance, explained in <a href="https://wwnorton.com/books/9780393929720">a popular elementary stat text</a> and even <a href="https://www.press.umich.edu/186351/cult_of_statistical_significance">entire books</a>. (See also <a href="https://academic.oup.com/ee/article/20/5/1246/2480617">my paper</a>.)</p>
 <p>Indeed, most statisticians had been aware of the flaws of ST, but had continued to use them and teach them. Why did they proceed in spite of knowing the dangers of STs? For some it was out of habit, for others it was an appreciation of the elegance of the theory. In many cases, it was just plain convenience: An ST will at least give the analyst “an answer,” and the analyst may thus be willing to ignore the potential problems with that answer.</p>
 <p>Then what changed? Among other things, <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124">a paper by John Ionnidis</a>, provcatively titled, “Why Most Published Research Findings Are False,” shook things up . Though it was mainly on the related issue of <em>p-hacking</em> rather on the core of ST, it caused the statistical community to take a long-overdue look at statistical practice.</p>
-<h2 id="running-example-class-of-sts">Running example class of STs</h2>
+<div id="running-example-class-of-sts" class="section level2">
+<h2>Running example class of STs</h2>
 <p>Say we have an asymptotically normal estimator T of some population value θ, with standard error s.e.(T). For a test of approximate Type I error α of H<sub>0</sub>: θ = θ<sub>0</sub>, reject H<sub>0</sub> if</p>
 <p>Z = |(T-θ<sub>0</sub></sub>) / s.e.(T)| &gt; 1 - q<sub>α / 2</sub></p>
 <p>where q() is the quantile function for N(0,1).</p>
 <p>If we reject, we say the result is “significant,” that “θ is significantly different from θ<sub>0</sub>,” one of the greatest abuses of the English language in all of science.</p>
 <p>The p-value is the most stringent α at which we would still reject. For researchers, typically the smaller the p-value, the more “significant” the finding, and the more elated the researchers are. “We not only rejected at α = 0.05 but even at α = 0.002!” Journals – and even R output – then report the result as “significant” (α below 0.05), “highly significant” (below 0.01), or “very highly significant” (below 0.001). Given that the word <em>significant</em> ordinarily means important, a very highly significant research finding is a cause for enormous joy. But it may be unwarranted joy, as we will discuss here.</p>
-<h2 id="confidence-intervals-as-the-preferred-alternative-to-sts">Confidence intervals as the preferred alternative to STs</h2>
+</div>
+<div id="confidence-intervals-as-the-preferred-alternative-to-sts" class="section level2">
+<h2>Confidence intervals as the preferred alternative to STs</h2>
 <p>The familiar confidence interval (CI) based on T is</p>
 <p>T ± q<sub>α / 2</sub> s.e.(T)</p>
 <p>Some defenders of ST point out, correctly, that there is a mathematical relation between STs and CIs. For instance, we can create a CI by <em>inverting</em> a test. (See for example <a href="https://www.stat.purdue.edu/~fmliang/STAT611/st611lect9.pdf">this presentation</a>.)</p>
 <p>Conversely, if one has a CI for the above H<sub>0</sub>, we can perform an α level test by simply observing whether θ<sub>0</sub> is in the CI. <strong>BUT THIS WOULD BE UNDESIRABLE, BECAUSE THE CI IS MORE INFORMATIVE.</strong> Using a CI to perform a test throws away valuable information:</p>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li><p>The center of the CI gives us some indication of how close the true θ is to θ<sub>0</sub>.</p></li>
 <li><p>The width of the CI gives us an idea as to how accurate the indication in (1) is above.</p></li>
 </ol>
-<h3 id="example-opinion-poll-in-an-election">Example: Opinion poll in an election</h3>
+<div id="example-opinion-poll-in-an-election" class="section level3">
+<h3>Example: Opinion poll in an election</h3>
 <p>Say you are the campaign manager for Candidate X, and conduct a poll of the electorate. You form a CI for p, the population proportion of voters who favor X, which turns out to be (0.505,0.518). You have two options in terms of reporting the results to X:</p>
 <ul>
 <li><p>Tell X, “Your support is significantly higher than 50%.”</p></li>
@@ -30,22 +275,33 @@
 </ul>
 <p>Of course, the second choice is far more informative. Not only is the CI close to 0.50, indicating that X is in a tight race, but also the narrowness of the interval says that the estimate of p here is likely very accurate.</p>
 <p>Or, say the CI is (0.492,0.551). While we should not give the impression that all the points in the CI are “equally likely,” it will give Candidate X cause for optimism, as opposed to simply telling X, “Your support is not significantly different from 50%.” At any rate, most important, X sees from the large width of the CI that a much larger poll is needed to get accurate results.</p>
-<h3 id="another-advantage-of-cis-over-st">Another advantage of CIs over ST</h3>
+</div>
+<div id="another-advantage-of-cis-over-st" class="section level3">
+<h3>Another advantage of CIs over ST</h3>
 <p>The opinion poll example illustrates the fact that, in addition to being more informative, another advantage of CIs is their Intuitive interpretability. Every poll is reported with a <em>margin of error</em>. This is actually the radius of a 95% CI for the population proportion under discussiuon. The general public is quite comfortable with margins of error, while by contrast it is exceedingly difficult to explain p-values to them.</p>
-<h2 id="h0-is-always-falsemeaningless">H<sub>0</sub> is always false/meaningless</h2>
+</div>
+</div>
+<div id="h0-is-always-falsemeaningless" class="section level2">
+<h2>H<sub>0</sub> is always false/meaningless</h2>
 <p>One of the central problems with STs is that we always know <em>a priori</em> that H<sub>0</sub> is false, or worse, meaningless.</p>
 <p>For a toy example, say we have some coin with unknown probability p of heads, and wish to test H<sub>0</sub>: p = 0.5000000000000000000000…, infinitely many 0s. That’s impossible. We know <em>a priori</em> that the coin is weighted slightly differently on one side than the other.</p>
 <p>Or say we have two prescription drugs, A and B, for alleviating hypertension, with μ<sub>A</sub> and μ<sub>B</sub> denoting the population mean reductions in blood pressure. We know those two means cannot be equal to infinitely many decimal places.</p>
 <p>But even worse, the very notion of an “exact” comparison of μ<sub>A</sub> and μ<sub>B</sub> is unwarranted. To begin with, our blood pressure measuring instruments don’t have infinite precision, so it makes no sense to ask whether the two drugs have exactly the same mean, to infinitely many decimal places.</p>
-<h2 id="implication-1">Implication 1</h2>
+</div>
+<div id="implication-1" class="section level2">
+<h2>Implication 1</h2>
 <p>In our example with T and θ above, as our sample size n grows, s.e.(T) will converge to 0, while the numerator in Z converges to θ<sub>true</sub> - θ<sub>0</sub>, the difference between the true population value of θ and the hypothesized value. In other words, Z will go to ±∞. The p-value will go to 0, and we will reject H<sub>0</sub> – which we already knew was false anyway.</p>
 <p>Our <a href="https://www.meetup.com/R-Users/">Bay Area R Users Group</a> once had a speaker from LinkedIN, who discussed his analyses of large LinkedIn datasets. At one point in the talk, he mentioned that he had been startled by the results at first, because “Everything came out significant!” Of course, he shouldn’t have been surprised.</p>
 <p>One might argue that these issues could be addressed by paying attention to the power of the test. But it is not very meaningful to ask the probability of rejecting a hypothesis that we already know is false.</p>
-<h2 id="implication-2">Implication 2</h2>
+</div>
+<div id="implication-2" class="section level2">
+<h2>Implication 2</h2>
 <p>It makes no sense to ask a question that we already know to be false/meaingless. <strong>THE ST IS SIMPLY ASKING THE WRONG QUESTION.</strong></p>
 <p>In the hypertension drugs example, as mentioned, as a practical matter it is meaningless to ask if the two population means are exactly equal, and anyway what we actually care about is whether one is subtantially better than the other. Thus the proper approach is to form a CI for the difference between the two means, and then factor in comparisons of costs, side effects and so on to our decision as to which one to use.</p>
 <p>The situation for goodness-of-fit tests is similar. Say we are constructing a mixed effects variance components model, which assumes normal distributions. Suppose we have a procedure to test for normality; should we use it? No! We know <em>a priori</em> that the effects can’t be exactly normal – e.g. no one is 20 feet tall nor has a negative height, yet normality would imply both – so again, the ST, by asking whether the distributions are exactly normal, is asking the wrong question. CI approaches may not be practical either (possibly the bootstrap could be made to work), so we may wish to continue a Method of Moments approach to estimating the variance components.</p>
-<h2 id="but-what-if-we-just-want-to-know-whether-there-is-some-difference-even-if-small">But what if we just want to know whether there is <em>some</em> difference, even if small?</h2>
+</div>
+<div id="but-what-if-we-just-want-to-know-whether-there-is-some-difference-even-if-small" class="section level2">
+<h2>But what if we just want to know whether there is <em>some</em> difference, even if small?</h2>
 <p>Say we are investigating the validity of some scientific theory, say the existence of gravity waves. (A statistical analysis was actually done for the latter, with problems, but the details would be a distraction here.) We might have some H<sub>0</sub> for which rejection means confirmation of the validity of the theory; even a tiny but nonzero effect might be of interest.</p>
 <p>Here again we have the problem in which exact specification of the null hypothesis is meaningless, due to issues with our measuring instruments and so on, which make our view “We even care about a tiny effect” untenable.</p>
 <p>In the hypertension drugs example, one might consider</p>
@@ -53,7 +309,29 @@
 <p>vs.</p>
 <p>H<sub>A</sub>: μ<sub>B</sub> &gt; μ<sub>A</sub> + c</p>
 <p>What if the new drug, B, falls just short of improving over A by an amount c? Should we just scrap the drug, after all the expense of developing it? Of course not. So again the hypothesis should not be taken so literally, which unfortunately the test does. A CI is still the proper analysis.</p>
-<h2 id="p-hacking">p-hacking</h2>
+</div>
+<div id="p-hacking" class="section level2">
+<h2>p-hacking</h2>
 <p>The term <em>p-hacking</em> refers to analyses of large studies with the following pitfall.</p>
 <p>Say one is studying genetic impacts on some outcome, with very large numbers of genes involved. Even if no gene has a real impact, due to sampling variation one of them will likely appear to have a ``significant’’ impact, just by accident. Note that this is a problem for CIs too, not just STs.</p>
 <p>One way to deal with this is to use the <em>Bonferroni-Dunn Inequality</em>, which in this context means that if you wish to analyze k different aspects of a setting, divide your chosen α value by k. This is the simplest of a class of methods known as <em>simultaneous inference techniques</em> or <em>multiple comparison techniques</em>. See for instance the <a href="https://www.taylorfrancis.com/chapters/introduction-simultaneous-statistical-inference-jason-hsu/10.1201/b15074-6">book by Jason Hsu</a>.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
