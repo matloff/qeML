@@ -10,13 +10,36 @@ vignette: >
 ---
 
 
-#  Clearing the Confusion: PCA and UMAP--why are they important, and how are they used in prediction?
+#  Clearing the Confusion: PCA and UMAP--how are they used in prediction, and what about claims that they require scaling?
+
+Principal Components Analysis (PCA) is a well-established method of
+dimension reduction.  It is often used as a means of gaining insight
+into the "hidden meanings" in a dataset, but in prediction
+contexts--ML--it is mainly a technique for avoiding overfitting and excess
+computation.
+
+A number of "nonlinear versons" of PCA have been developed, including 
+Uniform Manifold Approximation and Projection (UMAP), the technique
+discussed here.  Again, the goal is dimension reduction.
 
 Many resources on machine learning (ML) methodology recommend, or even
 state as crucial, that one *scale* (or *standardize*) one's data, i.e.
 divide each variable by its standard deviation (after subtracting the
 mean), before applying Principal Component Analysis (PCA).  Here we will
 show why that can be problematic, and provide alternatives.
+
+Here we will first give a brief overview of PCA's concepts (UMAP details
+are beyond the scope of this tutorial), with some rather nonstandard
+insights.  Use of UMAP will be presented briefly.
+
+We then tackle a common claim about PCA, that data must necessarily be
+scaled before use.
+
+# PCA
+
+# MAP
+
+# The Scaling Issue
 
 ## Overview
 
