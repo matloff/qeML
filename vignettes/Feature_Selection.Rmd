@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Clearing the Confusion: Feature Selection 
+# Clearing the Confusion: How (and why) should we select just a few of our (possible many) features?
 
 In many applications we may have a larger number of features---dozens,
 hundreds or even more.  In machine learning contexts, where we are

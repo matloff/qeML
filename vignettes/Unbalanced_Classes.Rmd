@@ -8,7 +8,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-#  Clearing the Confusion: Unbalanced Class Data  
+#  Clearing the Confusion: A Closer look at the issue of unbalanced class data 
 
 Many resources on machine learning (ML) classification problems
 recommend that if one's dataset has unbalanced class sizes, one

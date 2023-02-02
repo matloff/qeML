@@ -1,16 +1,16 @@
 
 
 ---
-title: "Should One Do SScaling in PCA?"
+title: "PCA and UMAP"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ScalingInPCA}
+  %\VignetteIndexEntry{PCA and UMAP}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
 
-#  Clearing the Confusion: Scaling in PCA
+#  Clearing the Confusion: PCA and UMAP--why are they important, and how are they used in prediction?
 
 Many resources on machine learning (ML) methodology recommend, or even
 state as crucial, that one *scale* (or *standardize*) one's data, i.e.
