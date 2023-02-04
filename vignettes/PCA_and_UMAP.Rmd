@@ -10,11 +10,11 @@ vignette: >
 ---
 
 
-#  Clearing the Confusion: PCA and UMAP--how are they used in prediction, and what about claims that they require scaling?
+#  Clearing the Confusion: PCA and UMAP--How Are They Used in Prediction, and What about Claims That They Require Scaling?
 
 Principal Components Analysis (PCA) is a well-established method of
 dimension reduction.  It is often used as a means of gaining insight
-into the "hidden meanings" in a dataset, but in prediction
+into the "hidden meanings" in a dataset.  But in prediction
 contexts--ML--it is mainly a technique for avoiding overfitting and excess
 computation.
 
