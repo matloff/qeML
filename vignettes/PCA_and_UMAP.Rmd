@@ -20,11 +20,11 @@ computation.
 
 This tutorial has two goals:
 
-* We will dispel the "abstract" reputation of PCA, by taking an up-close
-  view in real data.
+* We will give a more concrete, real-world overview of PCA than those
+  given in most treatments.
 
 * We will take a critical look at the commonly-held view that one must
-  center and scale one's data prior to performing PCA.`
+  scale one's data prior to performing PCA.`
 
 A number of "nonlinear versons" of PCA have been developed, including 
 Uniform Manifold Approximation and Projection (UMAP), which we will also
@@ -32,11 +32,17 @@ discuss briefly here.
 
 # PCA
 
-PCA forms new columns from the original columns of our data.  Each new
-column is some linear combination of our original columns.  Let's see
-concretely what that really means.
+**All PCA does is form new columns from the original columns 
+of our data.**  Those new column form our new feature set.
+It's that simple.
 
-## Dataset
+Each new column is some linear combination of our original columns.  
+Moreover, the new columns are uncorrelated with each other, the
+importance of which we will also discuss.
+
+Let's see concretely what all that really means.
+
+## Dataset--mlb
 
 Consider **mlb**, a dataset included with **qeML**.  We will look at
 heights, weights and ages of American professional baseball players.
@@ -64,6 +70,27 @@ The standard PCA function in R is **prcomp**:
 
 ``` r
 > z <- prcomp(mlb)  # defaults center=TRUE, scale.=FALSE)
+```
+
+We will look at the contents of **z** shortly.  But first, it is key to
+note that all that is happening is that *we started with 3 variables*,
+Height, Weight and Age, and now *have created 3 new variables*, **PC**,
+**PC2** and **PC3**.  
+
+Those new variables are stored in **z$x**.  Again, we will see the
+details below, but the salient point is: 3 new features.
+
+We originally had 3 measurements on each of 1015 people, and now we have 3 new
+measurements on each of those people:
+
+``` r
+> dim(z$x)
+[1] 1015    3
+```
+
+Well then, what *is* in there in **z**?
+
+``` r
 > str(z)
 List of 5
  $ sdev    : num [1:3] 20.87 4.29 1.91
@@ -82,35 +109,26 @@ List of 5
 
 ```
 
-What is in **z**?  Let's look at **rotation** first.
+Let's look at **rotation** first.
 
-As you may know, each principal component (PC) is a linear combination
+As noted, each principal component (PC) is a linear combination
 of the input features.  These coefficients are stored in **rotation**:
 
 ``` r
-> head(pcaOut$rotation)
+> head(z$rotation)
                PC1         PC2         PC3
 Height -0.05934555 -0.11013610 -0.99214321
 Weight -0.99776279 -0.02410352  0.06235738
 Age    -0.03078194  0.99362420 -0.10845927
 
 ```
-Though it may seem abstract, all that is happening is that *we started
-with 3 variables*, Height, Weight and Age, and now *have created 3 new
-variables*, **PC**, **PC2** and **PC3**.  
 
 For instance,
 
 PC2 = -0.11 Height - 0.02 Weight + 0.99 Age
 
-Those 3 new variables are stored in the **x** component of **z**.
-
-We originally 3 measurements on each of 1015, and now we have 3 new
-measurements on each of those pepole:
-
-``` r
-> dim(z$x)
-[1] 1015    3
+Those 3 new variables are stored in the **x** component of **z**.  For
+instance, consider the first person in the dataset:
 
 ``` r
 > mlb[1,]
@@ -121,7 +139,7 @@ Height Weight    Age
 In the new data, his numbers are:
 
 ``` r
-> pcaOut$x[1,]
+> z$x[1,]
       PC1       PC2       PC3 
 21.458611 -5.201495 -1.018951 
 
@@ -141,11 +159,11 @@ Ah yes, it checks.
 
 # Key properties
 
-A key property of PCA is that the PCs
+The key properties of PCA are that the PCs
 
-* (a) are arranged in order of decreasing variances, and
+a. are arranged in order of decreasing variances, and
 
-* (b) they are uncorrelated.
+b. they are uncorrelated.
 
 The variances (actually standard deviations) are reported in the return
 object from **prcomp**:
@@ -174,11 +192,19 @@ PC2 -1.295182e-16  1.000000e+00 2.341867e-16
 PC3  2.318554e-15  2.341867e-16 1.000000e+00
 ```
 
+Yes indeed, those new columns are uncorrelated.
+
 ## Practical importance of (a) and (b)
+
+The reader of this document has probably seen properties (a) and (b)
+before.  *But why are they so important?*
 
 Many data analysts, e.g. social scientists, use PCA to search for
 patterns in the data.  In the ML context, though, our main interest is
-prediction.  And if we have a large number of predictor variables, we
+prediction, and both (a) and (b) will be seen below to be central to the
+use of PCA.
+
+And if we have a large number of predictor variables, we
 would like to reduce that number, in order to avoid avoid overfitting,
 reduce computation and so on.  PCA can help us do that.
 
