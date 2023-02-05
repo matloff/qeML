@@ -157,7 +157,7 @@ columns, we can compute them via matrix multiplication:
 
 Ah yes, it checks.
 
-# Key properties
+## Key properties
 
 The key properties of PCA are that the PCs
 
@@ -210,6 +210,11 @@ Our focus:
 > computation and so on.  PCA can help us do that.  Properties (a) and
 > (b) will play a central role in this.
 
+Toward that end, we will first introduce another dataset, and then
+discuss *dimension reduction*--reducing the number of predictor
+variables--in the context of that data.  That will lead us to the
+importance of properties (a) and (b).
+
 ### Dataset--fiftyksongs
 
 Here we will use another built-in dataset in **qeML**, a song database
@@ -243,10 +248,12 @@ The first column of the data set is the year of release of the song,
 while the other 90 are various audio measurements.  The goal is to
 predict the year.  
 
+### Dimension reduction
+
 One hopes to substantially reduce the number of predictors from 90.  But
 how many should we retain?  And which ones?
 
-There are 2<sup>90</sup> possible sets of predictions to use.  It of
+There are 2<sup>90</sup> possible sets of predictors to use.  It of
 course would be out of the question to check them all.  (And given the
 randomness, the odds are high that the "best"-predicting set is just an
 accident.)
@@ -256,54 +263,52 @@ of the features (which are named **V2**, **V3**, **V4**,...)
 
 **V2** alone;
 **V2** and **V3**;
-**V2** and **V3** and V4**;
+**V2** and **V3** and **V4**;
 **V2** and **V3** and **V4** and **V5**;
 etc.
 
 Now we have only 90 predictor sets to check.  But there are two problems
 that would arise:
 
-* Presumably the **Vi** are not arranged in order of important as
+* Presumably the **Vi** are not arranged in order of importance as
   predictors.  What if, say, **V12**, **V28** and **V88** make for an
   especially powerful predictor set?  The scheme considered here would
   never pick that up.
 
-* Possibility of substantial duplication:  What if, say, **V2** and **V3**
-  are very highly correlated?  Then once **V2** is in our predictor set,
-  we probably would not want include **V3**; we are trying to find a
-  parsimonious predictor set, and inclusion of (near-)duplicates would
-  defeat the purpose.  Our second candidate set above would be **V2** and 
-  **V4**, the third would be **V2** and **V4** and V5**; and so on.  We may 
-  wish to skip some other**Vi** as well.
+* Possibility of substantial duplication:  What if, say, **V2** and
+  **V3** are very highly correlated?  Then once **V2** is in our
+  predictor set, we probably would not want to include **V3**; we are
+  trying to find a parsimonious predictor set, and inclusion of
+  (near-)duplicates would defeat the purpose.  Our second candidate set
+  above would be **V2** and **V4**, the third would be **V2** and **V4**
+  and **V5**; and so on.  We may wish to skip some other **Vi** as well.
 
+Both problems are addressed by using the PCs **Pi** instead of the
+original variables **Vi**.  We will consider these predictor sets,
 
+**P1** alone;
+**P1** and **P2**;
+**P1** and **P2** and **P3**;
+**P1** and **P2** and **P3** and **P4**;
+etc.
 
-To
-this aim, we might consider retaining only the first few PCs, i.e. only
-the first few columns in the 'x' component returned by **prcomp**.  Note
-the following:
+What does this buy us?
 
-1.  The set of all 90 PCs captures the entire linear variability of
-    the predictor variables.
+* Recall that Var(P<sub>i</sub>) is decreasing (technically
+  nonincreasing).  For large i, Var(P<sub>i</sub>) is typically tiny.
+  And a random variable with small variance is essentially constant,
+  thus of no value as a predictor.  That does not necessarily mean that
+  the actual predictive power of the **Pi** is decreasing in i, but 
+  at least we now have a reasonable ordering of our predictor sets.
 
-2.  The PCs are ordered in decreasing variance, and the last few
-    variances tend to be very small relative to the earlier ones. Such
-    PCs are essentially constant, thus useless as predictors.  (And due
-    to sample variance, the coefficients for those last PCs probably
-    would be unreliable anyway.)
+* By virtue of their uncorrelated nature, the **Pi** basically do not 
+  duplicate each other.  While it is true that uncorrelatedness does not 
+  imply independence, again we have a reasonable solution to the 
+  duplication problem raised earlier.
 
-3.  So it makes sense to retain only the first m PCs.  But what should
-    set m to?  We would like it to be small, but if it is too small,
-    we may miss important predictive information.
-
-4.  Note that since the PCs are uncorrelated, then roughly speaking,
-    the predictive information added in using m+1 PCs instead of m
-    will not overlap that of the previous m PCs.  Again, though, it's
-    a matter of where to stop, the famous Bias-Variance Tradeoff;
-    increasing m reduces bias but increases variance of predicted
-    values.
-
-5.  We try various values of m, assessing each via cross-validations.
+In summary, then, we will try predictor sets of size m, of the form
+**P1**,...,**Pm**, assessing each via cross-validations.  For
+convenience, well use a linear model
 
 Let's try the latter, with a linear model.  We'll first use the first
 PC, then the first two, then the first three etc.  We'll do 5 runs at
@@ -311,17 +316,23 @@ each level.
 
 ``` r
 > f50s <- fiftyksongs
+> w <- prcomp(f50s[,-1])  # omit year
 > f50s[,-1] <- w$x  # replace orig. features by PCs
 > dim(f50s)  
 [1] 50000    91
 
-> xval <- function(i)
-{
-   d <- f50s[,1:(1+i)]
-   print( replicMeans(10,"qeLin(d,'V1')$testAcc") )
-}
+# xvalOut <- vector(length=15)
+# xval <- function(i)
+# {
+#    d <- f50s[,1:(1+5*i)]
+#    xvalOut[i] i<<- replicMeans(50,"qeLin(d,'V1')$testAcc")
+# }
 
-> for (i in 1:25) xval(i)
+> for (i in 1:15) xval(i)
+
+
+
+for (i in seq(5,75,5)) xval(i)
 [1] 8.079996
 [1] 8.067937
 [1] 7.925185
@@ -336,9 +347,12 @@ It seems to m = 25 did best, and larger values may do even better.
 Also, of course, some other ML method than a linear model may do
 substantially better.  The above is just a start.
 
-
-
 ## The Scaling Issue
+
+One often hears that prior to performing PCA on a dataset, one should
+center and scale the data, so that each column has mean 0 and variance.
+This is generally reasonable, but it can be counterproductive in some
+settings.  Let's take a look.
 
 ### Overview
 
@@ -391,8 +405,8 @@ The word "must" is used here:
 
 ## The perceived problem
 
-As the DataCamp statement notes, some data may be "large" while other
-data are "small."  There is a concern that, without scaling, the large
+As the DataCamp statement notes, some features may be "large" while other
+features are "small."  There is a concern that, without scaling, the large
 ones will artificially dominate.  This is especially an issue in light
 of the variation in measurement systems -- should a variable measured in
 kilometers be given more weight than one measured in miles?
@@ -406,7 +420,8 @@ variables after centering and scaling.
 PCA is all about removing variables with small variance, as they are
 essentially constant.  If we work with A and B, we would of course use
 only A.  **But if we work with A' and B', we would use both of them, as
-they both have variance 1.0.**  Scaling has seriously misled us here.
+they both have variance 1.0** (and they are independent).  Scaling has
+seriously misled us here.
 
 ## Alternatives
 
