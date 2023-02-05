@@ -201,14 +201,16 @@ before.  *But why are they so important?*
 
 Many data analysts, e.g. social scientists, use PCA to search for
 patterns in the data.  In the ML context, though, our main interest is
-prediction, and both (a) and (b) will be seen below to be central to the
-use of PCA.
+prediction. 
 
-And if we have a large number of predictor variables, we
-would like to reduce that number, in order to avoid avoid overfitting,
-reduce computation and so on.  PCA can help us do that.
+Our focus:
 
-### Dataset
+> If we have a large number of predictor variables, we would like to
+> reduce that number, in order to avoid avoid overfitting, reduce
+> computation and so on.  PCA can help us do that.  Properties (a) and
+> (b) will play a central role in this.
+
+### Dataset--fiftyksongs
 
 Here we will use another built-in dataset in **qeML**, a song database
 named **fiftyksongs**.  It is a 50,000-row random subset of the famous Million
@@ -235,15 +237,48 @@ Song Dataset.
 [73]   26.325406   24.763188   22.192984   20.203667   19.739706   18.453111
 [79]   14.238237   13.935897   10.813426    9.659868    8.938295    7.725284
 [85]    6.935969    6.306459    4.931680    3.433850    3.041469    1.892496
-
-> 
 ```
 
 The first column of the data set is the year of release of the song,
 while the other 90 are various audio measurements.  The goal is to
 predict the year.  
 
-One hopes to substantially reduce the number of predictors from 90.  To
+One hopes to substantially reduce the number of predictors from 90.  But
+how many should we retain?  And which ones?
+
+There are 2<sup>90</sup> possible sets of predictions to use.  It of
+course would be out of the question to check them all.  (And given the
+randomness, the odds are high that the "best"-predicting set is just an
+accident.)
+
+So, we might consider the following predictor sets, following the order
+of the features (which are named **V2**, **V3**, **V4**,...)
+
+**V2** alone;
+**V2** and **V3**;
+**V2** and **V3** and V4**;
+**V2** and **V3** and **V4** and **V5**;
+etc.
+
+Now we have only 90 predictor sets to check.  But there are two problems
+that would arise:
+
+* Presumably the **Vi** are not arranged in order of important as
+  predictors.  What if, say, **V12**, **V28** and **V88** make for an
+  especially powerful predictor set?  The scheme considered here would
+  never pick that up.
+
+* Possibility of substantial duplication:  What if, say, **V2** and **V3**
+  are very highly correlated?  Then once **V2** is in our predictor set,
+  we probably would not want include **V3**; we are trying to find a
+  parsimonious predictor set, and inclusion of (near-)duplicates would
+  defeat the purpose.  Our second candidate set above would be **V2** and 
+  **V4**, the third would be **V2** and **V4** and V5**; and so on.  We may 
+  wish to skip some other**Vi** as well.
+
+
+
+To
 this aim, we might consider retaining only the first few PCs, i.e. only
 the first few columns in the 'x' component returned by **prcomp**.  Note
 the following:
