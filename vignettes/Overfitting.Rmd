@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# Clearing the Confusion:  A closer look at overfitting
+# Clearing the Confusion:  A Closer Look at Overfitting
 
 # Preparation
 
@@ -31,12 +31,15 @@ are "fitting the noise," again rather unsatisfying.
 Somewhat better are the explanations based on the famous Bias-Variance
 Tradeoff:
 
-> Mean squared prediction error is the sum of squared bias and variance.
+> Mean squared prediction error (MSPE) is the sum of squared bias and variance.
 > Bias and variance are at odds with each other.  The lower the bias, the
-> more the variance.
+> more the variance.  As we move through a sequence of models of
+> increasing complexity, eventually the reduction in bias is overwhlemed
+> by the increase in variance, a net loss.  Somewhere in that sequence
+> of models is a best one, i.e. one with minimum MSPE.
 
 OK, but the bias and variance of WHAT?  Our treatment here is based on
-that notion, **but with more emphasis on what it is that we are really
+that notion, **with emphasis on what it is that we are really
 talking about** in discussing bias and variance.
 
 ## Required Background
@@ -64,10 +67,11 @@ Y for the given X values.  In the weight/height/age example,
 &rho;(68.2,32.9) is the mean weight of all people of height 68.2 and age
 32.9.  
 
-&rho; is the best predictor of weight based on height and age, the
-ideal.  Note the phrase "based on," though.  If we had a third predictor
-variable/feature available, say waist size, there would be another &rho;
-for that 3-predictor setting, better than the 2-predictor one.
+&rho; is the best (i.e. minimum MSPE) predictor of weight based on
+height and age, the ideal.  Note the phrase "based on," though.  If we
+had a third predictor variable/feature available, say waist size, there
+would be another &rho; for that 3-predictor setting, better than the
+2-predictor one.
 
 Note that &rho; is a population entity, which we estimate from our
 sample data.  Denote the estimated &rho;(t) by r(t).  Say we are
@@ -86,15 +90,56 @@ much to, say, random forests as to linear models.
 In a binary classification problem, this function reduces to the
 probability of class 1.
 
-## Bias
+# Bias
+
+## A starting example
+
+Let's first review a famous instance of bias taught in elementary
+statistics courses, that of the sample variance.  Say we have an i.i.d.
+sample X<sub>1</sub>,...,X<sub>n</sub> from some population in which the
+variance of X is an unknown quantity &sigma;<sup>2</sup>.  
+
+(Note:  We use the word *sample* in the manner of the statistics
+community. A dataset of 100 rows is *a sample* (singular) of 100 cases, 
+not "100 samples" or "100 examples" is in the ML community..)
+
+How do we estimate &sigma;<sup>2</sup> from the X<sub>i</sub>?
+
+At first, one might take as our estimate
+
+S<sup>2 = </sup>(1/n) &Sigma;<sup>n</sup><sub>i=1</sub>
+(X<sub>i</sub> - X<sub>bar</sub>)<sup>2</sup>, 
+
+where X<sub>bar</sub> is the sample mean
+
+(1/n) &Sigma;<sup>n</sup><sub>i=1</sub> X<sub>i</sub>
+
+But the pioneering statisticians didn't like this, because they found
+that 
+
+E(S<sup>2</sup>) = ((n-1)/n) &sigma;<sup>2</sup>
+
+In other words, averaged over all possible samples from this population,
+S<sup>2</sup> comes out...a...little...too...small.  So, they declared
+that the estimator for &sigma;<sup>2</sup> would be
+
+s<sup>2</sup> = (n/(n-1)) S<sup>2</sup>
+
+to make things come out exactly right.
+
+However, most estimators are biased, and we must deal with that.  It's a
+major issue in prediction, as we now discuss.
+
+## Bias in prediction
 
 Parametric methods such as linear and logistic models have a bias, in
-the sense of the inaccuracy of the model itself.  Say we use a linear
-model to predict weight from height, i.e. our model for &rho;(height) is
+the sense of the fundamental inaccuracy of the model itself.  Say we use
+a linear model to predict weight from height, i.e. our model for
+&rho;(height) is
 
 &rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
 
-(This is called a "parametric" model, in that it expresses r(t) in terms
+(This is called a "parametric" model, in that it expresses &rho;(t) in terms
 of some parameters, in this case the &beta;<sub>i</sub>.)
 
 Our sample-based estimate is
@@ -110,10 +155,11 @@ size grows; r(t) WILL converge to something, but that something will be
 the best-fitting LINEAR FUNCTION for the population, not the
 best-fitting FUNCTION.
 
-The bias here is the difference between the true &rho;(t) and the
-limiting value of r(t) as the sample size grows to infinity.  It will be
-different at each t, probably larger at larger t.  E.g. the bias for the
-linear model may be larger for taller people.
+This is *model bias*.  Consider predicting the height of a person who is
+68.2 inches tall.  Our best prediction would be &rho;(68.2), which we
+estimate from our data via r(68.2).  Averaged over all possible samples,
+
+Ei[r(68.2)] &ne; &rho;(68.2)
 
 For model-free, i.e. nonparametric, methods, the bias is subtler.
 Consider k-Nearest Neighbors (k-NN), say again predicting weight from
@@ -124,28 +170,35 @@ a person of height 64, which is on the shorter end of the height range.
 Then the neighboring data points are likely be predominantly taller than
 64, and since our prediction will consist of the mean weight among the
 neighbors, this 64-inch tall person's weight will likely be
-overestimated.  
+overestimated, i.e.  
 
-So again, there is a bias, again dependent on the value of t of
-interest, just as in the case of parametric methods.  However, for this
-very reason, we let the size of the neighborhood get smaller as our
-dataset size grows, causing the bias to shrink.  There is no such
-(direct) remedy for a linear model.  There are analogs of this point for
-random forests, neural nets etc.  On the other hand, a linear model will
-have a smaller variance, our next topic:
+Ei[r(68.2)] > &rho;(68.2)
 
-## Variance
+But there is an important difference between this and the parametric
+example:  The larger the sample size n is (keeping k fixed), the smaller
+the bias.  With a very large sample, the neighbors of the 64-inch tall
+person, for example, will tend to be pretty close to 64, producing a
+smaller bias.  This is in contrast to the example of the linear model,
+in which the bias persists even as the sample size grows.
+
+I used k-NN here because it is easy to explain, but there are analogs of
+this point for random forests, neural nets etc.  They all will have bias
+going to 0 as n grows, which will not be true for the linear modle.
+
+On the other hand, a linear model will have a smaller variance, our next topic:
+
+# Variance
 
 This refers to sampling variance, which measures the degree of
 instability of one's estimated r(t) from one sample to another,
 e.g. the variation of the b<sub>i</sub> from one sample to another in
-our linear model above.
+our linear model above.  Different samples will yield different
+b<sub>i</sub>.
 
 The same holds for nonparametric models.  In the k-NN example above, say
-we take too small a value of k, even k = 1.  So we estimate r(68.2) to
-be the weight of whichever person in our sample is closest to 68.2.
-Clearly this value varies a lot from one sample to another, hence a
-large variance.  
+n = 1000 and k = 25.  Then we are essentially basing our r(68.2) on the
+average of 25 data points--whereas the linear model uses all 1000 data
+points.  So, k-NN will have a larger variance.
 
 The relevance of variance is difficult for many nonspecialists in
 statistics/machine learning to accept.  "But we only have one sample,"
@@ -153,10 +206,15 @@ some might object to the analysis in the preceding paragraphs.  True, but
 we are interested in the probability that that our sample is
 representative of the population.  In a gambling casino, you may play a
 game just once, but you still would like to know the probability of
-winning.  The same is true in data science, and that in turn means that
+winning.  If the winnings vary rather little from one play of the game
+to another, and if the expected value is positive, your risk is less.
+But with large variability from one play to another, you will likely
+feel uneasy about taking the chance.
+
+The same is true in data science, and that in turn means that
 sampling variance is key.
 
-## A U-Shaped Curve
+# A U-Shaped Curve
 
 We stated above that a linear model cannot be exactly correct, even with
 an unlimited amount of data.  So, why not a quadratic model?  
@@ -200,7 +258,7 @@ and an increasing quantity, variance.  This typically produces a
 U-shape, but there is no inherent reason that it must come out this way.
 A double-U can occur (see below), or for that matter, multiple=U.
 
-## Empirical Illustration
+# Empirical Illustration
 
 I used the [Million Song
 Dataset](https://archive.ics.uci.edu/ml/datasets/yearpredictionmsd).  It
