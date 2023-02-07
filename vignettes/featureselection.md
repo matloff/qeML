@@ -1,21 +1,5 @@
 
----
-title: "Feature Selection"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{FeatureSelection}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-# Clearing the Confusion: How (and why) should we select just a few of our (possible many) features?
+# Clearing the Confusion: How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
 
 In many applications we may have a larger number of features---dozens,
 hundreds or even more.  In machine learning contexts, where we are
