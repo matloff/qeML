@@ -20,8 +20,8 @@ computation.
 
 This tutorial has two goals:
 
-* We will give a more concrete, real-world overview of PCA than those
-  given in most treatments.
+* We will give a more concrete, more real-world-oriented, overview of
+  PCA than those given in most treatments.
 
 * We will take a critical look at the commonly-held view that one must
   scale one's data prior to performing PCA.`
@@ -33,10 +33,10 @@ discuss briefly here.
 # PCA
 
 **All PCA does is form new columns from the original columns 
-of our data.**  Those new column form our new feature set.
+of our data.**  Those new columns form our new feature set.
 It's that simple.
 
-Each new column is some linear combination of our original columns.  
+Each new column is some linear combination of our original columns.
 Moreover, the new columns are uncorrelated with each other, the
 importance of which we will also discuss.
 
@@ -75,10 +75,8 @@ The standard PCA function in R is **prcomp**:
 We will look at the contents of **z** shortly.  But first, it is key to
 note that all that is happening is that *we started with 3 variables*,
 Height, Weight and Age, and now *have created 3 new variables*, **PC**,
-**PC2** and **PC3**.  
-
-Those new variables are stored in **z$x**.  Again, we will see the
-details below, but the salient point is: 3 new features.
+**PC2** and **PC3**.  Those new variables are stored in **z$x**.  Again,
+we will see the details below, but the salient point is: 3 new features.
 
 We originally had 3 measurements on each of 1015 people, and now we have 3 new
 measurements on each of those people:
@@ -115,7 +113,7 @@ As noted, each principal component (PC) is a linear combination
 of the input features.  These coefficients are stored in **rotation**:
 
 ``` r
-> head(z$rotation)
+> z$rotation
                PC1         PC2         PC3
 Height -0.05934555 -0.11013610 -0.99214321
 Weight -0.99776279 -0.02410352  0.06235738
@@ -127,8 +125,8 @@ For instance,
 
 PC2 = -0.11 Height - 0.02 Weight + 0.99 Age
 
-Those 3 new variables are stored in the **x** component of **z**.  For
-instance, consider the first person in the dataset:
+As noted, those 3 new variables are stored in the **x** component of
+**z**.  For instance, consider the first person in the dataset:
 
 ``` r
 > mlb[1,]
@@ -221,6 +219,10 @@ Here we will use another built-in dataset in **qeML**, a song database
 named **fiftyksongs**.  It is a 50,000-row random subset of the famous Million
 Song Dataset.
 
+The first column of the data set is the year of release of the song,
+while the other 90 are various audio measurements.  The goal is to
+predict the year.  
+
 ``` r
 > dim(fiftyksongs)
 [1] 50000    91
@@ -244,10 +246,6 @@ Song Dataset.
 [85]    6.935969    6.306459    4.931680    3.433850    3.041469    1.892496
 ```
 
-The first column of the data set is the year of release of the song,
-while the other 90 are various audio measurements.  The goal is to
-predict the year.  
-
 ### Dimension reduction
 
 One hopes to substantially reduce the number of predictors from 90.  But
@@ -267,8 +265,8 @@ of the features (which are named **V2**, **V3**, **V4**,...)
 **V2** and **V3** and **V4** and **V5**;
 etc.
 
-Now we have only 90 predictor sets to check.  But there are two problems
-that would arise:
+Now we have only 90 predictor sets to check--a lot, but far better than
+2<sup>90</sup>.  Yet there are two problems that would arise:
 
 * Presumably the **Vi** are not arranged in order of importance as
   predictors.  What if, say, **V12**, **V28** and **V88** make for an
@@ -282,6 +280,8 @@ that would arise:
   (near-)duplicates would defeat the purpose.  Our second candidate set
   above would be **V2** and **V4**, the third would be **V2** and **V4**
   and **V5**; and so on.  We may wish to skip some other **Vi** as well.
+  Checking for such correlation at every step would be cumbersome and
+  time-consuming.
 
 Both problems are addressed by using the PCs **Pi** instead of the
 original variables **Vi**.  We will consider these predictor sets,
@@ -303,16 +303,12 @@ What does this buy us?
 
 * By virtue of their uncorrelated nature, the **Pi** basically do not 
   duplicate each other.  While it is true that uncorrelatedness does not 
-  imply independence, again we have a reasonable solution to the 
+  necessarily imply independence, again we have a reasonable solution to the 
   duplication problem raised earlier.
 
 In summary, then, we will try predictor sets of size m, of the form
 **P1**,...,**Pm**, assessing each via cross-validations.  For
 convenience, well use a linear model
-
-Let's try the latter, with a linear model.  We'll first use the first
-PC, then the first two, then the first three etc.  We'll do 5 runs at
-each level.
 
 ``` r
 > f50s <- fiftyksongs
@@ -320,32 +316,26 @@ each level.
 > f50s[,-1] <- w$x  # replace orig. features by PCs
 > dim(f50s)  
 [1] 50000    91
-
-# xvalOut <- vector(length=15)
-# xval <- function(i)
-# {
-#    d <- f50s[,1:(1+5*i)]
-#    xvalOut[i] i<<- replicMeans(50,"qeLin(d,'V1')$testAcc")
-# }
-
-> for (i in 1:15) xval(i)
-
-
-
-for (i in seq(5,75,5)) xval(i)
-[1] 8.079996
-[1] 8.067937
-[1] 7.925185
-...
-[1] 7.749934
-[1] 7.740841
-[1] 7.604057
 ```
 
-It seems to m = 25 did best, and larger values may do even better.  
+We predicted **f50s[,1]** from the first m PCs, for m = 1,...,9.  For
+instance, for m = 3, we predicted column 1 of **f50s** from columns 2
+through 16.  We took average mean absolute prediction error as our
+goodness criterion, and did 50 runs at each value of m.
 
-Also, of course, some other ML method than a linear model may do
-substantially better.  The above is just a start.
+The results were
+
+``` r
+ [1] 7.910858 7.865185 7.761906 7.692510 7.661526 7.620048 7.646959 7.633888
+ [9] 7.539551 7.567980 7.631762 7.652315
+```
+
+This is the familiar U-shaped bias-variance tradeoff curve, albeit
+somewhat flat.  
+
+It seems m = 45 did best.  of course, some other ML method than a linear
+model may do substantially better.  The above is just a start.  But the
+value of PCA in dimension reduction and in avoiding overfitting is clear.
 
 ## The Scaling Issue
 
@@ -450,4 +440,21 @@ concern more directly, without inducing the distortions I described
 above.  And if one is worried about outliers, then divide the variable
 by the median or other trimmed mean.
 
+# And What about UMAP?
+
+Again, PCA forms new variables that are *linear* functions of the
+original ones.  That can be quite useful, but possibly constraining.
+In recent years, other dimension reduction method have become popular,
+notably t-SNE and UMAP.  Let's take a very brief look at the latter.
+
+``` r
+
+custom.settings <- umap.defaults
+custom.settings$n_components <- 6
+umOut <- umap(fiftyksongs[,-1],config=custom.settings)
+
+```
+
+The new variables will then be returned in **umOut$layout** (analogous
+to our **z$x** above).
 
