@@ -1544,7 +1544,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    y <- data[,ycol]
    x <- data[,-ycol,drop=FALSE]
    requireNamespace('polyreg')
-   polyout <- polyreg::getPoly(x,deg)
+   polyout <- polyreg::getPoly(x,deg,maxInteractDeg)
    requireNamespace('glmnet')
    glmx <- as.matrix(polyout$xdata)
    fam <- if (classif) 'multinomial' else 'gaussian'
