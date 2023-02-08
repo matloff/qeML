@@ -1606,7 +1606,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    # if (!checkPkgVersion('polyreg','0.7'))
    #    stop('polyreg must be of version >= 1.7')
       
-   qeout <- polyreg::polyFit(xy,deg,use='glm')
+   qeout <- polyreg::polyFit(xy,deg,maxInteractDeg,use='glm')
    qeout$trainRow1 <- getRow1(data,yName)
    qeout$classif <- classif
    class(qeout) <- c('qePolyLog',class(qeout))
