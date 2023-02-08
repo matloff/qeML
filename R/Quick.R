@@ -1642,7 +1642,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    makeAllNumeric(x,data)
    
    classif <- is.factor(y)
-   if (classif) stop('currently not handling classification case')
+   # if (classif) stop('currently not handling classification case')
    fam <- if (classif) 'multinomial' else 'gaussian'
    ym <- as.matrix(y)
    qeout <- glmnet::cv.glmnet(x=xm,y=ym,alpha=alpha,family=fam)
@@ -1666,7 +1666,8 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    }
 
    qeout$coefs <- coef(qeout)
-   coefMatrix <- as.matrix(qeout$coefs)
+   coefMatrix <- 
+      if (!classif) as.matrix(qeout$coefs) else as.matrix(qeout$coefs[[1]])
    nonZeroIdxs <- which(coefMatrix != 0)
    nonZeroNames <- names(coefMatrix[nonZeroIdxs,])[-1]  # exclude beta0
    newdata <- xm[,nonZeroNames]
@@ -1704,7 +1705,8 @@ predict.qeLASSO <- function(object,newx,...)
    tmp <- predict(object,newx,type='response')
    tmp <- tmp[,,1,drop=TRUE]
    # dropped too far?
-   if (is.vector(tmp)) tmp <- matrix(tmp,ncol=ncol(object$x))
+   # if (is.vector(tmp)) tmp <- matrix(tmp,ncol=ncol(object$x))
+   if (is.vector(tmp)) tmp <- matrix(tmp,nrow=1)
    colnames(tmp) <- classNames
    maxCols <- apply(tmp,1,which.max)
    predClasses <- object$classNames[maxCols]
