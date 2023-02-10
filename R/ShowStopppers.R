@@ -30,14 +30,17 @@ qeFindShowStoppers <- function(x,yName,yesYVal=NULL)
      nonrareYs <- y[xCol != rarerLevel]
      rareness <- mean(xCol == rarerLevel)
      result <- c(result,rareness)
-     rootN <- sqrt(nrow(x))
      # difference in mean Ys
-     result <- c(result,mean(rareYs),sd(rareYs)/rootN)
-     c(result,mean(nonrareYs),sd(nonrareYs)/rootN)
+     serr <- sqrt((var(rareYs) + var(nonrareYs))/nrow(x))
+     c(result,mean(rareYs),mean(nonrareYs),serr)
    }
 
-   browser()
-   sapply(x[,dichots,drop=FALSE],checkShowStopper)
+browser()
+   w <- t(sapply(x[,dichots,drop=FALSE],checkShowStopper))
+   w <- as.data.frame(w)
+   names(w) <- c('level 1','level 2','rarerLevel','rareness',
+      'mean Y rare X','mean Y nonrare X','std. err.')
+   w
 
 }
 
