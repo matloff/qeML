@@ -800,7 +800,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    x <- as.matrix(xyc$x)
    y <- xyc$y
    if (!classif) {
-      rfout <- 
+      rfrout <- 
          if (!ll) 
             grf::regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
             mtry=mtry)
