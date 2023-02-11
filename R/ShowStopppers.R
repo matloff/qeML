@@ -5,6 +5,16 @@ qeFindShowStoppers <- function(x,yName,yesYVal=NULL)
 
    yCol <- which(names(x) == yName)
    y <- x[,yCol]
+   x <- x[,-yCol]
+
+   # restrict to factors
+   factors <- which(sapply(x,is.factor))
+   if (length(factors) ==0) stop('no factor variables present')
+   xF <- x[,factors]
+
+   xF <- factorsToDummies(xF,omitLast=F)
+   xF <- as.data.frame(xF)
+   # xF now all dummies
 
    # for dichotomous Y, change to 0,1 values
    classif <- is.factor(y)
@@ -13,34 +23,24 @@ qeFindShowStoppers <- function(x,yName,yesYVal=NULL)
       y <- as.integer(y == yesYVal)
    }
 
-   # find the dichotomous columns
-   isDichot <- function(xCol) length(levels(xCol)) == 2
-   dichots <- which(sapply(x,isDichot))
-
    # the basic op
-   checkShowStopper <- function(xCol) 
+   checkShowStopper <- function(xcolName) 
    {
-     lvls <- levels(xCol)
-     result <- lvls  # names of the dichtomy
-     w <- table(xCol)
-     wm <- which.min(w)
-     rarerLevel <- lvls[wm]  # name of the rarer one
-     result <- c(result,rarerLevel)
-     rareYs <- y[xCol == rarerLevel]
-     nonrareYs <- y[xCol != rarerLevel]
-     rareness <- mean(xCol == rarerLevel)
-     result <- c(result,rareness)
-     # difference in mean Ys
-     serr <- sqrt((var(rareYs) + var(nonrareYs))/nrow(x))
-     c(result,mean(rareYs),mean(nonrareYs),serr)
+    
+      xcol <- xF[[xcolName]]
+      result <- mean(xcol)
+      rareYs <- y[xcol == 1]
+      nonrareYs <- y[xcol == 0]
+      # difference in mean Ys
+      serr <- sqrt((var(rareYs) + var(nonrareYs))/nrow(xF))
+      c(result,mean(rareYs),mean(nonrareYs),serr)
    }
 
-browser()
-   w <- t(sapply(x[,dichots,drop=FALSE],checkShowStopper))
+   browser()
+   w <- t(sapply(names(xF),checkShowStopper))
    w <- as.data.frame(w)
-   names(w) <- c('level 1','level 2','rarerLevel','rareness',
-      'mean Y rare X','mean Y nonrare X','std. err.')
-   w
+   names(w) <- c('rareness','mean Y rare X','mean Y nonrare X','std. err.')
+   w[order(w$rareness),]
 
 }
 
