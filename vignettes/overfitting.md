@@ -1,23 +1,17 @@
 
----
-title: "Overfitting"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Overfitting}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
 
 # Clearing the Confusion:  A Closer Look at Overfitting
 
+* [Goals](#goals)
+* [Required Background](#required-background)
+* [Setting](#setting)
+* [The "True" Relation between Y and X](#the-"true"-relation-between-y-and-x)
+* [A starting example](#a-starting-example)
+* [Bias in prediction](#bias-in-prediction)
+* [Baffling behavior--drastic overfitting](#baffling-behavior--drastic-overfitting)
+* [How could it be possible?](#how-could-it-be-possible?)
+* [Baffling behavior--"double descent"](#baffling-behavior--"double-descent")
+* [How could it be possible?](#how-could-it-be-possible?)
 # Preparation
 
 ## Goals
@@ -54,34 +48,33 @@ being (height, age).  We include binary classification problems, with Y
 = 1 or 0.  (In multiclass problems, Y is a vectors of 1s and 0s, with
 only one component being 1 at a time.)
 
-# Bias and variance of WHAT?
 
 Overfitting is often described as arising when we go too far towards the
 low-bias end of the Bias-Variance Tradeoff.  Yes, but what does that
 really mean in the prediction context?
 
-## The "True" Relation between Y and X
+# The "True" Relation between Y and X
 
 The *regression function of Y on X*, &rho;(t), is defined to be the mean
-Y for the given X values.  In the weight/height/age example,
+Y for the given X values t.  In the weight/height/age example,
 &rho;(68.2,32.9) is the mean weight of all people of height 68.2 and age
 32.9.  
 
-&rho; is the best (i.e. minimum MSPE) predictor of weight based on
-height and age, the ideal.  Note the phrase "based on," though.  If we
-had a third predictor variable/feature available, say waist size, there
-would be another &rho; for that 3-predictor setting, better than the
-2-predictor one.
+The &rho; function is the best (i.e. minimum MSPE) predictor of weight
+based on height and age, the ideal.  Note the phrase "based on," though.
+If we had a third predictor variable/feature available, say waist size,
+there would be another &rho; for that 3-predictor setting, better than
+the 2-predictor one.
 
-Note that &rho; is a population entity, which we estimate from our
-sample data.  Denote the estimated &rho;(t) by r(t).  Say we are
-studying diabetic people.  &rho;(t) gives us the relation of weight vs.
-height and age in the entire population of diabetics; if our study
+Note that the &rho; function is a population entity, which we estimate
+from our sample data.  Denote the estimated &rho;(t) by r(t).  Say we
+are studying diabetic people.  &rho;(t) gives us the relation of weight
+vs.  height and age in the entire population of diabetics; if our study
 involves 100 patients, that is considered a sample from the population,
 and our estimate r(t) is based on that sample.
 
 (Note:  "Sample" means our entire dataset; we say, "A sample of 100
-peoplee," not "We have 100 samples.")
+people," not "We have 100 samples.")
 
 Also, though some books use the term "regression" to mean a
 linear model, the actual definition is unrestricted; it applies just as
@@ -90,16 +83,42 @@ much to, say, random forests as to linear models.
 In a binary classification problem, this function reduces to the
 probability of class 1.
 
-# Bias
+## Example: estimating the &rho; function via a linear model 
 
-## A starting example
+Say we use a linear model to predict weight from height, i.e. our model
+for &rho;(height) is
+
+&rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
+
+(This is called a "parametric" model, in that it expresses &rho;(t) in terms
+of some parameters, in this case the &beta;<sub>i</sub>.)
+
+Our sample-based estimate of the function &rho;(t) is a function r(t),
+with
+
+r(height) = mean weight = b<sub>0</sub> + b<sub>1</sub> height
+
+The b<sub>i</sub>, say computed using the familiar least-squares method,
+are the sample estimates of the &beta;<sub>i</sub>.
+
+## Example: estimating the &rho; function via a k-NN model 
+
+It will be convenient here to use as our nonparametric method the
+classic k-Nearest Neighbors approach.  To estimate &rho;(t), we find the
+k closest rows in our dataset to t, and average the Y values of those
+data points.  Of course, k is a hyperparameter, chosen by the analyst.
+
+
+# Bias and Variance of WHAT
+
+## A starting example: estimators of &sigma;<sup>2</sup>
 
 Let's first review a famous instance of bias taught in elementary
 statistics courses, that of the sample variance.  Say we have an i.i.d.
 sample X<sub>1</sub>,...,X<sub>n</sub> from some population in which the
 variance of X is an unknown quantity &sigma;<sup>2</sup>.  
 
-(Note:  We use the word *sample* in the manner of the statistics
+(Note again:  We use the word *sample* in the manner of the statistics
 community. A dataset of 100 rows is *a sample* (singular) of 100 cases, 
 not "100 samples" or "100 examples" is in the ML community..)
 
@@ -133,26 +152,13 @@ major issue in prediction, as we now discuss.
 ## Bias in prediction
 
 Parametric methods such as linear and logistic models have a bias, in
-the sense of the fundamental inaccuracy of the model itself.  Say we use
-a linear model to predict weight from height, i.e. our model for
-&rho;(height) is
-
-&rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
-
-(This is called a "parametric" model, in that it expresses &rho;(t) in terms
-of some parameters, in this case the &beta;<sub>i</sub>.)
-
-Our sample-based estimate is
-
-r(weight) = mean weight = b<sub>0</sub> + b<sub>1</sub> height
-
-The b<sub>i</sub> are the sample estimates of the &beta;<sub>i</sub>.
+the sense of the fundamental inaccuracy of the model itself.  
 
 Though the true population relation may be somewhat linear, the linear
 model cannot be perfectly correct.  So, no matter how much data we have,
 our estimated r(t) will not converge to the true &rho;(t) as the sample
 size grows; r(t) WILL converge to something, but that something will be
-the best-fitting LINEAR FUNCTION for the population, not the
+the best-fitting LINEAR function for the population &rho;(t), not the
 best-fitting FUNCTION.
 
 This is *model bias*.  Consider predicting the height of a person who is
@@ -162,52 +168,60 @@ estimate from our data via r(68.2).  Averaged over all possible samples,
 Ei[r(68.2)] &ne; &rho;(68.2)
 
 For model-free, i.e. nonparametric, methods, the bias is subtler.
-Consider k-Nearest Neighbors (k-NN), say again predicting weight from
-height.  To calculate, say, r(68.2), we find the k points in our data
-closest to 68.2, then take as r(68.2) the average weight among those
-people.  Bias arises as follows:  Say we wish to predict the weight for
-a person of height 64, which is on the shorter end of the height range.
-Then the neighboring data points are likely be predominantly taller than
+Consider k-NN, again predicting weight from height.  To calculate, say,
+r(68.6), we find the k points in our data closest to 68.6, then take as
+r(68.6) the average weight among those people.  
+
+Bias arises as follows:  Say we wish to predict the weight for
+a person of height 64.2, which is on the shorter end of the height range.
+Then most of the neighboring data points are likely to be taller than
 64, and since our prediction will consist of the mean weight among the
-neighbors, this 64-inch tall person's weight will likely be
+neighbors, this 64.2-inch tall person's weight will likely be
 overestimated, i.e.  
 
-Ei[r(68.2)] > &rho;(68.2)
+E[r(64.2)] > &rho;(64.2)
 
 But there is an important difference between this and the parametric
 example:  The larger the sample size n is (keeping k fixed), the smaller
-the bias.  With a very large sample, the neighbors of the 64-inch tall
-person, for example, will tend to be pretty close to 64, producing a
+the bias.  With a very large sample, the neighbors of the 64.2-inch tall
+person, for example, will tend to be pretty close to 64.2, producing a
 smaller bias.  This is in contrast to the example of the linear model,
 in which the bias persists even as the sample size grows.
 
-I used k-NN here because it is easy to explain, but there are analogs of
-this point for random forests, neural nets etc.  They all will have bias
-going to 0 as n grows, which will not be true for the linear model.
-
 Note too that for fixed n, smaller k will result in smaller bias.
-Fewer neighborhs means that the ones we have are close by.
+Fewer neighbors means that the ones we have are close by.
 
-On the other hand, a linear model will have a smaller variance, our next
+The bias described above is *pointwise*, meaning specific to a
+particular value of t, e.g. t = 64.2 (or say t = (64.2,28.0 if we are
+predicting from both height and age).)  By contrast, the MSPE is
+averaged over the distribution of X, i.e.
+
+MSPE = E[(Y - &rho;(X))<sup>2</sup>]
+
+So, a linear model has bias, even asymptotically.  But on
+the other hand, a linear model will have a smaller variance, our next
 topic:
 
-# Variance
+# Variance in Prediction
 
 This refers to sampling variance, which measures the degree of
-instability of one's estimated r(t) from one sample to another,
-e.g. the variation of the b<sub>i</sub> from one sample to another in
-our linear model above.  Different samples will yield different
-b<sub>i</sub>.
+instability of one's estimated r(t) from one sample to another.
+E.g. in the above linear model, there will the variation of the 
+b<sub>i</sub> from one sample to another, thus causing variation in 
+r(t) among samples.
 
 The same holds for nonparametric models.  In the k-NN example above, say
-n = 1000 and k = 25.  Then we are essentially basing our r(68.2) on the
+n = 1000 and k = 25.  Then we are essentially basing our r(64.2) on the
 average of 25 data points--whereas the linear model uses all 1000 data
-points.  So, k-NN will have a larger variance.
+points.  So, k-NN will have a larger variance.  
 
-The relevance of variance is difficult for many nonspecialists in
-statistics/machine learning to accept.  "But we only have one sample,"
-some might object to the analysis in the preceding paragraphs.  True, but
-we are interested in the probability that that our sample is
+Note too that since k-NN averages k values, then for fixed n, we will
+have that the larger k is, the smaller the variance.
+
+The relevance of sampling variance is difficult for many nonspecialists
+in statistics/machine learning to accept.  "But we only have one
+sample," some might object to the analysis in the preceding paragraphs.
+True, but we are interested in the probability that that our sample is
 representative of the population.  In a gambling casino, you may play a
 game just once, but you still would like to know the probability of
 winning.  If the winnings vary rather little from one play of the game
@@ -245,17 +259,24 @@ a lot.
 
 Result:
 
-> If we plot prediction error vs. degree, we typically will get a
+> If we plot MSPE vs. degree, we typically will get a
 > U-shaped curve.  Bias reduction dominates variance increase initially,
 > but eventually variance overpowers bias.  Once we pass the low point
-> of the curve, we we overfitting.
+> of the curve, **we are overfitting**.
 
 The same is true for k-NN, plotting prediction error against k.  As
 noted, we can achieve smaller bias with smaller k.  The latter situation
 means smaller neighborhoods, making the problem of "using tall people to
 predict a short person's weight" less likely.  But smaller k means we
 are taking an average over a small set of people, which will vary a lot
-from one sample to another, i.e. larger variance.
+from one sample to another, i.e. larger variance.  If we try a range of
+k values, the bias-variance tradeoff will typically result in a U-shaped
+curve.
+
+Again, MSPE is a population quantity, but we can estimate it via
+cross-validation.  For instance, for each value of k in a range, we can
+fit k-NN on our training data and the estimate the corresponding
+MSPE value by predicting our test set.
 
 Mean squared error is the sum of a decreasing quantity, squared bias,
 and an increasing quantity, variance.  This typically produces a
@@ -327,9 +348,9 @@ mysteries, which we address now.
 ## Baffling behavior--drastic overfitting
 
 In many ML applications, especially those in which neural networks are
-used, there may be far more hyperparameters than data points, i.e. p >> n.  
-Yet excellent prediction accuracy on new data has often been
-    reported in spite of such extreme overfitting.
+used, there may be far more hyperparameters than data points, i.e. p >>
+n.  Yet excellent prediction accuracy on new data has often been
+reported in spite of such extreme overfitting.
 
 ## How could it be possible?
 
@@ -386,11 +407,13 @@ second U over the first.
 
 The argument explaining double descent generally made by researchers in
 this field is actually similar to the argument I made for the
-"overfitting with impunity" analysis above.  
+"overfitting with impunity" analysis above, regarding minimum-norm
+estimators.  
 
 By the way, the function **penroseLM()** in the regtools package (on
 top of which qeML is built) does find the minimum-norm b in the case of
 overfitting a linear model.  As mentioned, this has been observed
-empirically, and some theoretical work has proved it.
+empirically, and some theoretical work has proved it under certain
+circumstances.
 
 

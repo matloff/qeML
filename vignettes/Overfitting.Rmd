@@ -364,9 +364,9 @@ mysteries, which we address now.
 ## Baffling behavior--drastic overfitting
 
 In many ML applications, especially those in which neural networks are
-used, there may be far more hyperparameters than data points, i.e. p >> n.  
-Yet excellent prediction accuracy on new data has often been
-    reported in spite of such extreme overfitting.
+used, there may be far more hyperparameters than data points, i.e. p >>
+n.  Yet excellent prediction accuracy on new data has often been
+reported in spite of such extreme overfitting.
 
 ## How could it be possible?
 
@@ -423,11 +423,13 @@ second U over the first.
 
 The argument explaining double descent generally made by researchers in
 this field is actually similar to the argument I made for the
-"overfitting with impunity" analysis above.  
+"overfitting with impunity" analysis above, regarding minimum-norm
+estimators.  
 
 By the way, the function **penroseLM()** in the regtools package (on
 top of which qeML is built) does find the minimum-norm b in the case of
 overfitting a linear model.  As mentioned, this has been observed
-empirically, and some theoretical work has proved it.
+empirically, and some theoretical work has proved it under certain
+circumstances.
 
 
