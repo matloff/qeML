@@ -15,6 +15,24 @@ knitr::opts_chunk$set(
 ```
 
 
+* [Notation](#notation)
+* [Running example](#running-example)
+* [The  R package's **qe***-series functions](#the-r-package's-**qe***-series-functions)
+* [Example](#example)
+* [Regression and classification problems, regression functions](#regression-and-classification-problems,-regression-functions)
+* [ML predictive methods](#ml-predictive-methods)
+  * [k-Nearest Neighbors](#k-nearest-neighbors)
+  * [Random forests](#random-forests)
+  * [Boosting](#boosting)
+  * [Linear model](#linear-model)
+  * [Logistic model](#logistic-model)
+  * [Polynomial-linear models](#polynomial-linear-models)
+  * [Shrinkage methods for linear/generalized linear models](#shrinkage-methods-for-linear/generalized-linear-models)
+  * [Support Vector Machines](#support-vector-machines)
+  * [Neural networks](#neural-networks)
+* [Overfitting](#overfitting)
+* [Which ML method to use?](#which-ml-method-to-use?)
+
 #  The 10-Page Machine Learning Book
 
 (The title here alludes to Andriy Burkov's excellent work,
@@ -50,11 +68,10 @@ Y<sub>n</sub>).  We wish to predict new cases
 is known but Y<sub>new</sub> needs to be predicted.
 
 So, we may wish to predict human weight Y from height X, or from height
-and weight in the 2-component vector X.  
-Say we have the latter situation, and data on n = 100 people.  Then for
-instance X<sub>23</sub> would be the vector of height and age for the
-23rd person in our training data, and Y<sub>23</sub> would be that
-person's weight.
+and age in a 2-component vector X.  Say we have the latter situation,
+and data on n = 100 people.  Then for instance X<sub>23</sub> would be
+the vector of height and age for the 23rd person in our training data,
+and Y<sub>23</sub> would be that person's weight.
 
 The vector X may include *indicator* variables, which have values only 1
 or 0.  We may for instance predict weight from height, age and gender,
@@ -66,11 +83,11 @@ variable.  In the famous Pima Diabetes dataset in the
 Repository](https://archive.ics.uci.edu/ml/index.php), 1 means diabetic,
 0 means not.
 
-If Y is categorical, we represent it by several indicator variables, one for
-each category.  In another disease-related UCI dataset (to be discussed
-below), Y is status of a person's vertebrae condition; there are 2
-disease types, and normal, for a total of 3 categories.  Y = (0,0,1)
-for a normal person, for instance.  Thus Y can be a vector too.
+If Y itself is categorical, we represent it by several indicator
+variables, one for each category.  In another disease-related UCI
+dataset, Y is status of a person's vertebrae condition; there are three
+classes: normal (NO), disk hernia (DH), or spondilolysthesis (SP).  Y =
+(1,0,0) for a normal person, for instance.  Thus Y can be a vector too.
 
 ## Running example
 
@@ -121,7 +138,7 @@ rfout <- qeRF(mlb,'Weight')  # fit random forests model
 
 Most methods have *hyperparameters*, values that can be used to tweak
 the analysis in various ways.  In **qeML**, default values of
-hyperparameters are used but can be overridden.
+hyperparameters are set but can be overridden.
 
 Prediction of new cases is equally easy, in the form
 
@@ -197,7 +214,7 @@ The **qe** series function sense whether the user is specifying a
 regression setting or a classification setting, by noting whether the Y
 variable (second argument) is numeric or an R factor.
 
-## ML predictive methods
+# ML predictive methods
 
 We now present the "30,000 foot" view of the major statistical/machine
 learning methods.
@@ -224,10 +241,10 @@ are not representative.
 To choose k, we could try various values, run **qeKNN** on each one,
 then use the value that produced the best (i.e. smallest) **testAcc**.
 
-If Y is an indicator variable, its average is the proportion of 1s.
-This will then be the estimated probability that Y = 1 for a new case.
-If that is greater than 0.5 in the neighborhood of the new case, we guess 
-Y = 1 for the new case, otherwise 0.  
+If Y is an indicator variable, its average works out to be the
+proportion of 1s.  This will then be the estimated probability that Y =
+1 for a new case.  If that is greater than 0.5 in the neighborhood of
+the new case, we guess Y = 1 for the new case, otherwise 0.  
 
 If Y is categorical, i.e. an R factor as in the case of predicting
 player position in the **mlb** dataset, we then find a probability for
@@ -247,8 +264,11 @@ within the neighborhood.
 
 ### Random forests
 
-This method was developed mainly by statisticians, starting in the
-1980s.
+This method stems from *decision trees*, which were developed mainly by
+statisticians in the 1080s, and which were extended to random forests in
+1990s.  Note too the related (but unfortunately seldom recognized)
+*random subspaces* work of Tin Kam Ho, who did her PhD in computer
+science.
 
 This is a natural extension of k-NN, in that it too creates a
 neighborhood and averages Y values within the neighborhood.  However, it
@@ -277,20 +297,25 @@ a split would violate that rule, then don't split.  Of course, if we set
 out threshold too high, we won't do enough splits, so again we need to
 try to find a "Goldilocks" level.
 
-Here is an example using the UCI Vertebrae dataset.  There are 6
+Here is an example using the vertebrae dataset.  There are 6
 predictor variables, named V1 through V6, consisting of various bone
-measurements.  There are 3 classes, DH (Disk Hernia), Spondylolisthesis
-(SL), and Normal (NO).  A single tree is shown.
+measurements.  A single tree is shown.
 
 ![alt text](RpartVert.png)
 
-At the root, if the variable V6 in our new case to be
-predicted is < 16, we go left, otherwise right.  Say we go left.
-Then if V4 < 28 in the new case, we go left again, getting to a leaf, in
-which we guess DH.  The 0.74 etc. mean that for the training data that
-happen to fall into that leaf, 74% of them are in class DH, 26% are NO
-and 0% are SL.  So we gues DH, based on there being an estimated 74%
-chance that this new case is of type DH..
+At the root, if the variable V6 in our new case to be predicted is < 16,
+we go left, otherwise right.  Say we go left.  Then if V4 < 28 in the
+new case, we go left again, getting to a leaf, in which we guess DH.
+The 0.74 etc. mean that for the training data that happen to fall into
+that leaf, 74% of them are in class DH, 26% are NO and 0% are SL.  So we
+gues DH, based on there being an estimated 74% chance that this new case
+is of type DH..
+
+In RF, many trees are generated at ranomd, using for instance random
+orders of entry of the features.  To predict a new case, we find its
+preditions in the various trees, then average them.  For indicator or
+categorical Y, each try gives a prodiction, and we predict whatever
+class is most common among the trees.
 
 Clearly, the order in which the predictor variables are evaluated (e.g.
 height, weight and age in the **mlb** data) can matter a lot.  So, more
@@ -301,7 +326,7 @@ get our final prediction.  In a classification setting, we see which
 class was predicted most often among all those trees.
 
 The thresholds used at each node are determined through a complicated
-process, depending on which implemented of RF one uses.
+process, depending on which implementation of RF one uses.
 
 The **qeRF** function wraps the function of the same name in the
 **randomForests** package.  The package also offers other
@@ -322,11 +347,11 @@ used here.
 
 The basic idea is to iteratively build up a sequence of trees, each of
 which is an improved update of the last.  At the end, all the trees are
-combined.
+combined, with more weight given to the more recent trees.
 
-The **qeGBoost** wraps **gbm** in the package of the same name.  It
-is tree-based, with hyperparameters similar to the random forests case,
-plus a *learning rate*.  The latter controls the size of iteration
+The **qeGBoost** wraps **gbm** in the package of the same name.  It is
+gradient tree-based, with hyperparameters similar to the random forests
+case, plus a *learning rate*.  The latter controls the size of iteration
 steps; more on this  below.
 
 The package also offers other implementations of boosting.
@@ -405,48 +430,45 @@ technique called *iteratively reweighted least squares*.
 The function **qeLogit** wraps the ordinary R function **glm**, but
 adds an important feature:  **glm** only handles the 2-class setting,
 e.g.  catcher vs. non-catcher.  The **qeLlogit** handles the c-class
-situation by calling **glm** one class at a time, generating c
+situation via the *One vs. All* method (applicable to any ML algorithm):
+
+it calls **glm** one class at a time, generating c
 **glm** outputs.  When a new case is to be predicted, it is fed into
 each of the c **glm** outputs, yielding c probabilities.  It then
 predicts the new case as whichever class has the highest probability.
 
-Here is an example, using the **phoneme** dataset that is included with 
-**qeML**.  The aim is to predict whether a spoken sound is nasal or not.
-(In the dataset, Y takes on the values 1 and 2, not 1 and 0, but the
-software converts internally.)
+Here is an example using the UCI vertebrae data;
 
 ``` r
-> w <- qeLogit(phoneme,'lbl')
-holdout set has  540 rows
-> w$testAcc
-[1] 0.2462963
-> w$baseAcc
-[1] 0.2911184
+> library(fdm2id)
+> data(spine)
+> str(spine)
+'data.frame':	310 obs. of  8 variables:
+ $ V1      : num  39.1 53.4 43.8 31.2 48.9 ...
+ $ V2      : num  10.1 15.9 13.5 17.7 20 ...
+ $ V3      : num  25 37.2 42.7 15.5 40.3 ...
+ $ V4      : num  29 37.6 30.3 13.5 28.9 ...
+ $ V5      : num  114 121 125 120 119 ...
+ $ V6      : num  4.56 5.99 13.29 0.5 8.03 ...
+ $ Classif2: Factor w/ 2 levels "AB","NO": 1 1 1 1 1 1 1 1 1 1 ...
+ $ Classif3: Factor w/ 3 levels "DH","NO","SL": 1 1 1 1 1 1 1 1 1 1 ...
+> spine <- spine[,-7]  # skip 2-class example
+> u <- qeLogit(spine,'Classif3')
+> u$testAcc
+[1] 0.1935484
+> u$baseAcc
+[1] 0.5053763
+
+> table(spine$Classif3) 
+
+ DH  NO  SL 
+ 60 100 150 
 ```
 
-We had about a 25% error rate on new data (i.e. the holdout set).  If we
-were to simply guess all new cases to have Y = 1 (since it is the
-majority value in the overall data), we would have a 29% error rate.  So
-we achieved a modest improvement by using the predictor variables.
-
-As an example of prediction, consider a case that is like the first row
-in the dataset, but with **V1**:
-
-``` r
-> newx <- phoneme[1,-6]  # omit the value to be predicted
-> newx[1] <- 0.32
-> predict(w,newx)
-$predClasses
-     [,1]
-[1,] "1"
-
-$probs
-          [,1]
-[1,] 0.9055212
-```
-
-We predict Y = 1, which, given the values in **newx**, has a 91% chance
-of being true.
+If we were to not use the body measurements V1 etc., we would always
+guess SL, resulting in an error rate of about 50%.  By making use of
+the measurement data, we can reduce the misclassification rate to about
+19%.
 
 Some presentations describe the logistic model as "modeling the
 logarithm of the odds of Y = 1 vs. Y = 0 as linear."  While this is
