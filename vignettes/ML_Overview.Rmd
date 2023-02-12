@@ -429,7 +429,7 @@ technique called *iteratively reweighted least squares*.
 
 The function **qeLogit** wraps the ordinary R function **glm**, but
 adds an important feature:  **glm** only handles the 2-class setting,
-e.g.  catcher vs. non-catcher.  The **qeLlogit** handles the c-class
+e.g.  catcher vs. non-catcher.  The **qeLogit** handles the c-class
 situation via the *One vs. All* method (applicable to any ML algorithm):
 
 it calls **glm** one class at a time, generating c
