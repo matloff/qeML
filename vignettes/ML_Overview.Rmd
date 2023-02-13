@@ -470,6 +470,24 @@ guess SL, resulting in an error rate of about 50%.  By making use of
 the measurement data, we can reduce the misclassification rate to about
 19%.
 
+Let's try a prediction.  Consider someone like the first patient in the
+dataset but with V6 = 6.22.  What would our prediction be?
+
+``` r
+> newx <- spine[1,-7]  # omit "Y"
+> newx$V6 <- 6.22
+> predict(u,newx)
+$predClasses
+[1] "DH"
+
+$probs
+            DH        NO         SL
+[1,] 0.7432193 0.2420913 0.01468937
+```
+
+We would predict the DH class, as our estimated probability for the lass
+is 0.74, the largest among the three classes.
+
 Some presentations describe the logistic model as "modeling the
 logarithm of the odds of Y = 1 vs. Y = 0 as linear."  While this is
 correct, it is less informative, in our opinion.  Why would we care
@@ -480,7 +498,8 @@ function models a probability, just what we need.
 
 Some people tend to shrink when they become older.  Thus we may wish to
 model a tendency for people to gain weight in middle age but then lose
-weight as seniors, say 
+weight as seniors, a nonlinear relation.  We could try a quadratic
+model:
 
 m(height,age) = 
 &beta;<sub>0</sub> +
@@ -514,13 +533,19 @@ problems.
 ### Shrinkage methods for linear/generalized linear models
 
 Some deep mathematical theory implies that in linear models it may be
-advantageous to shrink the estimated b<sub>i</sub>.  The LASSO
-method does this in a mathematically rigorous manner.  The LASSO is
-especially popular as a tool for predictor variable selection (see
-below).
+advantageous to shrink the estimated b<sub>i</sub>.  *Ridge* regression
+and the LASSO do this in a mathematically rigorous manner.  Each of them
+minimizes the usual sum of squared prediction errors, subject to a
+limit being placed on the size of the b vector; for ridge, the size is
+defined as the sum of the b<sub>i</sub><sup>2</sup>, while for the LASSO
+it's the sum of {b<sub>i</sub>|.
 
 The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
-package.  The main hyperparameter controls the amount of shrinkage.
+package.  The main hyperparameter **alpha** specifies ridge (0) or the
+LASSO (1, the default).
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
 
 There are various other shrinkage methods, such as Minimax Convex
 Penalty (MCP).  This and some others are available via **qeNCVregCV**,
