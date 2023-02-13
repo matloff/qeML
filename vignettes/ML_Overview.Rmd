@@ -219,7 +219,7 @@ variable (second argument) is numeric or an R factor.
 We now present the "30,000 foot" view of the major statistical/machine
 learning methods.
 
-### k-Nearest Neighbors
+## k-Nearest Neighbors
 
 This method was originally developed by statisticians, starting in the 1950s
 and 60s.
@@ -262,7 +262,7 @@ Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
 Setting the argument **smoothingFtn = loclin** removes a linear trend
 within the neighborhood.
 
-### Random forests
+## Random forests
 
 This method stems from *decision trees*, which were developed mainly by
 statisticians in the 1080s, and which were extended to random forests in
@@ -339,7 +339,7 @@ problem similar to that described for k-NN above.  In the case of random
 forests, the **qeRFgrf** function (which wraps the **grf** package)
 deals with the same bias problem via removal of a linear trend.
 
-### Boosting
+## Boosting
 
 This method has been developed both by CS and statistics people.  The
 latter have been involved mainly in *gradient* boosting, the technique
@@ -356,7 +356,7 @@ steps; more on this  below.
 
 The package also offers other implementations of boosting.
 
-### Linear model
+## Linear model
 
 This of course is the classical linear regression model, invented
 200 years ago (!) and developed by statisticians.
@@ -405,7 +405,7 @@ below).
 The function **qeLin** wraps the ordinary **lm**.  It mainly
 just calls the latter, but does some little fixess.
 
-### Logistic model
+## Logistic model
 
 This is a generalization of the linear model, developed by statisticians
 and economists.
@@ -494,7 +494,7 @@ correct, it is less informative, in our opinion.  Why would we care
 about a logarithm being linear?  The central issue is that the logistic
 function models a probability, just what we need.
 
-### Polynomial-linear models
+## Polynomial-linear models
 
 Some people tend to shrink when they become older.  Thus we may wish to
 model a tendency for people to gain weight in middle age but then lose
@@ -530,7 +530,7 @@ with any ML method.  In particular, polynomial functions tend to grow
 rapidly near the edges of one's dataset, causing both bias and variance
 problems.
 
-### Shrinkage methods for linear/generalized linear models
+## Shrinkage methods for linear/generalized linear models
 
 Some deep mathematical theory implies that in linear models it may be
 advantageous to shrink the estimated b<sub>i</sub>.  *Ridge* regression
@@ -544,14 +544,56 @@ The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
 package.  The main hyperparameter **alpha** specifies ridge (0) or the
 LASSO (1, the default).
 
-The LASSO tends to produce solutions in which some of the b<sub>i</sub>
-are 0.  Thus it is popular as a tool for predictor variable selection.
-
 There are various other shrinkage methods, such as Minimax Convex
 Penalty (MCP).  This and some others are available via **qeNCVregCV**,
 which wraps the **ncvreg** package.
 
-### Support Vector Machines
+Shrinkage methods are often also applied to other ML algorithms.
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
+
+### LASSO for feature selection
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
+
+Here is an example using **pef**, a dataset from the US Census, included
+with **qeML**.  The features consist of age, education, occupation and
+gender.  Those last three are categorical variables, which are converted
+to indicator varaibles.
+
+``` r
+> w <- qeLASSO(pef,'wageinc')
+> w$coefs
+11 x 1 sparse Matrix of class "dgCMatrix"
+                   s1
+(Intercept) -8983.986
+age           254.475
+educ.14      9031.883
+educ.16      9182.592
+occ.100     -2707.388
+occ.101     -1029.592
+occ.102      3795.166
+occ.106         .
+occ.140         .
+sex.1        4472.672
+wkswrkd      1178.889
+```
+
+There are six occupations (this dataset is just for programmers and
+engineers), 
+
+``` r
+> levels(pef$occ)
+[1] "100" "101" "102" "106" "140" "141"
+```
+
+thus five indicator variables.  The LASSO gave coefficients of 0 for
+occupations 106 and 140, so we might decide not to use them, even if we
+utimately use some other ML algorithm.
+
+## Support Vector Machines
 
 These were developed originally in the AI community, and later attracted
 interest among statisticians.  They are used mainly in classification
@@ -590,7 +632,7 @@ exceptions we are willing to accept.
 The **qeSVM** function wraps **svm** in the **e1071** package.  The
 package also offers various other implementations.
 
-### Neural networks
+## Neural networks
 
 These were developed almost exclusively in the AI community.
 
