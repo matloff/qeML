@@ -1,3 +1,19 @@
+---
+title: "MLOverview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Machine Learning Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
 
 #  The 10-Page Machine Learning Book
 
@@ -34,6 +50,7 @@ without loss of comprehehnsion of the text)
 * [Neural networks](#neural-networks)
 * [Overfitting](#overfitting)
 * [Which ML method to use?](#which-ml-method-to-use?)
+
 # Notation
 
 For convenience, we'll let Y denote the variable to be predicted, i.e.

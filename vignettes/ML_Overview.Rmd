@@ -50,6 +50,7 @@ without loss of comprehehnsion of the text)
 * [Neural networks](#neural-networks)
 * [Overfitting](#overfitting)
 * [Which ML method to use?](#which-ml-method-to-use?)
+
 # Notation
 
 For convenience, we'll let Y denote the variable to be predicted, i.e.
