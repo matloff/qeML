@@ -1,20 +1,4 @@
 
----
-title: "Overfitting"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Overfitting}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
 
 # Clearing the Confusion:  A Closer Look at Overfitting
 

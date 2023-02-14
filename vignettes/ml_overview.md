@@ -1,19 +1,3 @@
----
-title: "MLOverview"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Machine Learning Overview}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
 
 #  The 10-Page Machine Learning Book
 
