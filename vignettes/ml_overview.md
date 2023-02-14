@@ -1,37 +1,3 @@
----
-title: "MLOverview"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Machine Learning Overview}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-
-* [Notation](#notation)
-* [Running example](#running-example)
-* [The  R package's **qe***-series functions](#the-r-package's-**qe***-series-functions)
-* [Example](#example)
-* [Regression and classification problems, regression functions](#regression-and-classification-problems,-regression-functions)
-* [ML predictive methods](#ml-predictive-methods)
-  * [k-Nearest Neighbors](#k-nearest-neighbors)
-  * [Random forests](#random-forests)
-  * [Boosting](#boosting)
-  * [Linear model](#linear-model)
-  * [Logistic model](#logistic-model)
-  * [Polynomial-linear models](#polynomial-linear-models)
-  * [Shrinkage methods for linear/generalized linear models](#shrinkage-methods-for-linear/generalized-linear-models)
-  * [Support Vector Machines](#support-vector-machines)
-  * [Neural networks](#neural-networks)
-* [Overfitting](#overfitting)
-* [Which ML method to use?](#which-ml-method-to-use?)
 
 #  The 10-Page Machine Learning Book
 
@@ -50,9 +16,25 @@ statistical/machine learning (ML).  For each one, we present
   who simply wish to acquire an overview of ML may skip the R code
 without loss of comprehehnsion of the text)
 
-We'll also discuss the overfitting issue.
+# Contents
 
-## Notation
+* [Example](#example)
+* [Regression and classification problems, regression functions](#regression-and-classification-problems,-regression-functions)
+* [k-Nearest Neighbors](#k-nearest-neighbors)
+  * [K-NN edge bias](#k-nn-edge-bias)
+* [Random forests](#random-forests)
+  * [RF edge bias](#rf-edge-bias)
+* [Boosting](#boosting)
+* [Linear model](#linear-model)
+* [Logistic model](#logistic-model)
+* [Polynomial-linear models](#polynomial-linear-models)
+* [Shrinkage methods for linear/generalized linear models](#shrinkage-methods-for-linear/generalized-linear-models)
+  * [LASSO for feature selection](#lasso-for-feature-selection)
+* [Support Vector Machines](#support-vector-machines)
+* [Neural networks](#neural-networks)
+* [Overfitting](#overfitting)
+* [Which ML method to use?](#which-ml-method-to-use?)
+# Notation
 
 For convenience, we'll let Y denote the variable to be predicted, i.e.
 the response variable, and let X denote the set of predictor
@@ -89,7 +71,7 @@ dataset, Y is status of a person's vertebrae condition; there are three
 classes: normal (NO), disk hernia (DH), or spondilolysthesis (SP).  Y =
 (1,0,0) for a normal person, for instance.  Thus Y can be a vector too.
 
-## Running example
+# Running example
 
 The package's built-in dataset **mlb** consists of data on major league
 baseball players (courtesy of the UCLA Dept. of Statistics).
@@ -108,13 +90,13 @@ Here is a glimpse of the data:
 6   Brian_Roberts  BAL Second_Baseman     69    176 29.39   Infielder
 ```
 
-## The  R package's **qe***-series functions
+# The  R package's **qe***-series functions
 
 Here "qe" stands for **"quick and easy,"** and we really mean that!
 
 The functions have a simple, uniform interface, and most importantly,
 **require no setup.**  To fit an SVM model, say, one simply calls
-**qeSVM**, no preparation calls to define the model etc.
+**qeSVM**, no preparation calls to define the model etc.  
 
 The call form is
 
@@ -131,9 +113,9 @@ Neighbor and random forests.  (Details of the methods will be explained
 shortly; for now, let's just see how to invoke them.)
 
 ``` r
-mlb <- mlb[,4:6]  # columns for height, weight and age
-knnout <- qeKNN(mlb,'Weight')  # fit k-Nearest Neighbor model
-rfout <- qeRF(mlb,'Weight')  # fit random forests model
+mlb1 <- mlb[,4:6]  # columns for height, weight and age
+knnout <- qeKNN(mlb1,'Weight')  # fit k-Nearest Neighbor model
+rfout <- qeRF(mlb1,'Weight')  # fit random forests model
 ```
 
 Most methods have *hyperparameters*, values that can be used to tweak
@@ -157,8 +139,8 @@ using our random forests model created above, run
 
 Such a player would be predicted to weigh about 184 pounds.
 
-The model is automatically assessed on a holdout set (the concept is
-discussed later in this document):
+The data is partitioned into a training set and a holdout set, with the
+model being fit on the former and then tested on the latter. 
 
 ``` r
 > rfout$testAcc  # mean absolute prediction error
@@ -176,7 +158,8 @@ the k-NN model?
 Seems to be better, though we should try other values of the
 hyperparameters.
 
-(The formation of a holdout set can be suppressed.)
+(The size of the holdout set size can be set differently from the
+default, or suppressed entirely.)
 
 ## Regression and classification problems, regression functions
 
@@ -219,7 +202,7 @@ variable (second argument) is numeric or an R factor.
 We now present the "30,000 foot" view of the major statistical/machine
 learning methods.
 
-### k-Nearest Neighbors
+## k-Nearest Neighbors
 
 This method was originally developed by statisticians, starting in the 1950s
 and 60s.
@@ -251,6 +234,31 @@ player position in the **mlb** dataset, we then find a probability for
 each category in this manner, and guess Y to be whichever category has
 the highest probability.
 
+The hyperparameter k as default value 25.  Let's see if, say, 10 is
+better:
+
+``` r
+replicMeans(50,"qeKNN(mlb1,'Weight')$testAcc")
+[1] 13.61954
+attr(,"stderr")
+[1] 0.1346821
+replicMeans(50,"qeKNN(mlb1,'Weight',k=10)$testAcc")
+[1] 14.25737
+attr(,"stderr")
+[1] 0.1298224
+```
+
+Since the holdout set is randomly generated, we did 50 runs in each
+case.  The average test accuracy over 50 runs is printed out, along with
+a standard error for the figure.  (1.96 times the standard error will be
+the radius of an approximate 95% confidence interval.) Changing k to 10
+reduced accuracy.
+
+The **qeML** function **qeFit** makes it easier to try various values of
+the hyperparameters.
+
+### K-NN edge bias
+
 One potential problem is bias at the edge of a neighborhood.  Say we are
 predict weight from height, and a new case involving a very tall person.
 Most data points in the neighborhood of this particular height value
@@ -260,9 +268,10 @@ value for that case biased downward.
 
 Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
 Setting the argument **smoothingFtn = loclin** removes a linear trend
-within the neighborhood.
+within the neighborhood, and may improve predictive accuracy for new
+cases that are located near the edege of the training set.
 
-### Random forests
+## Random forests
 
 This method stems from *decision trees*, which were developed mainly by
 statisticians in the 1080s, and which were extended to random forests in
@@ -329,8 +338,12 @@ The thresholds used at each node are determined through a complicated
 process, depending on which implementation of RF one uses.
 
 The **qeRF** function wraps the function of the same name in the
-**randomForests** package.  The package also offers other
-implementations of RF, notably **qeRFgrf**, as follows.  
+**randomForests** package.  
+
+### RF edge bias
+
+The package also offers other implementations of RF, notably
+**qeRFgrf**, as follows.  
 
 The leaves in any tree method, such as random forests and boosting, are
 essentially neighborhoods, different in structure from those of k-NN,
@@ -339,7 +352,7 @@ problem similar to that described for k-NN above.  In the case of random
 forests, the **qeRFgrf** function (which wraps the **grf** package)
 deals with the same bias problem via removal of a linear trend.
 
-### Boosting
+## Boosting
 
 This method has been developed both by CS and statistics people.  The
 latter have been involved mainly in *gradient* boosting, the technique
@@ -356,7 +369,7 @@ steps; more on this  below.
 
 The package also offers other implementations of boosting.
 
-### Linear model
+## Linear model
 
 This of course is the classical linear regression model, invented
 200 years ago (!) and developed by statisticians.
@@ -405,7 +418,7 @@ below).
 The function **qeLin** wraps the ordinary **lm**.  It mainly
 just calls the latter, but does some little fixess.
 
-### Logistic model
+## Logistic model
 
 This is a generalization of the linear model, developed by statisticians
 and economists.
@@ -429,7 +442,7 @@ technique called *iteratively reweighted least squares*.
 
 The function **qeLogit** wraps the ordinary R function **glm**, but
 adds an important feature:  **glm** only handles the 2-class setting,
-e.g.  catcher vs. non-catcher.  The **qeLlogit** handles the c-class
+e.g.  catcher vs. non-catcher.  The **qeLogit** handles the c-class
 situation via the *One vs. All* method (applicable to any ML algorithm):
 
 it calls **glm** one class at a time, generating c
@@ -470,17 +483,36 @@ guess SL, resulting in an error rate of about 50%.  By making use of
 the measurement data, we can reduce the misclassification rate to about
 19%.
 
+Let's try a prediction.  Consider someone like the first patient in the
+dataset but with V6 = 6.22.  What would our prediction be?
+
+``` r
+> newx <- spine[1,-7]  # omit "Y"
+> newx$V6 <- 6.22
+> predict(u,newx)
+$predClasses
+[1] "DH"
+
+$probs
+            DH        NO         SL
+[1,] 0.7432193 0.2420913 0.01468937
+```
+
+We would predict the DH class, as our estimated probability for the lass
+is 0.74, the largest among the three classes.
+
 Some presentations describe the logistic model as "modeling the
 logarithm of the odds of Y = 1 vs. Y = 0 as linear."  While this is
 correct, it is less informative, in our opinion.  Why would we care
 about a logarithm being linear?  The central issue is that the logistic
 function models a probability, just what we need.
 
-### Polynomial-linear models
+## Polynomial-linear models
 
 Some people tend to shrink when they become older.  Thus we may wish to
 model a tendency for people to gain weight in middle age but then lose
-weight as seniors, say 
+weight as seniors, a nonlinear relation.  We could try a quadratic
+model:
 
 m(height,age) = 
 &beta;<sub>0</sub> +
@@ -492,7 +524,8 @@ where presumably &beta;<sub>3</sub> < 0.
 
 We may even include a height X age product term, allowing for interactions.
 Polynomials of degree 3 and so on could also be considered.  The choice
-of degree is a hyperparameter.
+of degree is a hyperparameter; in **qeSVM** it is named, of course,
+**degree**.
 
 This would seem nonlinear, but that would be true only in the sense of
 being nonlinear in age.  It is still linear in the &beta;<sub>i</sub> --
@@ -511,22 +544,70 @@ with any ML method.  In particular, polynomial functions tend to grow
 rapidly near the edges of one's dataset, causing both bias and variance
 problems.
 
-### Shrinkage methods for linear/generalized linear models
+## Shrinkage methods for linear/generalized linear models
 
 Some deep mathematical theory implies that in linear models it may be
-advantageous to shrink the estimated b<sub>i</sub>.  The LASSO
-method does this in a mathematically rigorous manner.  The LASSO is
-especially popular as a tool for predictor variable selection (see
-below).
+advantageous to shrink the estimated b<sub>i</sub>.  *Ridge* regression
+and the LASSO do this in a mathematically rigorous manner.  Each of them
+minimizes the usual sum of squared prediction errors, subject to a
+limit being placed on the size of the b vector; for ridge, the size is
+defined as the sum of the b<sub>i</sub><sup>2</sup>, while for the LASSO
+it's the sum of {b<sub>i</sub>|.
 
 The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
-package.  The main hyperparameter controls the amount of shrinkage.
+package.  The main hyperparameter **alpha** specifies ridge (0) or the
+LASSO (1, the default).
 
 There are various other shrinkage methods, such as Minimax Convex
 Penalty (MCP).  This and some others are available via **qeNCVregCV**,
 which wraps the **ncvreg** package.
 
-### Support Vector Machines
+Shrinkage methods are often also applied to other ML algorithms.
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
+
+### LASSO for feature selection
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
+
+Here is an example using **pef**, a dataset from the US Census, included
+with **qeML**.  The features consist of age, education, occupation and
+gender.  Those last three are categorical variables, which are converted
+to indicator varaibles.  Let's predict wage income.
+
+``` r
+> w <- qeLASSO(pef,'wageinc')
+> w$coefs
+11 x 1 sparse Matrix of class "dgCMatrix"
+                   s1
+(Intercept) -8983.986
+age           254.475
+educ.14      9031.883
+educ.16      9182.592
+occ.100     -2707.388
+occ.101     -1029.592
+occ.102      3795.166
+occ.106         .
+occ.140         .
+sex.1        4472.672
+wkswrkd      1178.889
+```
+
+There are six occupations (this dataset is just for programmers and
+engineers), 
+
+``` r
+> levels(pef$occ)
+[1] "100" "101" "102" "106" "140" "141"
+```
+
+thus five indicator variables.  The LASSO gave coefficients of 0 for
+occupations 106 and 140, so we might decide not to use them, even if we
+utimately use some other ML algorithm.
+
+## Support Vector Machines
 
 These were developed originally in the AI community, and later attracted
 interest among statisticians.  They are used mainly in classification
@@ -565,7 +646,7 @@ exceptions we are willing to accept.
 The **qeSVM** function wraps **svm** in the **e1071** package.  The
 package also offers various other implementations.
 
-### Neural networks
+## Neural networks
 
 These were developed almost exclusively in the AI community.
 
@@ -585,7 +666,8 @@ will be our predicted class.
 still linear combinations.  We might as well just use linear regression
 in the first place."  True, which is why there is more to the story:
 *activation functions*.  Each output of a layer is fed into a function
-A(t) for the purpose of allowing nonlinear effects in our model of m(t).
+A(t) before being passed on to the next layer; this is for the purpose
+of allowing nonlinear effects in our model of m(t).
 
 For instance, say we take A(t) = t^2 (not a common choice in practice,
 but a simple one to explain the issues).  The output of the first layer
@@ -710,47 +792,9 @@ polynomial degree, optimal number of nearest neighbors, optimal *network
 architecture* (configuration of layers and neurons), and so on.  How do
 we find it?
 
-Alas, **there are no magic answers here**.  The general approach is
-*cross-validation*.  Here is a simple version:  We set aside part of our
-training data as a *holdout set*; the remainder becomes our new training
-data.  For each of our candidate models, e.g. each polynomial degree, we
-fit the model to the training set and then use it to predict the holdout
-data.  We then choose the model that does best on the holdout data.
-
-
-All the **qe** functions allow one to randomly partition the data,
-treating one part as the training set, and using the rest, the *holdout*
-set, to treat as new data to get a reliable estimate of the performance
-of the model; the function fits on the training set, then uses the
-result to predict the holdout set.  Though a model may predict well on
-the training set, it may do less well on the holdout data, indicating
-overfitting.
-
-Among other things, this means that if our training data have a very
-large number of predictor variables, we may wish to delete some, or
-possibly combine them, in order to reduce complexity; this is the
-*variable selection* or *feature selection* problem.
-
-One way to approach this is *Principal Components Analysis* (PCA).  One
-creates new predictor variables as linear combinations of the original
-ones, then retains only the combinations that have a large variance.
-Since small variance means a random quantity is essentially constant,
-thus having no predictive value, we discard to the PCs with small
-variance.  
-
-As you may have guessed by now, "There's an app for that" --
-**qePCA**.  It finds the PCs, then applies the qe-series function of
-your choice, say **qeRF** to the new data in the form of the PCs.
-The function **qeUMAP** works similarly for UMAP, which is a kind of
-nonlinear analog of PCA.
-
-Needless to say, we once again encounter the Bias-Variance Tradeoff
-here, in choosing the number of PCs.
-
-Many people use the LASSO for predictor variable selection.  Since
-typically most of the LASSO coefficients are 0s, we use only the
-variables with nonzero coefficients.  One would then predict with that
-simplified LASSO model.
+Alas, **there are no magic answers here**.  But various approaches have
+been developed that one can try.  See the **qeML** vignettes
+**Feature\_Selection** and **Overfitting**. 
 
 ## Which ML method to use?
 
@@ -768,7 +812,7 @@ position.
 
 Where the two kinds of applications may differ, though, is whether there
 are general monotonic relationships between Y and the features.  In
-predicting diabetes, say, the higher the clucose level, the more likely
+predicting diabetes, say, the higher the glucose level, the more likely
 the patient is diabetic.  Though monotonic relations may exist in image
 classification, they maybe more localized.
 
