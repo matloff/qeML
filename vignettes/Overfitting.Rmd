@@ -28,6 +28,7 @@ knitr::opts_chunk$set(
 * [How could it be possible?](#how-could-it-be-possible?)
 * [Baffling behavior--"double descent"](#baffling-behavior--"double-descent")
 * [How could it be possible?](#how-could-it-be-possible?)
+
 # Preparation
 
 ## Goals
