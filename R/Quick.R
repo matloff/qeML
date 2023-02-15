@@ -2477,18 +2477,28 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
-   # requireNamespace('pROC')
+   requireNamespace('ROCR')
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    # ys <- as.factor(holdY == yLevelName)
    ys <- as.numeric(holdY == yLevelName)
    probs <- qeOut$holdoutPreds$probs
    if (is.null(probs)) stop('no holdoutPreds$probs')
-   if (nrow(probs) == 1) probs <- probs[1,]
-   else probs <- probs[,paste0('dfr.',yLevelName)]
+   if (nrow(probs) == 1) {
+      probs <- probs[1,]
+   } else if (yLevelName %in% colnames(probs)) {
+      probs <- probs[,yLevelName]
+   } else {
+      colName <- paste0(yName,'.',yLevelName)
+      if (colName %in% colnames(probs)) {
+         probs <- probs[,colName]
+      }
+      else probs <- probs[,paste0('dfr.',yLevelName)]
+   }
+
    # pROC::roc(ys,probs,plot=T)
    pred <- ROCR::prediction(probs,ys)
-   perf <- performance(pred,"tpr","fpr",colorkey.relwidth=1.0)
+   perf <- ROCR::performance(pred,"tpr","fpr",colorkey.relwidth=1.0)
    alphVals <- perf@alpha.values[[1]]
    print(alphVals)
    # expand <- 1 / min(alphVals)
