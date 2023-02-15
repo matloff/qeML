@@ -1,13 +1,4 @@
 
----
-title: "Quick Start"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Quick Start}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
----
-
 <img src="VertebraeUMAP.png" alt="drawing" width="400"/>
 
 # The qeML package: "Quick and easy" machine learning
