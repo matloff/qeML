@@ -190,3 +190,6 @@ topics.  A few example (showing how they are invoked):
   of predictor variables, both to save computation and prevent
   overfitting; how should this be done, especially in **qeML**?
 
+* **vignette('PCA_and_UMAP')**; this vignette first takes a closer, more
+  practical look at Principal Components Analysis, then gives an
+  overview of UMAP, a relatively new nonlinear alternative to PCA

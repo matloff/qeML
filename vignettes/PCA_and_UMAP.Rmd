@@ -448,13 +448,31 @@ In recent years, other dimension reduction method have become popular,
 notably t-SNE and UMAP.  Let's take a very brief look at the latter.
 
 ``` r
-
+library(umap)
 custom.settings <- umap.defaults
 custom.settings$n_components <- 6
 umOut <- umap(fiftyksongs[,-1],config=custom.settings)
 
 ```
 
-The new variables will then be returned in **umOut$layout** (analogous
-to our **z$x** above).
 
+The new variables will then be returned in **umOut$layout**, analogous
+to our **z$x** above.  We will now have a 50000 x 6 matrix, replacing
+our original 50000 x 90 data.
+
+So, what does UMAP actually do?  The math is quite arcane; even the
+basic assumption, "uniform distribution on a manifold," is beyond the
+scope of this tutorial.  
+
+But roughly speaking, the goal is to transform the original data,
+dimension 90 here, to a lower-dimensional data set (6 here) in such a
+way that "local" structure is retained.  The latter condition means that
+rows in the data that were neighbors of each other in the original data
+are likely still neighbors in the new data, subject to the
+hyperparameter **n_neighbors**: a data point **v** counts as a neighbor
+of **u** only if **v** is among the **n_neighbors** points to **u**.
+
+In terms of the Bias-Variance Tradeoff, smaller values of
+**n_neighbors** reduce bias while increasing variance, in a similar
+manner to the value of **k** in the k-Nearest Neighbors predictive
+method.
