@@ -69,7 +69,7 @@ for class 1 and class 0, respectively.  Here are some ways to rebalance.
 * Using distribution approximation methods such as SMOTE, resample 80000
   from the 20000.
 
-Upon closer inspection, though, one sees that **this
+Arguably, though, **this
 is generally inadvisable, indeed harmful,** for several reasons:
 
 * Undersampling is clearly problematic:  Why throw away data?
@@ -134,7 +134,7 @@ The dataset is conveniently available in the `mlbench` package.
 ### Mt. Sinai Hospital X-ray study
 
 In an X-ray [classification
-tudy](https://www.scientificamerican.com/article/rise-of-robot-radiologists)
+study](https://www.scientificamerican.com/article/rise-of-robot-radiologists)
 from Mount Sinai Hospital, the classification method worked well on the
 original hospital data, but not in prediction of new cases at other
 locations.  The study's authors found that an important factor
@@ -150,8 +150,8 @@ In
 Provost](https://link.springer.com/article/10.1023/A:1009700419189),
 the authors found that
 
-> The level of fraud changes dramat-ically month-to-month because of
-> modifications to work practices (both the carrier’s andthe bandits’). 
+> The level of fraud changes dramatically month-to-month because of
+> modifications to work practices (both the carrier’s and the bandits’). 
 
 
 
@@ -162,7 +162,7 @@ values as *conditional class probabilities*, because they are
 probabilities subject to conditions.  If say we wish to classify a
 patient as to whether she has a certain disease or not, and we know her
 blood test value on some measure is 2.39, the latter is the condition.
-Among all patients with that test value, what proportion of them have
+Among all patients with that blood test value, what proportion of them have
 the disease?
 
 The overall class probabilities, e.g. the 0.000172 value above, are
@@ -170,8 +170,8 @@ The overall class probabilities, e.g. the 0.000172 value above, are
 
 The conditional and unconditional class probabilities are often referred
 to as the *posterior* and *prior* probabilities.  This sounds Bayesian,
-and indeed we do use Bayes' Rule, but there is no subjectivity involved.
-These are real probabilities.  E.g. in a disease classification
+and indeed we do use Bayes' Rule, but there is no subjectivity involved;
+these are real probabilities.  E.g. in a disease classification
 application, there is a certain proportion of people in the population
 who have the disease.  This is a prior probability, which we will
 estimate from our training data.
