@@ -2486,6 +2486,8 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    if (is.null(probs)) stop('no holdoutPreds$probs')
    if (nrow(probs) == 1) {
       probs <- probs[1,]
+   } else if (ncol(probs) == 1) {
+      probs <- probs[,1]
    } else if (yLevelName %in% colnames(probs)) {
       probs <- probs[,yLevelName]
    } else {
