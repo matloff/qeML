@@ -8,7 +8,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-#  Clearing the Confusion: A Closer look at the issue of unbalanced class data 
+#  Clearing the Confusion: A Closer Look at the Issue of Unbalanced Training Data 
 
 Many resources on machine learning (ML) classification problems
 recommend that if one's dataset has unbalanced class sizes, one
@@ -16,10 +16,13 @@ should modify the data to have equal class counts.  Yet it is shown here
 that this is both unnecessary and often harmful.  Alternatives are
 presented.
 
+
+
 ## Outline
 
-* Why is imbalance a problem? Our ML algorithm may never predict the
-  small class, making the algorithm rather meaningless.
+* What is the concern regarding imbalanced training data? Our ML
+  algorithm may never predict very small classes, making the algorithm
+  rather meaningless, especially in 2-class settings.
 
 * A popular solution is to artificially balance the data, e.g. CRAN
   package **smotefamily**.
@@ -295,7 +298,7 @@ So, if your sampling scheme artificially creates balanced data, as in
 the LetterRecognition data, or if you do resampling to make your data balanced, as
 is commonly recommended, you are fooling your ML algorithm.  
 
-## Artificial Balance Won't Achieve Your Goals
+## Artificial Balance Will Not Achieve Our Goals
 
 In fooling your algorithm, it will generate the wrong conditional class
 probabilities r<sub>i</sub> in our notation above.  And whether we wish
@@ -367,7 +370,8 @@ To see why, say we are classifying patients as having a certain disease
 or not, say on the basis of a blood test.  For a value of h associated
 with a point on the line, diseased and disease-free patients would have
 the same probability of testing positive, indicating that the test has
-no discriminatory value.
+no discriminatory value.  Thus, the further above the 45-line our ROC
+curve is, the better our predictive power.
 
 *A note on AUC:*  AUC is the total area under the ROC curve.  As such,
 it is a measure of the general predictive ability of your algorithm on
@@ -397,7 +401,7 @@ by Price Waterhouse Coopers, it is pointed out that
 > depending on the facts that are unique to each case.
 
 Use of a machine learning algorithm to make a mechanical decision would
-obviate this needed flexibility.
+not provide this needed flexibility.
 
 Instead, a practical, *effective* approach would be to simply look at
 the r values for the new cases directly.  In other words, we have the
