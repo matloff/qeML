@@ -136,7 +136,7 @@ features,  though two original features have been retained.
 ### Missed appointments data
 
 This is a 
-[Kaggle dataset](https://www.kaggle.com/joniarroba/noshowappointments])
+[Kaggle dataset](https://www.kaggle.com/joniarroba/noshowappointments)
 on whether patients keep their medical appointments.  The imbalance here
 is more mild, with about 20% of the patients being no-shows.
 
