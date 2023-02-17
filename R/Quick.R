@@ -327,14 +327,17 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    
    if (classif) {
       if (classif2) {
-         y <- as.integer(y == yesYVal)
+         yToAvg <- as.integer(y == yesYVal)
          nYcols <- 1
       }
        else  {
-         y <- factorsToDummies(y)
-         nYcols <- ncol(y)
+         yToAvg <- factorsToDummies(y)
+         nYcols <- ncol(yToAvg)
       }
-   } else nYcols <- 1
+   } else {
+      yToAvg <- y
+      nYcols <- 1
+   }
 
    if (!is.numeric(x)) {
       x <- factorsToDummies(x,omitLast=TRUE)
@@ -351,16 +354,16 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       xTst <- x[holdIdxs,]
       x <- x[-holdIdxs,]
       if (classif2 || !classif) {
-         yTst <- y[holdIdxs]
-         y <- y[-holdIdxs]
+         yTst <- yToAvg[holdIdxs]
+         yToAvg <- yToAvg[-holdIdxs]
       }
       else {
-         yTst <- y[holdIdxs,]
-         y <- y[-holdIdxs,]
+         yTst <- yToAvg[holdIdxs,]
+         yToAvg <- yToAvg[-holdIdxs,]
       }
       tst <- cbind(xTst,yTst)
       tst <- as.data.frame(tst)
-      trn <- cbind(x,y)
+      trn <- cbind(x,yToAvg)
       if (classif && !classif2) ycol <- (ncol(x)+1):(ncol(x)+nYcols)
       else ycol <- ncol(trn)
    } 
@@ -397,7 +400,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    }
 
    # set scaleX to FALSE; scaling, if any, has already been done
-   knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=FALSE,classif=classif,
+   knnout <- regtools::kNN(xm,yToAvg,newx=NULL,k,scaleX=FALSE,classif=classif,
       smoothingFtn=smoothingFtn)
    knnout$classif <- classif
    knnout$classif2 <- classif2
