@@ -17,6 +17,31 @@ that this is both unnecessary and often harmful.  Alternatives are
 presented.
 
 
+* [Outline](#outline)
+* [Overview](#overview)
+* [Motivating examples](#motivating-examples)
+  * [Credit card fraud data](#credit-card-fraud-data)
+  * [Missed appointments data](#missed-appointments-data)
+  * [Optical letter recognition data](#optical-letter-recognition-data)
+  * [Mt. Sinai Hospital X-ray study](#mt.-sinai-hospital-x-ray-study)
+  * [Cell phone fraud](#cell-phone-fraud)
+* [Terminology](#terminology)
+* [Notation](#notation)
+* [Key issue:  How were the data generated?](#key-issue:-how-were-the-data-generated?)
+* [Optimal classification rules](#optimal-classification-rules)
+* [What your ML algorithm is thinking](#what-your-ml-algorithm-is-thinking)
+* [Artificial balance will not achieve our goals](#artificial-balance-will-not-achieve-our-goals)
+* [So, what SHOULD be done?](#so,-what-should-be-done?)
+  * [Approach 1: use the ROC curve](#approach-1:-use-the-roc-curve)
+  * [Approach 2:  informal, nonmechanical consideration of the r<sub>i</sub> (favored choice)](#approach-2:-informal,-nonmechanical-consideration-of-the-r<sub>i</sub>-(favored-choice))
+* [Obtaining the r<sub>i</sub>](#obtaining-the-r<sub>i</sub>)
+  * [Example: Missed Apppointments Data](#example:-missed-apppointments-data)
+* [Adjusting the p<sub>i</sub>](#adjusting-the-p<sub>i</sub>)
+  * [The adjustment formula](#the-adjustment-formula)
+* [Summary](#summary)
+* [Appendix A: derivation of the unequal-loss rule](#appendix-a:-derivation-of-the-unequal-loss-rule)
+* [Appendix B: derivation of the adjustment formula](#appendix-b:-derivation-of-the-adjustment-formula)
+* [Appendix C:  What is really happening if you use equal class probabilities?](#appendix-c:-what-is-really-happening-if-you-use-equal-class-probabilities?)
 
 ## Outline
 
@@ -43,8 +68,8 @@ probabilities may change.
 
 * Solutions:
 
-    - Regarding imbalance, we consider but reject ROC, and instead argue
-      that informal use of conditional probabilities is best.
+    - Regarding imbalance, we first consider ROC, but argue
+      that simple, informal use of conditional probabilities is best.
 
     - Regarding incorrect class probabilities, we develop an adjustment
       formula.
@@ -89,7 +114,7 @@ In other words:
 
 > Resampling methods **are both harmful and unnecessay**.
 
-## Motivating Examples  
+## Motivating examples  
 
 ### Credit card fraud data
 
@@ -298,7 +323,7 @@ So, if your sampling scheme artificially creates balanced data, as in
 the LetterRecognition data, or if you do resampling to make your data balanced, as
 is commonly recommended, you are fooling your ML algorithm.  
 
-## Artificial Balance Will Not Achieve Our Goals
+## Artificial balance will not achieve our goals
 
 In fooling your algorithm, it will generate the wrong conditional class
 probabilities r<sub>i</sub> in our notation above.  And whether we wish
@@ -332,15 +357,22 @@ Frank Harrell
 
 ## So, what SHOULD be done?
 
-Clearly, one's course of action should center around the conditional
-class probabilities r<sub>i</sub>.  (Note the plural; each case will
-have its own value of r<sub>i</sub>.)  So, specifically, how should we
-use them?  We will discuss two approaches:
+We will focus here on the 2-class class.  Let r<sub>new</sub> denote the
+conditional class probability P(Y<sub>new</sub> = 1 | X<sub>new</sub> =
+r<sub>new</sub> for a new case to be classified.
+
+Note that (a) as always, the r values are only sample estimates, subject
+to sampling variability, and (b) not all qe-series functions are capable
+of calculating the r values.
+
+Clearly, one's course of action should center around the value of
+r<sub>new</sub>.  specifically, how should we use it?  We will discuss
+two approaches:
 
 1. Use of the ROC curve, which is derived from the
    r<sub>i</sub> values.
 
-2. Informal, nonmechanical consideration of the r values.
+2. Informal, nonmechanical consideration of the r<sub>new</sub> value.
 
 Our recommendation will be Approach 2 above.
 
@@ -358,7 +390,10 @@ FPR(h) = P(Y<sub>pred</sub> = 1 | Y = 0)
 
 The ROC curve is then a graph of TPR vs. FPR.  As we vary h, it traces
 out the ROC curve.  Some R packages, such as ROCR, colorize the curve,
-with the color showing the value of h.  The qeML funcit
+with the color showing the value of h.  The qeML function **qeROC**
+(which wraps the **ROCR** package) does this.
+
+For instance, let's look at the Missed Appaointments Dataset.
 
 The idea here is that even if we cannot quantity l<sub>01</sub>, we can
 at least explore various values of h to produce a decision rule that
