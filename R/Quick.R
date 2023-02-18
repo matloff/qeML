@@ -2488,10 +2488,8 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    ys <- as.numeric(holdY == yLevelName)
    probs <- qeOut$holdoutPreds$probs
    if (is.null(probs)) stop('no holdoutPreds$probs')
-   if (nrow(probs) == 1) {
-      probs <- probs[1,]
-   } else if (ncol(probs) == 1) {
-      probs <- probs[,1]
+   if (is.vector(probs) || nrow(probs) == 1 || ncol(probs) == 1) {
+     probs <- as.vector(probs)
    } else if (yLevelName %in% colnames(probs)) {
       probs <- probs[,yLevelName]
    } else {
@@ -2511,6 +2509,7 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    # perf@alpha.values[[1]] <- expand*perf@alpha.values[[1]]
    # perf@alpha.name <- paste('Cutoffs expansion factor =',expand)
    plot(perf,colorize=TRUE)
+   abline(0,1)
    perf
 }
 
