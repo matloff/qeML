@@ -334,7 +334,7 @@ indirectly) rely on the values of r<sub>i</sub>.
 Consider the fraud example, in which the data are highly imbalanced but
 in which wrongly guessing the large class carries heavy penalties for
 us.  Recall our notation l<sub>01</sub> from above.  As noted, this may
-be difficult to quantity, but for the moment, let's suppose we can do
+be difficult to quantify, but for the moment, let's suppose we can do
 so.  What are the implications in terms of artificially balancing the
 data?
 
@@ -359,7 +359,7 @@ Frank Harrell
 
 We will focus here on the 2-class class.  Let r<sub>new</sub> denote the
 conditional class probability P(Y<sub>new</sub> = 1 | X<sub>new</sub> =
-r<sub>new</sub> for a new case to be classified.
+r<sub>new</sub>) for a new case to be classified.
 
 Note that (a) as always, the r values are only sample estimates, subject
 to sampling variability, and (b) not all qe-series functions are capable
@@ -393,9 +393,23 @@ out the ROC curve.  Some R packages, such as ROCR, colorize the curve,
 with the color showing the value of h.  The qeML function **qeROC**
 (which wraps the **ROCR** package) does this.
 
-For instance, let's look at the Missed Appaointments Dataset.
+For instance, let's look at the Missed Appointments Dataset.  Here re
+the code and result:
 
-The idea here is that even if we cannot quantity l<sub>01</sub>, we can
+``` r
+
+> z <- qeXGBoost(MissedAppts,'No.show')
+> qeROC(MissedAppts,z,'No.show','Yes')
+```
+
+![alt text](MissedApptsROCYes.png)
+
+So for instance, if we were to set h = 0.24, then FPR and TPR would be
+about 0.2 and 0.4, respectively.  While this may be interesting, it is
+not advising us how setting h = 0.24 is directly relevant to the issue
+at hand--how do we identify possible no-shows?
+
+The idea here is that even if we cannot quantify l<sub>01</sub>, we can
 at least explore various values of h to produce a decision rule that
 roughly reflects the relative values we place on true and false
 positives.
