@@ -409,11 +409,6 @@ about 0.2 and 0.4, respectively.  While this may be interesting, it is
 not advising us how setting h = 0.24 is directly relevant to the issue
 at hand--how do we identify possible no-shows?
 
-The idea here is that even if we cannot quantify l<sub>01</sub>, we can
-at least explore various values of h to produce a decision rule that
-roughly reflects the relative values we place on true and false
-positives.
-
 Often a 45-degree line is superimposed on the ROC graph for comparison.
 To see why, say we are classifying patients as having a certain disease
 or not, say on the basis of a blood test.  For a value of h associated
@@ -430,7 +425,7 @@ possible TPR/FPR scenarios; usually we are far more interested in some
 settings than others.  Note too that AUC values for original data vs.
 the artificially balanced data are not comparable.
 
-### Approach 2:  informal, nonmechanical consideration of the r<sub>i</sub> (favored choice)
+### Approach 2:  informal, nonmechanical consideration of r (favored choice)
 
 The key points are:
 
@@ -453,157 +448,68 @@ Use of a machine learning algorithm to make a mechanical decision would
 not provide this needed flexibility.
 
 Instead, a practical, *effective* approach would be to simply look at
-the r values for the new cases directly.  In other words, we have the
+the r value for the new case directly.  In other words, we have the
 algorithm only take the first step, after which we work "by hand" rather
 than by computer.  We would still set a threshold h, yes, but would use
 it only as first-stage screening, with the second stage being done by
 humans.  
 
-At that point, the (human) auditor would take  into account both that
-estimated probability -- now worrying not only that it is larger than h
-but also *how much larger* -- as well as such factors as the amount of
-the charge, special characteristics not measured in the available
-features, and so on.  The auditor may not give priority, for instance,
-to a case for which the probability is above h but the monetary value of
-the transaction is small.  On the other hand, if the probability is far
+At that point, the (human) fraud auditor would take  into account both
+that estimated probability as well as such factors as the amount of the
+charge, special characteristics not measured in the available features,
+and so on.  The auditor may not give priority, for instance, to a case
+for which the probability is above h but the monetary value of the
+transaction is small.  On the other hand, if the probability is far
 above h, the auditor may give this transaction a closer look even if the
 monetary value is small.
 
 A related issue is that of ranking.  In the credit card fraud example,
 for instance, we may have sufficient audit funding to investigate 100
 transactions per month.  Thus we would rank the r<sub>i</sub>, and cull
-out the top 100 cases.
-   
-## Obtaining the r<sub>i</sub>
+out the top 100 cases, and set h = r<sub>100</sub>.  Any future r value
+above that hwill be given extra scrutiny.
 
-Some ML algorithms naturally provide the r<sub>i</sub>, while others do
-not.
+## Extracting the r<sub>i</sub> values
 
-Below is an example for the logistic model, for a data frame **ccf**
-containing the credit card fraud data, with class variable **Class**.
-Say we take h = 0.25.  We'll cull out the cases with at least that
-probability of fraud, for preparation of investigation "by hand."
+The qe-series functions include a component **holdoutPreds**, which give
+us the predictions for the holdout cases.  That component in turn shows
+predicted classes and the r<sub>i</sub>.
 
 ``` r
-> glmout <- glm(Class ~ .,data=ccf,family=binomial)
-> condProbs <- predict(glmout,ccf,type='response')
-> toCheck <- which(condProbs > 0.25)
-> names(toCheck) <- NULL
-> head(toCheck)
-[1]  542 6109 6332 6335 6337 6339
-
+> names(z)
+ [1] "handle"         "raw"            "niter"          "evaluation_log"
+ [5] "call"           "params"         "callbacks"      "feature_names" 
+ [9] "nfeatures"      "classif"        "factorsInfo"    "yLevels"       
+[13] "holdoutPreds"   "testAcc"        "holdIdxs"      
+> names(z$holdoutPreds)
+[1] "predClasses" "probs"      
 ```
 
-So we'd check cases 542, 6109 and so on by hand.
-
-On the other hand, the SVM method does not produce the r<sub>i</sub>.
-In addition, even the r<sub>i</sub> produced by, e.g. **glm()** may have
-biases on the edges of the data.  Thus an external method is needed.  
-
-Many implementations of SVM use a method known as *Platt scaling*. This
-assumes a logistic model from the regression function of Y (2-class
-case) against the SVM scores.  In `regtools`, we instead use an method
-we developed, which performs a k-Nearest Neighbors regression of Y
-against the scores.  (In non-SVM cases, the scores can be anything used
-by the ML method at hand to predict Y.)  Our method is implemented in
-the `regtools` function `scoresToProbs()`. 
-
-### Example: Missed Apppointments Data
+The **probs** component in this case has No and Yes columns (no, the
+person was not a no-show):
 
 ``` r
-> ma <- read.csv('KaggleV2-May-2016.csv',header=T,stringsAsFactors=T)
-> ma <- ma[,-c(1,2,4,5,7)]
-> svmout <- qeSVM(ma,'No.show',holdout=NULL)
-```
-
-Let's predict a hypothetical patient with the characteristics of patient
-8 in our training data, but who is male:
-
-``` r
-> newx <- ma[8,-9]
-> newx$Gender <- 'M'
-> predict(svmout,newx)
-$predClasses
- 8 
-No 
-Levels: No Yes
-```
-
-We predict him to show up for the appointment.  But what is the
-probability of that?
-
-``` r
-> predict(svmout,newx,k=75)
-$predClasses
- 8 
-No 
-Levels: No Yes
-
-$probs
+> head(z$holdoutPreds$probs)
             No       Yes
-[1,] 0.8133333 0.1866667
+[1,] 0.8597212 0.1402789
+[2,] 0.8391342 0.1608659
+[3,] 0.8112034 0.1887966
+[4,] 0.7932751 0.2067250
+[5,] 0.8362259 0.1637741
+[6,] 0.8776399 0.1223601
 ```
 
-What happened here?  Our function `predict.qeSVM` includes this code:
+So, here is a histogram of the Yes r<sub>i</sub> in the Missed Appointments
+dataset, to give us an idea of how often various r values will arise in
+the future:
 
 ``` r
-    if (!is.null(k)) {
-        y <- object$y
-        trnScores <- object$decision.values
-        newScores <- getDValsE1071(object, newx)
-        probs <- scoresToProbs(y, trnScores, newScores, k)
-        res$probs <- probs
-    }
+hist(z$holdoutPreds$probs[,2])
 ```
 
-Armed with this probability estimate for the given patient, we can make
-an informal decision as to whether to invest time and effort to make
-sure he does show up, say by phone call reminders, additional text
-messages etc.
+![alt text](MissedApptsXBGYes.png)
 
-And what about ranking?  We would call **predict()** on our current set
-of new cases, then rank the resulting probabilities.  Just as an example,
-let's take our training set as the "new cases."
-
-``` r
-> preds <- predict(svmout,svmout$x,k=75) 
-> probs <- preds$probs
-> probsOrder <- order(probs) 
-> probsSorted <- probs[probsOrder]
-> head(probsSorted,100)
-  [1] 0.01333333 0.01333333 0.01333333 0.01333333 0.01333333 0.01333333
-  [7] 0.01333333 0.01333333 0.01333333 0.01333333 0.01333333 0.01333333
- [13] 0.01333333 0.01333333 0.01333333 0.01333333 0.01333333 0.01333333
- [19] 0.01333333 0.01333333 0.02666667 0.02666667 0.02666667 0.02666667
- [25] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [31] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [37] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [43] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [49] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [55] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [61] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [67] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [73] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [79] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [85] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [91] 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667 0.02666667
- [97] 0.02666667 0.02666667 0.02666667 0.02666667
-> head(probsOrder,100)
-  [1] 111857 116081 116105 117394 121485 132575 139922 141078 156201 158322
- [11] 166633 169521 172965 174563 191263 191534 193848 194199 200048 211445
- [21] 111474 111529 113535 113572 113577 113579 113582 113584 113585 113590
- [31] 113593 113598 113617 113634 113636 113637 113640 114420 115955 116040
- [41] 117506 117538 117540 117542 117543 117546 117548 117551 117555 117562
- [51] 117565 117628 117634 117638 117639 117640 117641 117648 117651 117663
- [61] 117693 117715 117718 117773 117842 117843 117845 117847 117849 117853
- [71] 117856 117956 117962 117966 117969 117970 117971 117979 117982 118010
- [81] 118013 118015 118018 118021 118024 118026 118027 118037 118038 118041
- [91] 118043 118048 118112 118125 118127 118130 118131 118133 118138 118139
-```
-
-So we might investigate case numbers 111857, 116081 and so on.
-
-## Adjusting the p<sub>i</sub>
+## Adjusting for incorrect/changed p<sub>i</sub>
 
 As noted in the LetterRecognition data example, in some cases the data
 are artificially balanced to begin with, due to the sampling design.  Or
@@ -634,9 +540,9 @@ classadjust <- function (econdprobs, wrongprob1, trueprob1)
 
 where 
 
-- `condprobs` is the vector of conditional class probabilities for
-the dataset at hand, reported by the software applied to that data using
-incorrect p<sub>i</sub>
+- `condprobs` is the vector of conditional class probabilities r<sub>i</sub> for
+  the dataset at hand, reported by the software applied to that data using
+  incorrect p<sub>i</sub>
 
 - `wrongratio` is the ratio of the numbers of Class 0 to Class 1
   datapoints in our dataset
@@ -644,7 +550,7 @@ incorrect p<sub>i</sub>
 - `trueratio` is the actual such ratio 
 
 The return value is the set of adjusted conditional class
-probabilities.
+probabilities r<sub>i</sub>.
 
 For instance, suppose we are in a setting in which there are equal
 numbers of the two classes in our dataset, yet we know the true
@@ -652,25 +558,6 @@ numbers of the two classes in our dataset, yet we know the true
 Then `wrongratio` would be 0.5/0.5 = 1.0, and `trueratio` would be
 0.2/0.8 = 0.25. 
 
-# The case of balanced data but unknown true class probabilities
-
-What if the data are balanced but the true unconditional class
-probabilities are unknown?  Other than creating various scenarios
-involving the true values and exploring the results, there is not much
-that we can do.  In essence, the result is a maximum-likelihood kind of
-situation:  Our predicted class will be the one whose (nominal)
-conditional probability makes our feature data most likely given the
-class (see Appendix B below), **which is very different from the question
-we want to ask, Which class is most likely given the feature set?** 
-We'll get answers ("Hey, the computer said such and such!"), but those
-answers will be of questionable value unless the predictors have very
-strong predictive power.
-
-Note that setting utility values for "false positive," "false negative"
-and so on does not solve the problem.  One still needs to factor in the
-class probabilities in order to maximize expected utility.
-
-Once again, **balancing the data will not help.**
 
 ## Summary
 
