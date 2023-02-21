@@ -331,7 +331,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
          nYcols <- 1
       }
        else  {
-         yToAvg <- factorsToDummies(y)
+         yToAvg <- regtools::factorsToDummies(y)
          nYcols <- ncol(yToAvg)
       }
    } else {

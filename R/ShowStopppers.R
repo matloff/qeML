@@ -12,7 +12,7 @@ qeFindShowStoppers <- function(x,yName,yesYVal=NULL)
    if (length(factors) ==0) stop('no factor variables present')
    xF <- x[,factors]
 
-   xF <- factorsToDummies(xF,omitLast=F)
+   xF <- regtools::factorsToDummies(xF,omitLast=F)
    xF <- as.data.frame(xF)
    # xF now all dummies
 

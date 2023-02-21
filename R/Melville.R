@@ -11,10 +11,9 @@
 getJLMImageSet <- function(imageSet) 
 {
    require(umap)
-   require(devtools)
    u <- require(snedata)
    if (!u) {
-      devtools::install <- devtools::github("jlmelville/snedata")
+      devtools::install_github("jlmelville/snedata")
    }
 
    cmd <- paste0('download_',imageSet,'()')
