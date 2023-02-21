@@ -306,7 +306,7 @@ factorToTopLevels <- function(f,lowCountThresh=0)
 {
    levelCounts <- table(f)
    if (lowCountThresh==0) {
-      hist(levelCounts,xlab='counts per level',
+      graphics::hist(levelCounts,xlab='counts per level',
          ylab='number of levels having a given count')
       lowCountThresh <- readline('enter lowCountThresh: ')
    }

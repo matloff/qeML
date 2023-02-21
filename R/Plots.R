@@ -11,7 +11,7 @@ plotClassesUMAP <- function(data,classVar)
       x <- data
    }
    if (!is.factor(classVar)) classVar <- as.factor(classVar)
-   if (!allNumeric(x)) x <- factorsToDummies(x)
+   if (!allNumeric(x)) x <- regtools::factorsToDummies(x)
    ump <- uwot::umap(x)
    plot(ump[,1:2],col=classVar,xlab='UMAP1',ylab='UMAP2')
 }
