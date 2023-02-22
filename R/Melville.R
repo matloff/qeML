@@ -10,8 +10,8 @@
 
 getJLMImageSet <- function(imageSet) 
 {
-   require(umap)
-   u <- require(snedata)
+   requireNamespace('umap')
+   u <- requireNamespace('snedata')
    if (!u) {
       devtools::install_github("jlmelville/snedata")
    }
