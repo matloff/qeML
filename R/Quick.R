@@ -2418,6 +2418,54 @@ predict.qeKNNna <- function(object,newx,kPred=1,...)
    preds
 }
 
+#######################  qeXGBoost()()  ##############################
+
+# XGBoost
+
+# arguments:  see above, plus
+
+#     nRounds: number of boosting rounds
+#     params: R list of tuning parameters; see documentation fo
+#        xgboost::xgboost()
+ 
+qeXGBoost <- function(data,yName,nRounds=5,params=list(),yesYVal,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   ycol <- which(names(data) == yName)
+   if (classif) {
+      y <- data[,yName]
+      yLevels <- levels(y)
+      if (length(yLevels) > 2)
+         stop('use xgboost::xgboost directly for multiclass case')
+      if (is.null(yesYVal)) 
+         stop('must specify yesYVal')
+      whichYes <- which(yLevels == yesYVal)
+      noYVal <- yLevels[3 - whichYes]
+      data[,ycol] <- as.integer(y == yesYVal)
+   } else noYVal <- NULL
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      splitData(holdout,data)
+      y <- data[-holdIdxs,ycol]
+      x <- data[-holdIdxs,-ycol]
+   } else {
+      x <- data[,-ycol]
+      y <- data[,ycol]
+   }
+   # if holdout, x,y are now the training set
+   
+   if (!allNumeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo') 
+   } else factorsInfo <- NULL
+
+
+}
+
 #######################  qeParallel()  ##############################
 
 # arguments:
