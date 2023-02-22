@@ -13,6 +13,7 @@
 \alias{qeLASSO}
 \alias{qePolyLin}
 \alias{qePolyLog}
+\alias{qePoly}
 \alias{qeIso}
 % \alias{qeCompare}
 \alias{qePCA}
@@ -20,6 +21,16 @@
 \alias{qeskRF}
 \alias{qeskSVM}
 \alias{qeParallel}
+\alias{qeDT}
+\alias{qeFOCI}
+\alias{qeFOCIrand}
+\alias{qeLinKNN}
+\alias{qePolyLASSO}
+\alias{qeROC}
+\alias{qeXGBoost}
+\alias{qeCompare}
+\alias{qeFT}
+\alias{qeDeepnet}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
@@ -40,9 +51,11 @@
 \alias{predict.qeUMAP}
 \alias{predict.qeskRF}
 \alias{predict.qeskSVM}
+\alias{predict.qeDeepnet}
 \alias{predict.qeParallel}
-\alias{plot.RF}
-\alias{plot.LASSO}
+\alias{plot.qePoly}
+\alias{plot.qeRF}
+\alias{plot.qeLASSO}
 
 \title{Quick-and-Easy Machine Learning Wrappers}
 
@@ -56,19 +69,22 @@ for teaching.
 }
 
 \usage{
-qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
-qeLin(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
-qeKNN(data,yName,k,scaleX=TRUE,holdout=floor(min(1000,0.1*nrow(data))))
-qeRF(data,yName,nTree,minNodeSize,holdout=floor(min(1000,0.1*nrow(data))))
-qeRFranger(data,yName,nTree,minNodeSize,
-   holdout=floor(min(1000,0.1*nrow(data))),   yYesName="") 
+qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
+qeLin(data,yName,noBeta0=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
+qeKNN(data,yName,k,scaleX=TRUE,smoothingFtn=mean,yesYVal=NULL,
+   expandVars=NULL,expandVals =NULL,holdout=floor(min(1000,0.1*nrow(data))))
+qeRF(data,yName,nTree=500,minNodeSize=10,mtry=floor(sqrt(ncol(data)))+1,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeRFranger(data,yName,nTree=500,minNodeSize=10,
+   mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))),yesYVal="") 
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
-   holdout=floor(min(1000,0.1*nrow(data))),
-   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)))
+   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
+   holdout=floor(min(1000,0.1*nrow(data))))
 qeskRF(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
+   allDefaults=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
 qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
@@ -88,33 +104,83 @@ qePolyLog(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeCompare(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
-qePCA(dataName,yName,qeName,opts=NULL,pcaProp,
+qePCA(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
+qeUMAP(data,yName,qeName,opts=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
+   nComps=NULL,nNeighbors=NULL)
+qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
    holdout=floor(min(1000,0.1*nrow(data))))
-\method{predict}{qeLogit}(object,newx)
-\method{predict}{qeLin}(object,newx)
-\method{predict}{qeKNN}(object,newx,newxK=1)
-\method{predict}{qeRF}(object,newx)
-\method{predict}{qeRFranger}(object,newx)
-\method{predict}{qeRFgrf}(object,newx)
-\method{predict}{qeSVM}(object,newx,k=25)
-\method{predict}{qeGBoost}(object,newx)
-\method{predict}{qelightGBoost}(object,newx)
-\method{predict}{qeNeural}(object,newx)
-\method{predict}{qeLASSO}(object,newx)
+qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
+   yesYLevel=NULL)
+qeFOCIrand(data,yName,xSetSize,nXSets)
+qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
+   expandVars=NULL,expandVals=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeROC(dataIn,qeOut,yName,yLevelName)
+qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
+   holdout=floor(min(1000,0.1*nrow(data))))
+qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
+   learningrate=0.8,momentum=0.5,learningrate_scale=1,
+   numepochs=3,batchsize=100,hidden_dropout=0,yesYVal=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))))
+\method{predict}{qeLogit}(object,newx,...)
+\method{predict}{qeLin}(object,newx,useTrainRow1=TRUE,...)
+\method{predict}{qeKNN}(object,newx,newxK=1,...)
+\method{predict}{qeRF}(object,newx,...)
+\method{predict}{qeRFranger}(object,newx,...)
+\method{predict}{qeRFgrf}(object,newx,...)
+\method{predict}{qeSVM}(object,newx,...)
+\method{predict}{qeGBoost}(object,newx,newNTree=NULL,...)
+\method{predict}{qeLightGBoost}(object,newx,...)
+\method{predict}{qeNeural}(object,newx,k=NULL,...)
+\method{predict}{qeLASSO}(object,newx,...)
 \method{predict}{qePoly}(object,newx)
-\method{predict}{qePCA}(object,newx)
-\method{predict}{qeUMAP}(object,newx)
-\method{plot}{qeLASSO}(object,newx)
-\method{plot}{qeSVM}(object,newx,k=25)
-\method{plot}{qeRF}(object,newx)
+\method{predict}{qePCA}(object,newx,...)
+\method{predict}{qeUMAP}(object,newx,...)
+\method{predict}{qeDeepnet}(object,newx,...)
+\method{plot}{qeLASSO}(x,...)
+\method{plot}{qeRF}(x,...)
 }
 
 \arguments{
+  \item{...}{Further arguments.}
+  \item{hidden_dropout}{Drop out fraction for hidden layer.}
+  \item{batchsize}{Batch size.}
+  \item{numepochs}{Number of iterations to conduct.}
+  \item{learningrate}{Learning rate.}
+  \item{momemtum}{Momemtum}
+  \item{learningrate_scale}{Learning rate will be multiplied by this at
+     each iteration, allowing for decay.}
+  \item{activationfun}{Can be 'sigm', 'tanh' or 'linear'.}
+  \item{newNTree}{Number of trees to use in prediction.}
+  \item{newxK}{If predicting new cases, number of nearest neighbors to
+     smooth in the object returned by \code{qeKNN}.}
+  \item{useTrainRow1}{If TRUE, take names in \code{newx} from row 1 in
+     the training data.}
+  \item{newx}{New data to be predicted.}
+  \item{object}{An object returned by a qe-series function.}
+  \item{minsplit}{Minimum number of data points in a node.}
+  \item{minbucket}{Minimum number of data points in a terminal node.}
+  \item{maxdepth}{Maximum number of levels in a tree.}
+  \item{qeName}{Name of qe-series predictive function.}
+  \item{conv}{R list specifying the convolutional layers, if any.}
+  \item{deweightPars}{Values for de-emphasizing variables in a split,
+     e.g. 'list(age=0.2,gender=0.5)'.}
+  \item{allDefaults}{Use all default values of the wrapped function.}
+  \item{expandVars}{Columns to be emphasized.}
+  \item{expandVals}{Emphasis values; a value less than 1 means de-emphasis.}
+  \item{mtry}{Number of variables randomly tried at each split.}
+  \item{yesYVal}{Y value to be considered "yes," to be coded 1 rather than 0.}
+  \item{yesYLevel}{Y value to be considered "yes," to be coded 1 rather than 0.}
+  \item{noBeta0}{No intercept term.}
   \item{pcaProp}{Desired proportion of overall variance for the PCs.`}
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
+  \item{dataIn}{See \code{data}.}
+  \item{qeOut}{Output from a qe-series function.}
   \item{yName}{Name of the class labels column.}
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
@@ -134,7 +200,8 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
   \item{acts}{Vector of names of the activation functions, one per
      hidden layer.  Choices inclde 'relu', 'sigmoid', 'tanh', 'softmax',
      'elu', 'selu'.}
-  \item{alpha}{1 for LASSO, 2 for ridge.}
+  \item{alpha}{In the case of \code{qeDT}, a p-value cutoff criterion.
+     Otherwise 1 for LASSO, 2 for ridge.}
   \item{gamma}{Scale parameter in \code{e1071::svm}.}
   \item{cost}{Cost parameter in \code{e1071::svm}.}
   \item{kernel}{In the case of \code{qeSVM}, this is 
@@ -151,7 +218,8 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
      \code{regtools::fineTuning}.}
   \item{nCombs}{Number of hyperparameter combinations to run.  
      See \code{regtools::fineTuning}.}
-  \item{nTsts}{Size of test sets.  See \code{regtools::fineTuning}.}
+  \item{nTst}{Number of data points to be in the test set..  
+     See \code{regtools::fineTuning}.}
   \item{nXval}{Number of cross-validations to run.  
      See \code{regtools::fineTuning}.}
   \item{showProgress}{If TRUE, show results as they arise.  
@@ -164,11 +232,21 @@ qeUMAP(dataName,yName,qeName,opts=NULL,nComps,nNeighbors,
      linear model.  Just use the linear model fit to the entire dataset.}
   \item{xShape}{Input X data shape, e.g. c(28,28) for 28x28 grayscale
      images.  Must be non-NULL if \code{conv} is.}
-  \item{yYesName}{For a binary classification problem, the value to
-     be considered "yes" in probability reports.}
   \item{treeDepth}{Number of levels in each tree.}
   \item{nRounds}{Number of boosting rounds.}
   \item{rpartControl}{An R list specifying properties of fitted trees.}
+  \item{numCores}{Number of cores to use in parallel computation.}
+  \item{parPlat}{Parallel platforParallel platform.  Valid values are
+     'none', 'cluster' (output of \code{parallel::makeCluster}), and 
+     'locThreads' (local cores).}
+  \item{xSetSize}{Size of subsets of the predictor variables.}
+  \item{nXSets}{Number of subsets of the predictor variables.}
+  \item{deg}{Degree of a polynomial.}
+  \item{maxInteractDeg}{Maximul degree of interaction terms in
+     a polynomial.}
+  \item{yLevelName}{Name of the class to be considered a positive
+     response in a classification problem.}
+  \item{params}{Tuning parameters for \code{xgboost}.}
 }
 
 \details{

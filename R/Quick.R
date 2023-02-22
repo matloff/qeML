@@ -87,14 +87,16 @@
 qeLogit <- 
    function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
+   yNameSave <- yName
    data <- stats::na.exclude(data)
    checkForNonDF(data)
    dataY <- data[[yName]]
    classif <- is.factor(dataY)
-   if (classif && length(levels(dataY)) == 2)
-      if (is.null(yesYVal)) 
-         stop('must specify yesYVal in 2-class problems')
    if (!classif) {print('for classification problems only'); return(NA)}
+   yLevels <- levels(dataY)
+   if (classif && length(yLevels == 2))
+      if (is.null(yesYVal)) 
+         yesYVal <- yLevels[1]
    yLevels <- levels(dataY)
    if(length(yLevels) == 2) {
       whichYes <- which(yLevels == yesYVal)
@@ -144,6 +146,7 @@ qeLogit <-
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -216,6 +219,7 @@ predict.qeLogit <- function(object,newx,...)
 qeLin <- function(data,yName,noBeta0=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -248,6 +252,7 @@ qeLin <- function(data,yName,noBeta0=FALSE,
          lmout$holdoutR2 <- cor(preds,tst[,ycol])^2
       }
    }
+   lmout$yName <- yNameSave
    lmout
 }
 
@@ -271,7 +276,12 @@ predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
    list(predClasses=predClasses,probs=probs)
 }
 
-#########################  qeKNN()  #################################
+#########################  qeKNNtmp()  #################################
+
+# will be revised qeKNN
+
+# seems to work in all 3 cases: regression, classif binary Y, classif
+# categorical Y; need to revise predict()
 
 # arguments:  see above, plus
 
@@ -291,39 +301,74 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
-   classif <- is.factor(data[[yName]])
-   if (classif) {
-      y <- data[,yName]
-      yLevels <- levels(y)
-      if (length(yLevels) > 2)
-         stop('use regtools::kNN directly for multiclass case')
-      if (is.null(yesYVal)) 
-         stop('must specify yesYVal')
-      whichYes <- which(yLevels == yesYVal)
-      noYVal <- yLevels[3 - whichYes]
-   } else noYVal <- NULL
-
    ycol <- which(names(data) == yName)
-   if (classif) data[,ycol] <- as.integer(data[,ycol] == yesYVal)
+   y <- data[,ycol]
+   x <- data[,-ycol]
 
-   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
-   if (!is.null(holdout)) {
-      splitData(holdout,data)
-      y <- data[-holdIdxs,ycol]
-      x <- data[-holdIdxs,-ycol]
+   # housekeeping for classification case
+   if (is.factor(y)) {
+      classif <- TRUE
+      yLevels <- levels(y)
+      classif2 <- length(yLevels) == 2
+      if (classif2) {
+         if (is.null(yesYVal)) 
+            yesYVal <- yLevels[1]
+         whichYes <- which(yLevels == yesYVal)
+         noYVal <- yLevels[3 - whichYes]
+      } else noYVal <- NULL
    } else {
-      x <- data[,-ycol]
-      y <- data[,ycol]
+      noYVal <- NULL
+      classif <- FALSE
+      classif2 <- FALSE
    }
-   # if holdout, x,y are now the training set
    
-   if (!allNumeric(x)) {
-      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+   if (classif) {
+      if (classif2) {
+         yToAvg <- as.integer(y == yesYVal)
+         nYcols <- 1
+      }
+       else  {
+         yToAvg <- regtools::factorsToDummies(y)
+         nYcols <- ncol(yToAvg)
+      }
+   } else {
+      yToAvg <- y
+      nYcols <- 1
+   }
+
+   if (!is.numeric(x)) {
+      x <- factorsToDummies(x,omitLast=TRUE)
       factorsInfo <- attr(x,'factorsInfo') 
    } else factorsInfo <- NULL
 
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      # splitData(holdout,newData); no, write separate code for qeKNN
+      nHold <- holdout
+      cat('holdout set has ',nHold, 'rows\n')
+      holdIdxs <- sample(1:nrow(x),nHold)
+
+      xTst <- x[holdIdxs,]
+      x <- x[-holdIdxs,]
+      if (classif2 || !classif) {
+         yTst <- yToAvg[holdIdxs]
+         yToAvg <- yToAvg[-holdIdxs]
+      }
+      else {
+         yTst <- yToAvg[holdIdxs,]
+         yToAvg <- yToAvg[-holdIdxs,]
+      }
+      tst <- cbind(xTst,yTst)
+      tst <- as.data.frame(tst)
+      trn <- cbind(x,yToAvg)
+      if (classif && !classif2) ycol <- (ncol(x)+1):(ncol(x)+nYcols)
+      else ycol <- ncol(trn)
+   } 
+   # if holdout, x,y are now the training set
+   
    xm <- as.matrix(x)
 
    if (scaleX) {
@@ -355,9 +400,10 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    }
 
    # set scaleX to FALSE; scaling, if any, has already been done
-   knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=FALSE,classif=classif,
+   knnout <- regtools::kNN(xm,yToAvg,newx=NULL,k,scaleX=FALSE,classif=classif,
       smoothingFtn=smoothingFtn)
    knnout$classif <- classif
+   knnout$classif2 <- classif2
    knnout$yesYVal <- yesYVal
    knnout$noYVal <- noYVal
    knnout$scalePars <- scalePars
@@ -367,19 +413,16 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       knnout$expandVars <- expandVars
       knnout$expandVals <- expandVals
    }
+   # class(knnout) <- c('qeKNNtmp','kNN')
    class(knnout) <- c('qeKNN','kNN')
    if (!is.null(holdout)) {
-      predictHoldout(knnout)
+      yName <- 'yTst'
+      tst[,ycol] <- y[holdIdxs]
+      predictHoldoutKNN(knnout)
       knnout$holdIdxs <- holdIdxs
    } else knnout$holdIdxs <- NULL
+   knnout$yName <- yNameSave
    knnout
-}
-
-newMultCols <- function (x,cols,vals) {
-   partx <- x[,cols,drop=FALSE]
-   nvals <- length(vals)
-   x[,cols] <- partx %*% diag(vals,nrow=nvals,ncol=nvals)
-   x
 }
 
 predict.qeKNN <- function(object,newx,newxK=1,...)
@@ -387,8 +430,9 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
    class(object) <- 'kNN'
    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
    classif <- object$classif
+   classif2 <- object$classif2
 
-   if (!is.null(object$factorsInfo)) 
+   if (!is.numeric(newx) && !is.null(object$factorsInfo)) 
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
 
    if (is.data.frame(newx)) newx <- as.matrix(newx)
@@ -413,14 +457,173 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 
    if (!object$classif) return(preds)
 
-   probs <- preds
-   predClasses <- round(probs) 
-   yesYVal <- object$yesYVal
-   noYVal <- object$noYVal
-   predClasses[predClasses == 1] <- yesYVal
-   predClasses[predClasses == 0] <- noYVal
-   list(predClasses=predClasses,probs=probs)
+   if (object$classif2) {
+      probs <- preds
+      predClasses <- round(probs) 
+      yesYVal <- object$yesYVal
+      noYVal <- object$noYVal
+      predClasses[predClasses == 1] <- yesYVal
+      predClasses[predClasses == 0] <- noYVal
+      return(list(predClasses=predClasses,probs=probs))
+   }
+
+   # multiclass case
+   predClassIdxs <- apply(preds,1,which.max) 
+   predClasses <- colnames(preds)[predClassIdxs]
+   list(predClasses=predClasses,probs=preds)
+
 }
+
+### #########################  qeKNN()  #################################
+### 
+### # arguments:  see above, plus
+### 
+### #     k: number of nearest neighbors
+### #     scaleX: if TRUE, features will be centered and scaled; note that
+### #        this means the features must be numeric
+### #     smoothingFtn: as in kNN(); 'mean' or 'loclin'
+### #     expandVars,expandVals:  e.g. expandVars element = 3 and
+### #        expandVals = 0.2 means give variable 3 a weight of 0.2
+### #        instead of 1.0 in the distance function
+### 
+### # value:  see above
+### 
+### # see note in kNN() man pg
+###  
+### qeKNN <- function(data,yName,k=25,scaleX=TRUE,
+###    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
+###    holdout=floor(min(1000,0.1*nrow(data))))
+### {
+###    checkForNonDF(data)
+###    trainRow1 <- getRow1(data,yName)
+###    classif <- is.factor(data[[yName]])
+###    if (classif) {
+###       y <- data[,yName]
+###       yLevels <- levels(y)
+###       if (length(yLevels) > 2)
+###          stop('use regtools::kNN directly for multiclass case')
+###       if (is.null(yesYVal)) 
+###          stop('must specify yesYVal')
+###       whichYes <- which(yLevels == yesYVal)
+###       noYVal <- yLevels[3 - whichYes]
+###    } else noYVal <- NULL
+### 
+###    ycol <- which(names(data) == yName)
+###    if (classif) data[,ycol] <- as.integer(data[,ycol] == yesYVal)
+### 
+###    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+###    if (!is.null(holdout)) {
+###       splitData(holdout,data)
+###       y <- data[-holdIdxs,ycol]
+###       x <- data[-holdIdxs,-ycol]
+###    } else {
+###       x <- data[,-ycol]
+###       y <- data[,ycol]
+###    }
+###    # if holdout, x,y are now the training set
+###    
+###    if (!allNumeric(x)) {
+###       x <- regtools::factorsToDummies(x,omitLast=TRUE)
+###       factorsInfo <- attr(x,'factorsInfo') 
+###    } else factorsInfo <- NULL
+### 
+###    xm <- as.matrix(x)
+### 
+###    if (scaleX) {
+###       xm <- scale(xm)
+###       ctr <- attr(xm,'scaled:center')
+###       scl <- attr(xm,'scaled:scale')
+###       scalePars <- list(ctr=ctr,scl=scl)
+###    } else scalePars <- NULL
+###   
+###    if (!is.null(expandVars)) {
+###       # convert expandVars, expandVals according to possible creation of
+###       # dummies
+###       dta <- xm[,expandVars,drop=FALSE]
+###       dta <- rbind(expandVals,dta)
+###       dta <- as.data.frame(dta)
+###       tmp <- regtools::factorsToDummies(dta,omitLast=TRUE)
+###       expandVars <- colnames(tmp)
+###       expandVals <- tmp[1,]
+###       # convert expandVars from names to column numbers (not efficient, but
+###       # quick anyway)
+###       for (i in 1:length(expandVars)) {
+###          j <- which(expandVars[i] == colnames(x))
+###          expandVars[i] <- j
+###       }
+###       # col numbers are character strings, change to numbers
+###       expandVars <- as.numeric(expandVars)
+###    
+###       xm <- newMultCols(xm,expandVars,expandVals)
+###    }
+### 
+###    # set scaleX to FALSE; scaling, if any, has already been done
+###    knnout <- regtools::kNN(xm,y,newx=NULL,k,scaleX=FALSE,classif=classif,
+###       smoothingFtn=smoothingFtn)
+###    knnout$classif <- classif
+###    knnout$yesYVal <- yesYVal
+###    knnout$noYVal <- noYVal
+###    knnout$scalePars <- scalePars
+###    knnout$factorsInfo <- factorsInfo
+###    knnout$trainRow1 <- trainRow1
+###    if (!is.null(expandVars)) {
+###       knnout$expandVars <- expandVars
+###       knnout$expandVals <- expandVals
+###    }
+###    class(knnout) <- c('qeKNN','kNN')
+###    if (!is.null(holdout)) {
+###       predictHoldout(knnout)
+###       knnout$holdIdxs <- holdIdxs
+###    } else knnout$holdIdxs <- NULL
+###    knnout
+### }
+
+newMultCols <- function (x,cols,vals) {
+   partx <- x[,cols,drop=FALSE]
+   nvals <- length(vals)
+   x[,cols] <- partx %*% diag(vals,nrow=nvals,ncol=nvals)
+   x
+}
+
+### predict.qeKNN <- function(object,newx,newxK=1,...)
+### {
+###    class(object) <- 'kNN'
+###    if (!regtools::allNumeric(newx)) newx <- setTrainFactors(object,newx)
+###    classif <- object$classif
+### 
+###    if (!is.null(object$factorsInfo)) 
+###       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,object$factorsInfo)
+### 
+###    if (is.data.frame(newx)) newx <- as.matrix(newx)
+### 
+###    if (is.vector(newx)) {
+###       nr <- 1
+###    } else {
+###       nr <- nrow(newx)
+###    } 
+###    newx <- matrix(newx,nrow=nr)
+### 
+###    if (!is.null(object$scalePars)) {
+###       ctr <- object$scalePars$ctr
+###       scl <- object$scalePars$scl
+###       newx <- scale(newx,ctr,scl)
+###    }
+### 
+###    if (!is.null(object$expandVars)) 
+###       newx <- regtools::multCols(newx,object$expandVars,object$expandVals)
+### 
+###    preds <- predict(object,newx,newxK)
+### 
+###    if (!object$classif) return(preds)
+### 
+###    probs <- preds
+###    predClasses <- round(probs) 
+###    yesYVal <- object$yesYVal
+###    noYVal <- object$noYVal
+###    predClasses[predClasses == 1] <- yesYVal
+###    predClasses[predClasses == 0] <- noYVal
+###    list(predClasses=predClasses,probs=probs)
+### }
 
 #########################  qeRF()  #################################
 
@@ -438,6 +641,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -455,6 +659,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
    }
+   rfout$yName <- yNameSave
    rfout
 }
 
@@ -490,8 +695,9 @@ plot.qeRF <- function(x,...)
 
 qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),yesYVal='')
+   holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    # in binary Y case, change to 0,1
@@ -499,6 +705,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    yvec <- data[,ycol]
    if (is.factor(yvec)) {
       if (length(levels(yvec)) == 2) {
+         if (is.null(yesYVal)) yesYVal <- levels(yvec)[1]
          if (length(yesYVal) > 0) {
             whichYes <- which(yvec == yesYVal)
             yvec <- as.character(yvec)
@@ -528,6 +735,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       split.select.weights <- wts
    } else split.select.weights <- NULL
    rfrout <- ranger::ranger(frml,data=data,num.trees=nTree,mtry=mtry,
+      importance='impurity',
       split.select.weights=split.select.weights,probability=classif,
       min.node.size=minNodeSize)
    rfrout$classNames <- xyc$classNames
@@ -539,6 +747,7 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(rfrout)
       rfrout$holdIdxs <- holdIdxs
    }
+   rfrout$yName <- yNameSave
    rfrout
 
 }
@@ -573,6 +782,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
 
@@ -594,7 +804,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    x <- as.matrix(xyc$x)
    y <- xyc$y
    if (!classif) {
-      rfout <- 
+      rfrout <- 
          if (!ll) 
             grf::regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
             mtry=mtry)
@@ -627,6 +837,7 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
    }
+   rfout$yName <- yNameSave
    rfout
 }
 
@@ -689,9 +900,10 @@ predict.qeRFgrf<- function(object,newx,...)
 #value:  see above
 
 qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
-    degree = 2, allDefaults = TRUE, holdout = floor(min(1000,
+    degree = 2, allDefaults = FALSE, holdout = floor(min(1000,
         0.1 * nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
     classif <- is.factor(data[[yName]])
     if (!classif) {
@@ -723,6 +935,7 @@ qeSVM <- function (data, yName, gamma = 1, cost = 1, kernel = "radial",
         predictHoldout(svmout)
         svmout$holdIdxs <- holdIdxs
     }
+    svmout$yName <- yNameSave
     svmout
 }
 
@@ -748,7 +961,7 @@ predict.qeSVM <- function (object, newx,...)
 #    plot(object,object$data,formula)
 # }
 
-## ## liquidSVM apparently no longer available
+## ## liquidSVM apparently no longer availabl
 ## ## #########################  qeSVMliquid()  #################################
 ## ## 
 ## ## # uses liquidSVM package
@@ -808,6 +1021,7 @@ predict.qeSVM <- function (object, newx,...)
 qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -852,6 +1066,7 @@ qeGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -910,6 +1125,7 @@ plot.qeGBoost <- function(x,...)
 qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('lightgbm')
    classif <- is.factor(data[[yName]])
    if (classif) stop('classification cases not implemented yet')  
@@ -937,7 +1153,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       tsty <- NULL
    }
    
-   # convert to lighGBM binned form 
+   # convert to lightGBM binned form 
    trnxm <- as.matrix(trnx)
    lgbData <- lightgbm::lgb.Dataset(data=trnxm,label=trny)
 
@@ -968,6 +1184,7 @@ qeLightGBoost <- function(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
       outlist$baseAcc <- mean(abs(tsty - mean(tsty)))
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -997,6 +1214,7 @@ predict.qeLightGBoost <- function(object,newx,...)
 qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    if (!is.factor(data[[yName]])) stop('for classification problems only')
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -1042,6 +1260,7 @@ qeAdaBoost <- function(data,yName,treeDepth=3,nRounds=100,rpartControl=NULL,
       predictHoldout(outlist)
       outlist$holdIdxs <- holdIdxs
    }
+   outlist$yName <- yNameSave
    outlist
 }
 
@@ -1101,6 +1320,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
    acts=rep("relu",length(hidden)),learnRate=0.001,conv=NULL,xShape=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    checkForNonDF(data)
    # for use with qeRT(), hidden could be a string
    if (is.character(hidden)) 
@@ -1141,6 +1361,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
       predictHoldout(krsout)
       krsout$holdIdxs <- holdIdxs
    }
+   krsout$yName <- yNameSave
    krsout
 }
 
@@ -1265,6 +1486,7 @@ predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
 qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    classif <- is.factor(data[[yName]])
    if (classif) {print('currently not for classification problems'); return(NA)}
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -1290,6 +1512,7 @@ qePolyLin <- function(data,yName,deg=2,maxInteractDeg=deg,
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
+   qeout$yName <- yNameSave
    qeout
 }
 
@@ -1317,6 +1540,7 @@ predict.qePoly <- function()
 qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    classif <- is.factor(data[[yName]])
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -1324,7 +1548,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    y <- data[,ycol]
    x <- data[,-ycol,drop=FALSE]
    requireNamespace('polyreg')
-   polyout <- polyreg::getPoly(x,deg)
+   polyout <- polyreg::getPoly(x,deg,maxInteractDeg)
    requireNamespace('glmnet')
    glmx <- as.matrix(polyout$xdata)
    fam <- if (classif) 'multinomial' else 'gaussian'
@@ -1337,6 +1561,7 @@ qePolyLASSO <- function(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yNameSave
    res
 }
 
@@ -1370,6 +1595,7 @@ predict.qePolyLASSO <- function(object,newx,...)
 qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    ycol <- which(names(data) == yName)
    xy <- data[,c(setdiff(1:ncol(data),ycol),ycol)]
    classif <- is.factor(data[[yName]])
@@ -1384,7 +1610,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
    # if (!checkPkgVersion('polyreg','0.7'))
    #    stop('polyreg must be of version >= 1.7')
       
-   qeout <- polyreg::polyFit(xy,deg,use='glm')
+   qeout <- polyreg::polyFit(xy,deg,maxInteractDeg,use='glm')
    qeout$trainRow1 <- getRow1(data,yName)
    qeout$classif <- classif
    class(qeout) <- c('qePolyLog',class(qeout))
@@ -1392,6 +1618,7 @@ qePolyLog <- function(data,yName,deg=2,maxInteractDeg=deg,
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
+   qeout$yName <- yName
    qeout
 }
 
@@ -1408,6 +1635,7 @@ predict.qePolyLog <- function(object,newx,...)
 
 qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('glmnet')
    ycol <- which(names(data) == yName)
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
@@ -1418,6 +1646,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    makeAllNumeric(x,data)
    
    classif <- is.factor(y)
+   # if (classif) stop('currently not handling classification case')
    fam <- if (classif) 'multinomial' else 'gaussian'
    ym <- as.matrix(y)
    qeout <- glmnet::cv.glmnet(x=xm,y=ym,alpha=alpha,family=fam)
@@ -1441,7 +1670,8 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
    }
 
    qeout$coefs <- coef(qeout)
-   coefMatrix <- as.matrix(qeout$coefs)
+   coefMatrix <- 
+      if (!classif) as.matrix(qeout$coefs) else as.matrix(qeout$coefs[[1]])
    nonZeroIdxs <- which(coefMatrix != 0)
    nonZeroNames <- names(coefMatrix[nonZeroIdxs,])[-1]  # exclude beta0
    newdata <- xm[,nonZeroNames]
@@ -1460,6 +1690,7 @@ qeLASSO <- function(data,yName,alpha=1,holdout=floor(min(1000,0.1*nrow(data))))
       predictHoldout(qeout)
       qeout$holdIdxs <- holdIdxs
    }
+   qeout$yName <- yNameSave
    qeout
 }
 
@@ -1478,7 +1709,8 @@ predict.qeLASSO <- function(object,newx,...)
    tmp <- predict(object,newx,type='response')
    tmp <- tmp[,,1,drop=TRUE]
    # dropped too far?
-   if (is.vector(tmp)) tmp <- matrix(tmp,ncol=ncol(object$x))
+   # if (is.vector(tmp)) tmp <- matrix(tmp,ncol=ncol(object$x))
+   if (is.vector(tmp)) tmp <- matrix(tmp,nrow=1)
    colnames(tmp) <- classNames
    maxCols <- apply(tmp,1,which.max)
    predClasses <- object$classNames[maxCols]
@@ -1548,6 +1780,7 @@ plot.qeLASSO <- function(x,...)
 qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    # eventual return value
    res <- list()
    res$scaleX <- FALSE  # already scaled via prcomp()
@@ -1586,6 +1819,7 @@ qePCA <- function(data,yName,qeName,opts=NULL,pcaProp,
    res$numPCs <- numPCs
    res$trainRow1 <- qeOut$trainRow1
    class(res) <- 'qePCA'
+   res$yName <- yNameSave
    res
 }
 
@@ -1620,6 +1854,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),scaleX=FALSE,
    nComps=NULL,nNeighbors=NULL)
 {
+   yNameSave <- yName
    requireNamespace('umap')
 
    # eventual return value
@@ -1661,6 +1896,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    res$trainRow1 <- qeOut$trainRow1
    res$nColX <- ncol(x)
    class(res) <- 'qeUMAP'
+   res$yName <- yNameSave
    res
 }
 
@@ -1736,18 +1972,26 @@ predict.qeTS <- function(object,newx,...)
 
 # arguments:
 
-#    data: 2-col data frame; col 1 is a vector of character strings,
-#       one per training set document; col 2 is R factor, doc categories
+#    data: as in other qe* functions, but with the "Y" column
+#       consisting of a character vector, with one element storing an
+#       entire document in a single string
+#    yName: as in other qe* functions
 #    kTop: number of most-frequent words to use
 #    stopWords: stop lists to use
 #    qeName: qe-series function to use
+#    opts: optional arguments for that function
 #    holdout: as with the other qe-series functions
 
-qeText <- function(data,kTop=50,
+qeText <- function(data,yName,kTop=50,
    stopWords=tm::stopwords('english'),qeName,opts=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
-   if (!is.factor(data[,2])) stop('y must be an R factor')
+   yNameSave <- yName
+   if (ncol(data) > 2) stop('must have only 1 text column and 1 label column')
+
+   ycol <- which(names(data) == yName)
+   y <- data[,ycol]
+   if (!is.factor(y)) stop('y must be an R factor')
    
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
@@ -1756,18 +2000,19 @@ qeText <- function(data,kTop=50,
 
    res <- list()  # ultimately, the return value
 
-   textToXYout <- regtools::textToXY(data[,1],data[,2],kTop,stopWords)
-   textToXYout$y <- data[,2]  # convert back to factor
+   textToXYout <- regtools::textToXY(data[,3-ycol],data[,ycol],kTop,stopWords)
+   ## textToXYout$y <- data[,2]  # convert back to factor
    res$textToXYout <- textToXYout
 
    # form data for ML call
    qeData <- textToXYout$x
    qeData <- as.data.frame(qeData)
-   qeData <- cbind(qeData,textToXYout$y)
+   qeData <- cbind(qeData,y[-holdIdxs])
+   # names(qeData)[ncol(qeData)] <- yName
    ncx <- ncol(qeData) - 1
    names(qeData) <- paste0('keyword',1:ncx)
    names(qeData)[ncx+1] <- 'label'
-   yName <- names(data)[2]
+   # yName <- names(data)[2]
 
    # now call the ML function, forming the call in string form first
    cmd <- paste0(qeName,'(qeData,','"label",')
@@ -1782,6 +2027,7 @@ qeText <- function(data,kTop=50,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yNameSave
    res
 }
 
@@ -1814,6 +2060,7 @@ predict.qeText <- function(object,newDocs,...)
 qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('reticulate')
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
@@ -1852,6 +2099,7 @@ qeskRF <- function(data,yName,nTree=500,minNodeSize=10,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yNameSave
    res
 }
 
@@ -1881,6 +2129,7 @@ predict.qeskRF <- function(object,newx,...)
 qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   yNameSave <- yName
    requireNamespace('reticulate')
    res <- NULL  # eventually the return value
    ycol <- which(names(data) == yName)
@@ -1912,6 +2161,7 @@ qeskSVM <- function(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
       predictHoldout(res)
       res$holdIdxs <- holdIdxs
    }
+   res$yName <- yNameSave
    res
 }
 
@@ -2219,8 +2469,6 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 ######################  qeROC()  #############################
 
-# wrapper for pROC::roc()
-
 # will plot ROC, print AUC
 
 # arguments:
@@ -2233,15 +2481,36 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
-   requireNamespace('pROC')
+   requireNamespace('ROCR')
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
-   ys <- as.factor(holdY == yLevelName)
+   # ys <- as.factor(holdY == yLevelName)
+   ys <- as.numeric(holdY == yLevelName)
    probs <- qeOut$holdoutPreds$probs
    if (is.null(probs)) stop('no holdoutPreds$probs')
-   probs <- probs[,yLevelName]
-   probs <- probs/sum(probs)
-   pROC::roc(ys,probs,plot=T,aug=T)
+   if (is.vector(probs) || nrow(probs) == 1 || ncol(probs) == 1) {
+     probs <- as.vector(probs)
+   } else if (yLevelName %in% colnames(probs)) {
+      probs <- probs[,yLevelName]
+   } else {
+      colName <- paste0(yName,'.',yLevelName)
+      if (colName %in% colnames(probs)) {
+         probs <- probs[,colName]
+      }
+      else probs <- probs[,paste0('dfr.',yLevelName)]
+   }
+
+   # pROC::roc(ys,probs,plot=T)
+   pred <- ROCR::prediction(probs,ys)
+   perf <- ROCR::performance(pred,"tpr","fpr",colorkey.relwidth=1.0)
+   alphVals <- perf@alpha.values[[1]]
+   print(alphVals)
+   # expand <- 1 / min(alphVals)
+   # perf@alpha.values[[1]] <- expand*perf@alpha.values[[1]]
+   # perf@alpha.name <- paste('Cutoffs expansion factor =',expand)
+   plot(perf,colorize=TRUE)
+   abline(0,1)
+   perf
 }
 
 ######################  qeToweranNA()  #############################
@@ -2269,8 +2538,7 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
 # l1 distance is used; some Yi might be NAs
 
 qeKNNna <- function(data,yName,k=25,
-   minNonNA=1,holdout = floor(min(1000, 0.1 * nrow(data))),
-   printDists=FALSE)
+   minNonNA=1,holdout = floor(min(1000, 0.1 * nrow(data))))
 {
 
     # error checks
@@ -2428,7 +2696,7 @@ predict.qeKNNna <- function(object,newx,kPred=1,...)
 #     params: R list of tuning parameters; see documentation fo
 #        xgboost::xgboost()
  
-qeXGBoost <- function(data,yName,nRounds=5,params=list(),yesYVal,
+qeXGBoost <- function(data,yName,nRounds=250,params=list(),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    checkForNonDF(data)
@@ -2438,15 +2706,17 @@ qeXGBoost <- function(data,yName,nRounds=5,params=list(),yesYVal,
    if (classif) {
       y <- data[,yName]
       yLevels <- levels(y)
-      if (length(yLevels) > 2)
-         stop('use xgboost::xgboost directly for multiclass case')
-      if (is.null(yesYVal)) 
-         stop('must specify yesYVal')
-      whichYes <- which(yLevels == yesYVal)
-      noYVal <- yLevels[3 - whichYes]
-      data[,ycol] <- as.integer(y == yesYVal)
-   } else noYVal <- NULL
+      tmp <- as.integer(y) - 1
+      data[,yName] <- tmp
+      objective <- 'multi:softprob'
+   } else {
+      yLevels <- NULL
+      objective='reg:squarederror'
+   }
 
+   params$objective <- objective
+   if (classif) params$num_class <- length(yLevels)
+   
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       splitData(holdout,data)
@@ -2463,8 +2733,321 @@ qeXGBoost <- function(data,yName,nRounds=5,params=list(),yesYVal,
       factorsInfo <- attr(x,'factorsInfo') 
    } else factorsInfo <- NULL
 
+   xm <- as.matrix(x)
+   xgbOut <- xgboost::xgboost(data=xm,label=y,nrounds=nRounds,
+      param=params)
+   class(xgbOut) <- c('qeXGBoost','xgb.Booster')
+
+   xgbOut$classif <- classif
+   xgbOut$factorsInfo <- factorsInfo
+   xgbOut$yLevels <- yLevels
+
+   if (!is.null(holdout)) {
+      tst[,ycol] <- tst[,ycol] + 1
+      predictHoldoutXGB(xgbOut)
+      xgbOut$holdIdxs <- holdIdxs
+    }
+   else xgbOut$holdIdxs <- NULL
+
+   xgbOut
 
 }
+
+predict.qeXGBoost <- function(object,x,...) 
+{
+   if (!allNumeric(x)) 
+      x <- regtools::factorsToDummies(x,omitLast=TRUE,
+         factorsInfo=object$factorsInfo)
+   else x <- as.matrix(x)
+   class(object) <- class(object)[-1]
+   preds <- predict(object,x)
+   if (object$classif) {
+      preds <- t(matrix(preds,ncol=nrow(x)))
+      colnames(preds) <- object$yLevels
+      predClassIdxs <- apply(preds,1,which.max)
+      predClasses <- object$yLevels[predClassIdxs]
+      preds <- list(predClasses=predClasses,probs=preds)
+   }
+   preds
+}
+
+# data(pef)
+# pef1<- pef[,-2]
+# z <- qeXGBoost(pef1,'wageinc',holdout=NULL,nRounds=250)
+# predict(z,pef1[1:28,-4])
+
+#######################  qeliquidSVM()()  ##############################
+
+# note: liquidSVM is no longer on CRAN, but old versions are archived
+# and the library is apparently maintained
+
+# liquidSVM
+
+# arguments:  see above, plus
+
+#     nRounds: number of boosting rounds
+#     params: R list of tuning parameters; see documentation fo
+#        xgboost::xgboost()
+ 
+qeliquidSVM <- function(data,yName,yesYVal=NULL,predict.prob=FALSE,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   ycol <- which(names(data) == yName)
+   y <- data[,ycol]
+   if (classif) {
+      yLevels <- levels(y)
+      classif2 <- length(yLevels) == 2
+      if (classif2) {
+         if (is.null(yesYVal)) yesYVal <- yLevels[1]
+         whichYes <- which(yLevels == yesYVal)
+         noYVal <- yLevels[3 - whichYes]
+         y <- as.integer(y == yesYVal)
+         data[,ycol] <- as.factor(y)
+      }
+   } else classif2 <- FALSE
+   if (!classif2) {
+      yesYVal <- NULL
+      noYVal <- NULL
+   }
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) splitData(holdout,data)
+   
+   frml <- as.formula(paste0(yName,' ~ .'))
+   dta <- if (is.null(holdout)) data else trn
+   svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob)
+
+   liqOut <- list(svmOut=svmOut,classif=classif,classif2=classif2,
+      yesY=yesYVal,noY=noYVal)
+   class(liqOut) <- c('qeliquidSVM')
+
+   if (!is.null(holdout)) {
+        predictHoldout(liqOut)
+        liqOut$holdIdxs <- holdIdxs
+    }
+   else liqOut$holdIdxs <- NULL
+
+   liqOut
+
+}
+
+predict.qeliquidSVM <- function(object,x,...) 
+{
+   preds <- predict(object$svmOut,x)
+   if (object$classif2) {
+      preds <- ifelse(preds=='1',object$yesY,object$noY)
+   }
+   list(predClasses=preds)
+}
+
+#######################  qeDeepnet()()  ##############################
+
+# Deepnet
+
+# using almost all available arguments from the wrappee, but not
+# allowing regression cases, on which the package seems to behave
+# erraticly
+ 
+qeDeepnet <- function(data,yName,hidden=c(10),activationfun='sigm',
+   learningrate=0.8,momentum=0.5,learningrate_scale=1,
+   numepochs=3,batchsize=100,hidden_dropout=0,
+   yesYVal=NULL,holdout=floor(min(1000,0.1*nrow(data))))
+{
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   if (!classif) stop('set up for classification problems only')
+   ycol <- which(names(data) == yName)
+   x <- data[,-ycol,drop=FALSE]
+   y <- data[,yName]
+   yLevels <- levels(y)
+   y <- factorsToDummies(y,omitLast=FALSE)
+   output <- 'sigm'
+   
+   if (!allNumeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo') 
+   } else factorsInfo <- NULL
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      holdIdxs <- sample(1:nrow(data),holdout)
+      tsty <- y[holdIdxs]
+      tstx <- x[holdIdxs,,drop=FALSE]
+      trny <- y[-holdIdxs]
+      trnx <- x[-holdIdxs,,drop=FALSE]
+   } else {
+      trnx <- x
+      trny <- y
+   }
+   # if holdout, x,y are now the training set
+
+   xm <- as.matrix(x)
+   nnOut <- deepnet::nn.train(x=xm,y=y,hidden=hidden, 
+      activationfun=activationfun,learningrate=learningrate, 
+      momentum=momentum,learningrate_scale=learningrate_scale,
+      output=output,numepochs=numepochs,batchsize=batchsize, 
+      hidden_dropout=hidden_dropout) 
+   class(nnOut) <- c('qeDeepnet')
+
+   nnOut$classif <- classif
+   nnOut$factorsInfo <- factorsInfo
+   nnOut$yLevels <- yLevels
+
+   if (!is.null(holdout)) {
+      preds <- predict(nnOut,tstx)
+      nnOut$testAcc <- mean(preds$predClasses != data[holdIdxs,ycol])
+      nnOut$holdIdxs <- holdIdxs
+    }
+   else nnOut$holdIdxs <- NULL
+
+   nnOut
+
+}
+
+predict.qeDeepnet <- function(object,x,...) 
+{
+   if (!allNumeric(x)) 
+      x <- regtools::factorsToDummies(x,omitLast=TRUE,
+         factorsInfo=object$factorsInfo)
+   else x <- as.matrix(x)
+   probs <- deepnet::nn.predict(object,x)
+   colnames(probs) <- object$yLevels
+   predClassIdxs <- apply(probs,1,which.max)
+   predClasses <- object$yLevels[predClassIdxs]
+   list(predClasses=predClasses,probs=probs)
+}
+
+#######################  qeNCVreg()  ##############################
+
+# wrappers for ncvreg package, "nonconves regularization"
+
+# qeNCVreg <- function(data,yName,
+qeNCVregCV <- function(data,yName,
+   family="gaussian",
+   penalty="MCP",
+   gamma=switch(penalty, SCAD=3.7,3),alpha=1,
+   lambda.min=0.001,nlambda=100,lambda,eps=1e-04,
+   max.iter=10000,
+   cluster=NULL,
+   nfolds=10,yesYVal=NULL,
+   holdout=floor(min(1000,0.1*nrow(data)))) 
+{
+   if (!is.null(cluster)) 
+      stop('currently cluster computation is not implemented')
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   classif <- is.factor(data[[yName]])
+   if (family=='binomial' && !classif) 
+      stop('binomial case needs factor Y')
+   ycol <- which(names(data) == yName)
+   if (classif) {
+      # stop('classification case under construction')
+      family <- 'binomial'
+      y <- data[,yName]
+      yLevels <- levels(y)
+      if (length(yLevels) != 2) 
+         stop('only 2-class problems are handled as of now')
+      if (is.null(yesYVal)) {
+         if (setequal(yLevels,c(0,1))) {
+            yesYVal <- '1'
+            noYVal <- '0'
+         } else {
+            yesYVal <- yLevels[1]
+            noYVal <- yLevels[2]
+         }
+      } else {
+         yesyval <- which(yLevels == yesYVal)
+         noYVal <- yLevels[3-yesyval]
+      }
+      tmp <- as.integer(y == yesYVal)
+      data[,yName] <- tmp
+   } else {
+      yLevels <- NULL
+      yesYVal <- NULL
+      noYVal <- NULL
+   }
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      splitData(holdout,data)
+      y <- data[-holdIdxs,ycol]
+      x <- data[-holdIdxs,-ycol]
+   } else {
+      x <- data[,-ycol]
+      y <- data[,ycol]
+   }
+   # if holdout, x,y are now the training set
+   
+   if (!allNumeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo')
+   } else factorsInfo <- NULL
+
+   xm <- as.matrix(x)
+   if (!is.null(holdout)) {
+      trnx <- xm
+      trny <- y
+      tstx <- regtools::factorsToDummies(data[holdIdxs,-ycol],omitLast=TRUE,
+         factorsInfo=factorsInfo)
+      tsty <- data[holdIdxs,ycol]
+   }
+
+   cvout <- ncvreg::cv.ncvreg(xm,y,
+      family=family,
+      penalty=penalty,
+      gamma=gamma,
+      lambda.min=lambda.min,
+      max.iter=max.iter,
+      # cluster=cluster,
+      nfolds=nfolds,
+      seed=9999,
+      holdout=floor(min(1000,0.1*nrow(data)))) 
+
+
+   cvoutBig <- list(cvout=cvout,classif=classif,
+      yesYVal=yesYVal,noYVal=noYVal)
+   class(cvoutBig) <- 'qeNCVregCV'
+
+   if (!is.null(holdout)) {
+       predictHoldoutNCV(cvoutBig)
+       cvoutBig$holdIdxs <- holdIdxs
+   }
+   else cvoutBig$holdIdxs <- NULL
+
+   i <- which(cvout$fit$lambda == cvout$lambda.min)
+   cvoutBig$finalBetaHat <- cvout$fit$beta[,i]
+   cvoutBig
+}
+
+predict.qeNCVregCV <- function(object,newx) 
+{
+   if (!is.matrix(newx)) {
+      newx <- regtools::factorsToDummies(newx,omitLast = TRUE, 
+         factorsInfo = object$factorsInfo)
+   }
+
+   cvout <- object$cvout
+   classif <- object$classif
+   type <- if (!classif) 'link' else 'response'
+   preds <- as.numeric(predict(cvout,newx,type=type))
+   if (!object$classif) return(preds)
+   tmp <- list(probs=preds)
+   predYs <- round(preds)
+   predClasses <- ifelse(predYs,object$yesYVal,object$noYVal)
+   list(probs=preds,predClasses=predClasses)
+}
+
+plot.qeNCVregCV <- function(object) 
+{
+   plot(object$cvout)
+}
+
+qencvregcv <- qeNCVregCV
+
 
 #######################  qeParallel()  ##############################
 

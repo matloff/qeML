@@ -19,7 +19,7 @@ that mean loss may actually increase with n in the overfitting region.
 The function \code{doubleD} facilitates easy exploration of this
 phenomenon.  }
 
-\usage{qeFtnCall,xPts,nReps,makeDummies=NULL,classif=FALSE}
+\usage{doubleD(qeFtnCall,xPts,nReps,makeDummies=NULL,classif=FALSE)}
 
 \arguments{
    \item{qeFtnCall}{Quoted string; somewhere should include 'xPts[i]'.}

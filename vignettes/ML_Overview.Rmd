@@ -1,0 +1,841 @@
+---
+title: "MLOverview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Machine Learning Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+#  The 10-Page Machine Learning Book
+
+(The title here alludes to Andriy Burkov's excellent work,
+*The Hundred-Page Machine Learning Book*.  Note too my own 
+forthcoming book, *The Art of Machine Learning: Algorithms+Data+R*.)
+
+Here we give an overview of the most widely used predictive methods in
+statistical/machine learning (ML).  For each one, we present
+
+* background
+
+* overview of how it works
+
+* function in the R package, **qeML** (readers without R background or
+  who simply wish to acquire an overview of ML may skip the R code
+without loss of comprehehnsion of the text)
+
+# Contents
+
+* [Example](#example)
+* [Regression and classification problems, regression functions](#regression-and-classification-problems,-regression-functions)
+* [k-Nearest Neighbors](#k-nearest-neighbors)
+  * [K-NN edge bias](#k-nn-edge-bias)
+* [Random forests](#random-forests)
+  * [RF edge bias](#rf-edge-bias)
+* [Boosting](#boosting)
+* [Linear model](#linear-model)
+* [Logistic model](#logistic-model)
+* [Polynomial-linear models](#polynomial-linear-models)
+* [Shrinkage methods for linear/generalized linear models](#shrinkage-methods-for-linear/generalized-linear-models)
+  * [LASSO for feature selection](#lasso-for-feature-selection)
+* [Support Vector Machines](#support-vector-machines)
+* [Neural networks](#neural-networks)
+* [Overfitting](#overfitting)
+* [Which ML method to use?](#which-ml-method-to-use?)
+
+# Notation
+
+For convenience, we'll let Y denote the variable to be predicted, i.e.
+the response variable, and let X denote the set of predictor
+variables/features.  (ML people tend to use the term *features*,
+while In stat, the term *predictors* is common.  In applied fields, e.g.
+economics or psychology, some use the term *independent variables*.)
+
+We develop our prediction rule from available 
+*training data*, consisting of n data points, denoted by
+(X<sub>1</sub>, Y<sub>1</sub>),.., (X<sub>n</sub>,
+Y<sub>n</sub>).  We wish to predict new cases
+(X<sub>new</sub>,Y<sub>new</sub>) in the future, in which X<sub>new</sub>
+is known but Y<sub>new</sub> needs to be predicted.
+
+So, we may wish to predict human weight Y from height X, or from height
+and age in a 2-component vector X.  Say we have the latter situation,
+and data on n = 100 people.  Then for instance X<sub>23</sub> would be
+the vector of height and age for the 23rd person in our training data,
+and Y<sub>23</sub> would be that person's weight.
+
+The vector X may include *indicator* variables, which have values only 1
+or 0.  We may for instance predict weight from height, age and gender,
+the latter being 1 for female, 0 for male.
+
+If Y represents a binary variable, we represent it as an indicator
+variable.  In the famous Pima Diabetes dataset in the
+[UCI Machine Learning
+Repository](https://archive.ics.uci.edu/ml/index.php), 1 means diabetic,
+0 means not.
+
+If Y itself is categorical, we represent it by several indicator
+variables, one for each category.  In another disease-related UCI
+dataset, Y is status of a person's vertebrae condition; there are three
+classes: normal (NO), disk hernia (DH), or spondilolysthesis (SP).  Y =
+(1,0,0) for a normal person, for instance.  Thus Y can be a vector too.
+
+# Running example
+
+The package's built-in dataset **mlb** consists of data on major league
+baseball players (courtesy of the UCLA Dept. of Statistics).
+
+Here is a glimpse of the data:
+
+``` r
+> data(mlb)
+> head(mlb)
+             Name Team       Position Height Weight   Age PosCategory
+1   Adam_Donachie  BAL        Catcher     74    180 22.99     Catcher
+2       Paul_Bako  BAL        Catcher     74    215 34.69     Catcher
+3 Ramon_Hernandez  BAL        Catcher     72    210 30.78     Catcher
+4    Kevin_Millar  BAL  First_Baseman     72    210 35.43   Infielder
+5     Chris_Gomez  BAL  First_Baseman     73    188 35.71   Infielder
+6   Brian_Roberts  BAL Second_Baseman     69    176 29.39   Infielder
+```
+
+# The  R package's **qe***-series functions
+
+Here "qe" stands for **"quick and easy,"** and we really mean that!
+
+The functions have a simple, uniform interface, and most importantly,
+**require no setup.**  To fit an SVM model, say, one simply calls
+**qeSVM**, no preparation calls to define the model etc.  
+
+The call form is
+
+``` r
+model fit <- qe<model name>(<data name>,<Y name>)
+```
+
+As noted, no prior calls are needed to define the model, etc.
+
+## Example
+
+Let's predict weight from height and age, using two methods, k-Nearest
+Neighbor and random forests.  (Details of the methods will be explained
+shortly; for now, let's just see how to invoke them.)
+
+``` r
+mlb1 <- mlb[,4:6]  # columns for height, weight and age
+knnout <- qeKNN(mlb1,'Weight')  # fit k-Nearest Neighbor model
+rfout <- qeRF(mlb1,'Weight')  # fit random forests model
+```
+
+Most methods have *hyperparameters*, values that can be used to tweak
+the analysis in various ways.  In **qeML**, default values of
+hyperparameters are set but can be overridden.
+
+Prediction of new cases is equally easy, in the form
+
+``` r
+predict(<model fit>, <new X value>)
+```
+
+E.g. to predict the weight of a new player of height 70 and age 28, 
+using our random forests model created above, run
+
+``` r
+> predict(rfout,c(70,28))
+       2 
+184.1626 
+```
+
+Such a player would be predicted to weigh about 184 pounds.
+
+The data is partitioned into a training set and a holdout set, with the
+model being fit on the former and then tested on the latter. 
+
+``` r
+> rfout$testAcc  # mean absolute prediction error
+[1] 15.16911
+```
+
+So, on average, our predictions are off by about 15 pounds.  What about
+the k-NN model?
+
+``` r
+> knnout$testAcc
+[1] 13.20277
+```
+
+Seems to be better, though we should try other values of the
+hyperparameters.
+
+(The size of the holdout set size can be set differently from the
+default, or suppressed entirely.)
+
+## Regression and classification problems, regression functions
+
+Prediction applications in which Y is a continuous variable, say weight,
+or at least ordinal, are called *regression settings*.  Applications in
+which Y is categorical, i.e. Y is a factor variable in R, say predicting
+the player's position (e.g. pitcher) are *classification settings*.
+
+Somewhat confusingly, both settings make use of the *regression function*,
+m(t) = E(Y | X = t), the mean value of Y in the subpopulation defined by
+X = t.  If say we are predicting weight in the **mlb** data, then for instance
+m(71,23) would be the mean weight among all players of height 71 inches
+and 23 years old.  To predict the weight of a new player, say height 77
+and age 19, we use m(77,19).
+
+In classification problems, Y is converted to a set of indicator
+variables.  For the position 'pitcher' in the **mlb** data, we would have
+Y = 1 or 0, depending on whether the player is a pitcher or not.
+(Position is in column 3 of the original dataset.)
+Then  E(Y | X = t) reduces to P(Y = 1 | X = t), the probability that the
+player is a pitcher given the player's height, weight and age, say.  We
+would typically find probabilities for each position, then guess the one
+with the highest probability.
+
+In other words, the regression function m(t) is central to both regression
+and classification settings.  The statistical/machine learning methods
+presented here amount to ways to estimate m(t).  The methods are
+presented below in an order that shows connection between them.
+
+Even though each ML method has its own special *tuning parameters* or
+*hyperparameters*, used to fine-tune performance, they all center around
+the regression function m(t).
+
+The **qe** series function sense whether the user is specifying a
+regression setting or a classification setting, by noting whether the Y
+variable (second argument) is numeric or an R factor.
+
+# ML predictive methods
+
+We now present the "30,000 foot" view of the major statistical/machine
+learning methods.
+
+## k-Nearest Neighbors
+
+This method was originally developed by statisticians, starting in the 1950s
+and 60s.
+
+It's very intuitive.  To predict, say, the weight of a new
+player of height 72 and age 25, we find the k closest players in our 
+training data to (72,25), and average their weights.  This is our
+estimate of m(72,25), and we use it as our prediction.  The default
+value of k in **qeKNN** is 25.
+
+The **qeKNN** function wraps **kNN** in **regtools**.  The main
+hyperparameter is the number of neighbors k.  As with any
+hyperparameter, the user aims to set a "Goldilocks" level, not too big,
+not too small.  Setting k too small will result in our taking the
+average of just a few Y values, too small a sample.  On the other hand,
+too large a value for k will some distant data points may be used that
+are not representative.
+
+To choose k, we could try various values, run **qeKNN** on each one,
+then use the value that produced the best (i.e. smallest) **testAcc**.
+
+If Y is an indicator variable, its average works out to be the
+proportion of 1s.  This will then be the estimated probability that Y =
+1 for a new case.  If that is greater than 0.5 in the neighborhood of
+the new case, we guess Y = 1 for the new case, otherwise 0.  
+
+If Y is categorical, i.e. an R factor as in the case of predicting
+player position in the **mlb** dataset, we then find a probability for
+each category in this manner, and guess Y to be whichever category has
+the highest probability.
+
+The hyperparameter k as default value 25.  Let's see if, say, 10 is
+better:
+
+``` r
+replicMeans(50,"qeKNN(mlb1,'Weight')$testAcc")
+[1] 13.61954
+attr(,"stderr")
+[1] 0.1346821
+replicMeans(50,"qeKNN(mlb1,'Weight',k=10)$testAcc")
+[1] 14.25737
+attr(,"stderr")
+[1] 0.1298224
+```
+
+Since the holdout set is randomly generated, we did 50 runs in each
+case.  The average test accuracy over 50 runs is printed out, along with
+a standard error for the figure.  (1.96 times the standard error will be
+the radius of an approximate 95% confidence interval.) Changing k to 10
+reduced accuracy.
+
+The **qeML** function **qeFit** makes it easier to try various values of
+the hyperparameters.
+
+### K-NN edge bias
+
+One potential problem is bias at the edge of a neighborhood.  Say we are
+predict weight from height, and a new case involving a very tall person.
+Most data points in the neighborhood of this particular height value
+will be for people who are shorter than the new case.  Those neighbors
+are thus likely to be lighter than the new case, making our predicted
+value for that case biased downward.
+
+Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
+Setting the argument **smoothingFtn = loclin** removes a linear trend
+within the neighborhood, and may improve predictive accuracy for new
+cases that are located near the edege of the training set.
+
+## Random forests
+
+This method stems from *decision trees*, which were developed mainly by
+statisticians in the 1080s, and which were extended to random forests in
+1990s.  Note too the related (but unfortunately seldom recognized)
+*random subspaces* work of Tin Kam Ho, who did her PhD in computer
+science.
+
+This is a natural extension of k-NN, in that it too creates a
+neighborhood and averages Y values within the neighborhood.  However, it
+does so in a different way, creating tree structures.
+
+Say in some dataset we are predicting blood pressure from height, weight
+and age.  We first ask whether the height is above or below a certain
+threshold.  After that, we ask whether weight is above or below a
+certain (different) threshold.  This partitions height-weight space into
+4 sectors.  We then might subdivide each sector according to whether age
+is above or below a threshold, now creating 8 sectors of
+height-weight-age space.  Each sector is now a "neighborhood."  To
+predict a new case, we see which neighborhood it belongs to, then take
+our prediction to be the average Y value among training set points in
+that neighborhood.
+
+The word *might* in the above paragraph alludes to the fact that the
+process may stop early, if the current subdivision is judged by the
+algorithm to be fine enough to produce good accuracy.  So we might end
+up using only height and weight, not age.
+
+And one generally wants to avoid having neighborhoods (*nodes* in the
+tree) that don't have many data points; this is controlled by a
+hyperparameter, say setting a minimum number of data points per node; if
+a split would violate that rule, then don't split.  Of course, if we set
+out threshold too high, we won't do enough splits, so again we need to
+try to find a "Goldilocks" level.
+
+Here is an example using the vertebrae dataset.  There are 6
+predictor variables, named V1 through V6, consisting of various bone
+measurements.  A single tree is shown.
+
+![alt text](RpartVert.png)
+
+At the root, if the variable V6 in our new case to be predicted is < 16,
+we go left, otherwise right.  Say we go left.  Then if V4 < 28 in the
+new case, we go left again, getting to a leaf, in which we guess DH.
+The 0.74 etc. mean that for the training data that happen to fall into
+that leaf, 74% of them are in class DH, 26% are NO and 0% are SL.  So we
+gues DH, based on there being an estimated 74% chance that this new case
+is of type DH..
+
+In RF, many trees are generated at ranomd, using for instance random
+orders of entry of the features.  To predict a new case, we find its
+preditions in the various trees, then average them.  For indicator or
+categorical Y, each try gives a prodiction, and we predict whatever
+class is most common among the trees.
+
+Clearly, the order in which the predictor variables are evaluated (e.g.
+height, weight and age in the **mlb** data) can matter a lot.  So, more
+than one tree is constructed, with random orders.  The number of trees
+is another hyperparameter.  Each tree gives us a prediction for the
+unknown Y.  In a regression setting, those predictions are averaged to
+get our final prediction.  In a classification setting, we see which
+class was predicted most often among all those trees.
+
+The thresholds used at each node are determined through a complicated
+process, depending on which implementation of RF one uses.
+
+The **qeRF** function wraps the function of the same name in the
+**randomForests** package.  
+
+### RF edge bias
+
+The package also offers other implementations of RF, notably
+**qeRFgrf**, as follows.  
+
+The leaves in any tree method, such as random forests and boosting, are
+essentially neighborhoods, different in structure from those of k-NN,
+but with similar properties.  In particular, they have an "edge bias"
+problem similar to that described for k-NN above.  In the case of random
+forests, the **qeRFgrf** function (which wraps the **grf** package)
+deals with the same bias problem via removal of a linear trend.
+
+## Boosting
+
+This method has been developed both by CS and statistics people.  The
+latter have been involved mainly in *gradient* boosting, the technique
+used here.
+
+The basic idea is to iteratively build up a sequence of trees, each of
+which is an improved update of the last.  At the end, all the trees are
+combined, with more weight given to the more recent trees.
+
+The **qeGBoost** wraps **gbm** in the package of the same name.  It is
+gradient tree-based, with hyperparameters similar to the random forests
+case, plus a *learning rate*.  The latter controls the size of iteration
+steps; more on this  below.
+
+The package also offers other implementations of boosting.
+
+## Linear model
+
+This of course is the classical linear regression model, invented
+200 years ago (!) and developed by statisticians.
+
+For motivation, below is a graph of mean weight vs. height for the 
+**mlb** data.  (There are many players for each height level, and we
+find and plot the mean weight at each height.)
+
+![alt text](WtVsHt.png)
+
+The means seem to lie near a straight line.  (Remember, though, that
+these are sample means.)  That suggests modeling m(t) is a linear
+function.
+
+For example, a model for mean weight, given height and age, would be
+
+m(height,age) = 
+&beta;<sub>0</sub> +
+&beta;<sub>1</sub> height + 
+&beta;<sub>2</sub> age
+
+for unknown population constants &beta;<sub>i</sub>, which are estimated
+from our training data, using the classic *least-squares* approach.  Our
+estimates of the &beta;<sub>i</sub>, denoted b<sub>i</sub>, are
+calculated by minimizing
+
+&Sigma;<sub>i</sub> 
+[
+weight<sub>i</sub> - 
+(b<sub>0</sub>+b<sub>1</sub>height<sub>i</sub>+b<sub>2</sub>age<sub>i</sub>)
+]
+<sup>2</sup>
+
+This is a simple calculus problem.  We find the partial derivatives of
+the sum of squares with respect to the b<sub>i</sub>, and set them to 0.
+This gives us 3 equations in 3 unknowns, and since these equations are
+linear, it is easy to solve them for the b<sub>i</sub>.
+
+There are no hyperparameters here.
+
+This model is mainly for regression settings, though some analysts use
+it in classification.  If used in conjunction with polynomials (see
+below), this may work as well or better than the logistic model (see
+below).
+
+The function **qeLin** wraps the ordinary **lm**.  It mainly
+just calls the latter, but does some little fixess.
+
+## Logistic model
+
+This is a generalization of the linear model, developed by statisticians
+and economists.
+
+This model is only for classification settings.  As noted, since Y is
+now 1 or 0, its mean becomes the probability of 1.  Since m(t) is now a
+probability, we need it to have values in the interval [0,1].  This is
+achieved by feeding a linear model into the *logistic function*,
+l(u) = (1 + exp(-u))<sup>-1</sup>, which does take values in (0,1).  
+So for instance, to predict whether a player is a catcher (Y = 1 if 
+yes, Y = 0 if no), we fit the model 
+
+P(catcher | height, weight, age) = m(height,weight,age) = 
+1 / [1 + exp{-(&beta;<sub>0</sub> +
+&beta;<sub>1</sub> height + 
+&beta;<sub>2</sub> weight +
+&beta;<sub>3</sub> age)}]
+
+The &beta;<sub>i</sub> are estimated from the sample data, using a
+technique called *iteratively reweighted least squares*.
+
+The function **qeLogit** wraps the ordinary R function **glm**, but
+adds an important feature:  **glm** only handles the 2-class setting,
+e.g.  catcher vs. non-catcher.  The **qeLogit** handles the c-class
+situation via the *One vs. All* method (applicable to any ML algorithm):
+
+it calls **glm** one class at a time, generating c
+**glm** outputs.  When a new case is to be predicted, it is fed into
+each of the c **glm** outputs, yielding c probabilities.  It then
+predicts the new case as whichever class has the highest probability.
+
+Here is an example using the UCI vertebrae data;
+
+``` r
+> library(fdm2id)
+> data(spine)
+> str(spine)
+'data.frame':	310 obs. of  8 variables:
+ $ V1      : num  39.1 53.4 43.8 31.2 48.9 ...
+ $ V2      : num  10.1 15.9 13.5 17.7 20 ...
+ $ V3      : num  25 37.2 42.7 15.5 40.3 ...
+ $ V4      : num  29 37.6 30.3 13.5 28.9 ...
+ $ V5      : num  114 121 125 120 119 ...
+ $ V6      : num  4.56 5.99 13.29 0.5 8.03 ...
+ $ Classif2: Factor w/ 2 levels "AB","NO": 1 1 1 1 1 1 1 1 1 1 ...
+ $ Classif3: Factor w/ 3 levels "DH","NO","SL": 1 1 1 1 1 1 1 1 1 1 ...
+> spine <- spine[,-7]  # skip 2-class example
+> u <- qeLogit(spine,'Classif3')
+> u$testAcc
+[1] 0.1935484
+> u$baseAcc
+[1] 0.5053763
+
+> table(spine$Classif3) 
+
+ DH  NO  SL 
+ 60 100 150 
+```
+
+If we were to not use the body measurements V1 etc., we would always
+guess SL, resulting in an error rate of about 50%.  By making use of
+the measurement data, we can reduce the misclassification rate to about
+19%.
+
+Let's try a prediction.  Consider someone like the first patient in the
+dataset but with V6 = 6.22.  What would our prediction be?
+
+``` r
+> newx <- spine[1,-7]  # omit "Y"
+> newx$V6 <- 6.22
+> predict(u,newx)
+$predClasses
+[1] "DH"
+
+$probs
+            DH        NO         SL
+[1,] 0.7432193 0.2420913 0.01468937
+```
+
+We would predict the DH class, as our estimated probability for the lass
+is 0.74, the largest among the three classes.
+
+Some presentations describe the logistic model as "modeling the
+logarithm of the odds of Y = 1 vs. Y = 0 as linear."  While this is
+correct, it is less informative, in our opinion.  Why would we care
+about a logarithm being linear?  The central issue is that the logistic
+function models a probability, just what we need.
+
+## Polynomial-linear models
+
+Some people tend to shrink when they become older.  Thus we may wish to
+model a tendency for people to gain weight in middle age but then lose
+weight as seniors, a nonlinear relation.  We could try a quadratic
+model:
+
+m(height,age) = 
+&beta;<sub>0</sub> +
+&beta;<sub>1</sub> height + 
+&beta;<sub>2</sub> age +
+&beta;<sub>3</sub> age<sup>2</sup>
+
+where presumably &beta;<sub>3</sub> < 0.
+
+We may even include a height X age product term, allowing for interactions.
+Polynomials of degree 3 and so on could also be considered.  The choice
+of degree is a hyperparameter; in **qeSVM** it is named, of course,
+**degree**.
+
+This would seem nonlinear, but that would be true only in the sense of
+being nonlinear in age.  It is still linear in the &beta;<sub>i</sub> --
+e.g. if we double each &beta;<sub>i</sub> in the above expression, the
+value of the expression is doubled -- so **qeLin** can be used, or
+**qeLogit** for classification settings.
+
+Forming the polynomial terms by hand would be tedious, especially since
+we would also have to do this for predicting new cases.  Instead, we use
+**qePolyLin** (regression setting) and **qePolyLog**
+(classification).  They make use of the package **polyreg**.
+
+Polynomial models can in many applications hold their own with the fancy
+ML methods.  One must be careful, though, about overfitting, just as
+with any ML method.  In particular, polynomial functions tend to grow
+rapidly near the edges of one's dataset, causing both bias and variance
+problems.
+
+## Shrinkage methods for linear/generalized linear models
+
+Some deep mathematical theory implies that in linear models it may be
+advantageous to shrink the estimated b<sub>i</sub>.  *Ridge* regression
+and the LASSO do this in a mathematically rigorous manner.  Each of them
+minimizes the usual sum of squared prediction errors, subject to a
+limit being placed on the size of the b vector; for ridge, the size is
+defined as the sum of the b<sub>i</sub><sup>2</sup>, while for the LASSO
+it's the sum of {b<sub>i</sub>|.
+
+The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
+package.  The main hyperparameter **alpha** specifies ridge (0) or the
+LASSO (1, the default).
+
+There are various other shrinkage methods, such as Minimax Convex
+Penalty (MCP).  This and some others are available via **qeNCVregCV**,
+which wraps the **ncvreg** package.
+
+Shrinkage methods are often also applied to other ML algorithms.
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
+
+### LASSO for feature selection
+
+The LASSO tends to produce solutions in which some of the b<sub>i</sub>
+are 0.  Thus it is popular as a tool for predictor variable selection.
+
+Here is an example using **pef**, a dataset from the US Census, included
+with **qeML**.  The features consist of age, education, occupation and
+gender.  Those last three are categorical variables, which are converted
+to indicator varaibles.  Let's predict wage income.
+
+``` r
+> w <- qeLASSO(pef,'wageinc')
+> w$coefs
+11 x 1 sparse Matrix of class "dgCMatrix"
+                   s1
+(Intercept) -8983.986
+age           254.475
+educ.14      9031.883
+educ.16      9182.592
+occ.100     -2707.388
+occ.101     -1029.592
+occ.102      3795.166
+occ.106         .
+occ.140         .
+sex.1        4472.672
+wkswrkd      1178.889
+```
+
+There are six occupations (this dataset is just for programmers and
+engineers), 
+
+``` r
+> levels(pef$occ)
+[1] "100" "101" "102" "106" "140" "141"
+```
+
+thus five indicator variables.  The LASSO gave coefficients of 0 for
+occupations 106 and 140, so we might decide not to use them, even if we
+utimately use some other ML algorithm.
+
+## Support Vector Machines
+
+These were developed originally in the AI community, and later attracted
+interest among statisticians.  They are used mainly in classification
+settings.
+
+Say in the baseball data we are predicting catcher vs. non-catcher,
+based on height and weight.  We might plot a scatter diagram, with
+height on the horizontal axis and weight on the vertical, using red dots
+for the catchers and blue dots for the non-catchers.  We might draw a
+line that best separates the red and blue dots, then predict new cases
+by observing which side of the line they fall on.  This is what SVM does
+(with more predictors, the line become a plane or hyperplane).
+
+Here is an example, using the Iris dataset built in to R:
+
+![alt text](SVM.png)
+
+There are 3 classes, but we are just predicting setosa species (shown by + 
+symbols) vs. non-setosa (shown by boxes) here.  Below the solid line,
+we predict setosa, otherwise non-setosa.  
+
+SVM philosophy is that we'd like a wide buffer separating the classes,
+called the *margin*, denoted by the dashed lines.  Data points lying on
+the edge of the margin are termed *support vectors*, so called because
+if any other data point were to change, the margin would not change.
+
+In most cases, the two classes are not linearly separable.  So we allow
+curved boundaries, implemented through polynomial (or similar)
+transformations to the data.  The degree of the polynomial is a
+hyperparameter. 
+
+Another hyperparameter is **cost:**  Here we allow some data points to
+be within the margin.  The cost variable is roughly saying how many
+exceptions we are willing to accept.
+
+The **qeSVM** function wraps **svm** in the **e1071** package.  The
+package also offers various other implementations.
+
+## Neural networks
+
+These were developed almost exclusively in the AI community.
+
+An NN consists of *layers*, each of which consists of a number of
+*neurons* (also called *units* or *nodes*).  Say for concreteness we
+have 10 neurons per layer.  The output of the first layer will be 10
+linear combinations of the predictor variables/features, essentially 10
+linear regression models.  Those will be fed into the second layer,
+yielding 10 "linear combinations of linear combinations," and so on.
+
+In regression settings, the outputs of the last layer will be averaged
+together to produce our estimated m(t).  In the classification case with
+c classes, our final layer will have c outputs; whichever is largest
+will be our predicted class.
+
+"Yes," you say, "but linear combinations of linear combinations are
+still linear combinations.  We might as well just use linear regression
+in the first place."  True, which is why there is more to the story:
+*activation functions*.  Each output of a layer is fed into a function
+A(t) before being passed on to the next layer; this is for the purpose
+of allowing nonlinear effects in our model of m(t).
+
+For instance, say we take A(t) = t^2 (not a common choice in practice,
+but a simple one to explain the issues).  The output of the first layer
+will be quadratic functions of our features.  Since we square again at
+the outputs of the second layer, the result will be 4th-degree
+polynomials in the features.  Then 8th-degree polynomials come out of
+the third layer, and so on.
+
+One common choice for A(t) is the logistic function l(u) we saw earlier.
+Another popular choice is ReLU, r(t) = max(0,t).  No matter what we
+choose for A(t), the point is that we have set up a nonlinear model for
+m(t).
+
+Here's an example, again with the Vertebrae data:  The predictor
+variables V1, V2 etc. for a new case to be predicted enter on the left,
+and the predictions come out the right; whichever of the 3 outputs
+is largest, that will be our predicted class.
+
+![alt text](VertebraeNN.png)
+
+The first layer consists of V1 through V6.  The second layer, our
+only *hidden* layer here, has three neurons.  Entering on
+the left of each neuron is a linear combination of V1 through V6.  The
+outputs are fed into A(t) and then to the third layer. 
+
+Hyperparameters for NNs include the number of layers, the number of
+units per layer (which need not be the same in each layer), and the
+activation function.  Most NN software also includes various other
+hyperparameters.
+
+The linear combination coefficients, shown as numeric labels in the
+picture, are known as *weights*.  How are they calculated?  Again least
+squares is used, minimizing 
+
+&Sigma;<sub>i</sub> 
+(Y<sub>i</sub> - finaloutput<sub>i</sub>)
+<sup>2</sup>
+
+Let n<sub>w</sub> denote the number of weights.  This can be quite
+large, even in the millions.  Moreover, the n<sub>w</sub>
+equations we get by setting the partial derivatives to 0 are not linear.
+
+Thus this is no longer a "simple" calculus problem.  Iterative methods
+must be used, and it can be extremely tricky to get them to converge.
+Here's why:
+
+Though far more complex than in the linear case, we are still in the
+calculus realm.  We compute the partial derivatives of the sum of
+squares with respect to the n<sub>w</sub> weights, and set the results
+to 0s.  So, we are finding roots of a very complicated function in
+n<sub>w</sub> dimensions, and we need to do so iteratively. 
+
+A simplified version of the iteration process is as follows.  Consider
+the function f graphed below:
+
+![alt text](ObjFtnPlusTangent.png)
+
+There is an overall minimum at approximately x = 2.2.  This is termed
+the *global minimum*.  But there is also a *local
+minimum*, at about x = 0.4; that term means that this is the minimum
+value of the function only for points near---"local to"--- 0.4.  Let's
+give the name x<sub>0</sub> to the value of x at the global minimum.
+
+Denote our guess for x<sub>0</sub> at iteration i by g<sub>i</sub>.
+Say our initial guess g<sub>0</sub> = 1.1.
+
+The tangent line is pointing upward to the right, i.e. has positive
+slope, so it tells us that by going to the left we will go to smaller
+values of the function.  We do want smaller values, but in this case,
+the tangent is misleading us.  We should be going to the right, towards
+2.2, where the global minimum is.
+
+You can see that if our current guess were near 2.2, the tangent line
+would guide us in the right direction.  But we see above that it can
+send us in the wrong direction.  One remedy (among several typically
+used in concert) is to not move very far in the direction the tangent
+line sends us.  The idea behind this is, if we are going to move in the
+wrong direction, let's limit our loss.  The amount we move is called the 
+*step size* in general math, but the preferred ML term is
+the *learning rate*.  And, this is yet another hyperparameter.
+
+So, NNs are arguably the most complex of all the methods described here,
+and tend to use huge amounts of computing time, even weeks!
+
+The **qeNeural** function allows specifying the numbers of layers and
+neurons per layer, and the number of iterations.  It wraps **krsFit**
+from the **regtools** package, which in turn wraps the R **keras**
+package (and there are further wraps involved after that).
+
+Since any continuous activation function can be approximated by a
+polynomial, the outputs of the layers are approximately polynomials, of
+higher and higher degree with each layer.  Thus they are subject to the
+same issues on the edges of the dataset as were described for polynomial
+models above.
+
+## Overfitting
+
+Up to a point, the more complex a model is, the greater its predictive
+power.  "More complex" can mean adding more predictor variables, using a
+higher-degree polynomial, adding more layers etc.
+
+As we add more and more complexity, the *model bias* will decrease,
+meaning that our models become closer to the actual m(t), in principle.
+But the problem is that at the same time, the *variance* of a
+predicted Y<sub>new</sub> is increasing.  
+
+Say again we are predicting human weight from height, with 
+polynomial models.  With a linear model, we use our training data to
+estimate two coefficients, b<sub>0</sub> and b<sub>1</sub>.  With a
+quadratic model, we estimate three, and estimate four in the case of a
+cubic model and so on.  But it's same training data in each case, and
+intuitively we are "spreading the data thinner" with each more complex
+model.  As a result, the standard error of our predicted Y<sub>new</sub>
+(estimated standard deviation) increases.
+
+Hence the famous Bias-Variance Tradeoff.  If we use too complex a model,
+the increased variance overwhelms the reduction in bias, and our
+predictive ability suffers.  We say we have *overfit*.
+
+So there is indeed a "Goldilocks" level of complexity, an optimal
+polynomial degree, optimal number of nearest neighbors, optimal *network
+architecture* (configuration of layers and neurons), and so on.  How do
+we find it?
+
+Alas, **there are no magic answers here**.  But various approaches have
+been developed that one can try.  See the **qeML** vignettes
+**Feature\_Selection** and **Overfitting**. 
+
+## Which ML method to use?
+
+The usual answer given for this question is, "The best method is very
+dependent on which dataset you have."  True, but are there some general
+principles?
+
+ML people often distinguish between "tabular" and "nontabular" data.
+A disease diagnosis application may be considered tabular--rows of
+patients, and columns of measurements such as blood glucose, body
+temperature and so on.  On the other hand, a facial recognition
+application is considered nontabular, which is confusing, since it too
+has the form of a table--one row per picture, and one column per pixel
+position.
+
+Where the two kinds of applications may differ, though, is whether there
+are general monotonic relationships between Y and the features.  In
+predicting diabetes, say, the higher the glucose level, the more likely
+the patient is diabetic.  Though monotonic relations may exist in image
+classification, they maybe more localized.
+
+The point then, is that generally "monotonic" applications may be best
+served by ML methods that have either linear components or low-degree
+polynomials, such as linear or generalized linear models, SVM and
+polynomial versions of these.  For other applications, one might try
+k-NN, NNs etc.
+
