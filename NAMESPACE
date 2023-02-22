@@ -2,7 +2,7 @@
 importFrom("graphics", 'hist', "abline", "matplot", "plot", "lines")
 importFrom("stats","binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
-             "var", "loess")
+             "var", "loess", 'as.formula')
 importFrom('regtools','kNN', 'allNumeric', 'factorToDummies', 'charsToFactors',    'krsFit', 'penrosePoly', 'hasFactors', 'getDFclasses',
     'confusion', 'fineTuning')
 
