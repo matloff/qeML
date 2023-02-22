@@ -2481,7 +2481,7 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 qeROC <- function(dataIn,qeOut,yName,yLevelName) 
 {
-   requireNamespace('ROCR')
+   if (!requireNamespace('ROCR')) stop('ROCR package required')
    holdout <- dataIn[qeOut$holdIdxs,]
    holdY <- holdout[[yName]]
    # ys <- as.factor(holdY == yLevelName)

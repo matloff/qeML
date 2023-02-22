@@ -10,7 +10,7 @@ importFrom('grf','regression_forest','ll_regression_forest')
 
 importFrom('gbm','gbm.perf')
 
-import('FOCI','gtools','partools')
+import('FOCI','gtools','partools','rmarkdown')
 
 S3method(predict,qeLogit)
 S3method(predict,qeLin)
