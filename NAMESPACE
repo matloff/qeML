@@ -1,8 +1,8 @@
 
 importFrom("graphics", 'hist', "abline", "matplot", "plot", "lines")
-importFrom("stats","binomial", "coef", "cor", "cov", "glm", "lm",
+importFrom("stats", 'as.formua', "binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
-             "var", "loess", 'as.formula')
+             "var", "loess")
 importFrom('regtools','kNN', 'allNumeric', 'factorToDummies', 'charsToFactors',    'krsFit', 'penrosePoly', 'hasFactors', 'getDFclasses',
     'confusion', 'fineTuning')
 
