@@ -317,17 +317,15 @@ factorToTopLevels <- function(f,lowCountThresh=0)
    as.factor(fNew)
 }
 
-checkPkgInstalled <- function(pkgName,whereObtain='CRAN') 
+checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
 {
    if (!require(pkgName)) {
       pkgErr <- paste0(pkgName, ' is required')
       print(pkgErr)
-      obtain <- paste0('obtain from ',whereObtain)
-      stop((obtain)
+      obtain <- paste0('if not installed, obtain from ',whereObtain)
+      stop(obtain)
    }
-
-   stop('ROCR package required')
-      requireNamespace(pkgName)
+   requireNamespace(pkgName)
 
 }
 
