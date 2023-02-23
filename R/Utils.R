@@ -319,14 +319,20 @@ factorToTopLevels <- function(f,lowCountThresh=0)
 
 checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
 {
-   if (!require(pkgName)) {
-      pkgErr <- paste0(pkgName, ' is required')
+   cmd <- sprintf('require(%s)',pkgName)
+   if (!evalr(cmd)) {
+      pkgErr <- sprintf('%s is required',pkgName)
       print(pkgErr)
       obtain <- paste0('if not installed, obtain from ',whereObtain)
-      stop(obtain)
+      stop(sprintf('if not installed, obtain from %s',whereObtain))
    }
    requireNamespace(pkgName)
 
+}
+
+
+evalr function(toexec) {
+   eval(parse(text=toexec),parent.frame())
 }
 
 

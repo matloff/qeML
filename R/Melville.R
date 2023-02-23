@@ -10,13 +10,15 @@
 
 getJLMImageSet <- function(imageSet) 
 {
-   requireNamespace('umap')
-   u <- requireNamespace('snedata')
-   if (!u) {
-      devtools::install_github("jlmelville/snedata")
-   }
+#    requireNamespace('umap')
+#    u <- requireNamespace('snedata')
+#    if (!u) {
+#       devtools::install_github("jlmelville/snedata")
+#    }
 
+   checkPkgLoaded('ROCR','github.com/jlmelville/snedata')
    cmd <- paste0('download_',imageSet,'()')
-   eval(parse(text=cmd))
+   cmd <- sprintf('download_%s()',imageSet)
+   evalr(cmd)
 }
 
