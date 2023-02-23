@@ -2771,11 +2771,6 @@ predict.qeXGBoost <- function(object,x,...)
    preds
 }
 
-# data(pef)
-# pef1<- pef[,-2]
-# z <- qeXGBoost(pef1,'wageinc',holdout=NULL,nRounds=250)
-# predict(z,pef1[1:28,-4])
-
 #######################  qeliquidSVM()()  ##############################
 
 # note: liquidSVM is no longer on CRAN, but old versions are archived
@@ -2792,6 +2787,7 @@ predict.qeXGBoost <- function(object,x,...)
 qeliquidSVM <- function(data,yName,yesYVal=NULL,predict.prob=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkPkgLoaded('liquidSVM')
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
@@ -2856,6 +2852,7 @@ qeDeepnet <- function(data,yName,hidden=c(10),activationfun='sigm',
    numepochs=3,batchsize=100,hidden_dropout=0,
    yesYVal=NULL,holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkPkgLoaded('deepnet')
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    classif <- is.factor(data[[yName]])
@@ -2936,6 +2933,7 @@ qeNCVregCV <- function(data,yName,
    nfolds=10,yesYVal=NULL,
    holdout=floor(min(1000,0.1*nrow(data)))) 
 {
+   checkPkgLoaded('ncvreg')
    if (!is.null(cluster)) 
       stop('currently cluster computation is not implemented')
    checkForNonDF(data)

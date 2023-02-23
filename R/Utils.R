@@ -331,7 +331,7 @@ checkPkgLoaded <- function(pkgName,whereObtain='CRAN')
 }
 
 
-evalr function(toexec) {
+evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
 }
 
