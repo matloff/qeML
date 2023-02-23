@@ -3039,7 +3039,7 @@ predict.qeNCVregCV <- function(object,newx)
    list(probs=preds,predClasses=predClasses)
 }
 
-plot.qeNCVregCV <- function(object) 
+plot.qeNCVregCV <- function(object,...) 
 {
    plot(object$cvout)
 }
