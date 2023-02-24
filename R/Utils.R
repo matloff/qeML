@@ -319,6 +319,10 @@ factorToTopLevels <- function(f,lowCountThresh=0)
 
 checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
 {
+
+   # workaround
+   cmd <- sprintf('%s <- NULL',pkgName)
+
    cmd <- sprintf('require(%s)',pkgName)
    if (!evalr(cmd)) {
       pkgErr <- sprintf('%s is required',pkgName)
