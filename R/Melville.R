@@ -16,7 +16,7 @@ getJLMImageSet <- function(imageSet)
 #       devtools::install_github("jlmelville/snedata")
 #    }
 
-   checkPkgLoaded('ROCR','github.com/jlmelville/snedata')
+   checkPkgLoaded('snedata','github.com/jlmelville/snedata')
    cmd <- paste0('download_',imageSet,'()')
    cmd <- sprintf('download_%s()',imageSet)
    evalr(cmd)
