@@ -317,7 +317,7 @@ factorToTopLevels <- function(f,lowCountThresh=0)
    as.factor(fNew)
 }
 
-# check if pkg is stored in user library directory
+# try to require() pkg; if not installed, tell user where to get it
 checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
 {
 

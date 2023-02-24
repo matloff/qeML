@@ -3,7 +3,8 @@
 
 plotClassesUMAP <- function(data,classVar) 
 {
-   checkPkgInstalled('uwot')
+   checkPkgLoaded('uwot')
+
    if (is.character(classVar)) {  # name of a column in 'data'
       whichClass <- which(names(data) == classVar)
       x <- data[,-whichClass]
