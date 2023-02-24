@@ -1,6 +1,4 @@
 \name{FeatureModelSelect}
-\alias{qeCompare}
-\alias{qeFT}
 \alias{qeText}
 \alias{qeTS}
 
