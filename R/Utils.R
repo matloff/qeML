@@ -317,11 +317,13 @@ factorToTopLevels <- function(f,lowCountThresh=0)
    as.factor(fNew)
 }
 
+# check if pkg is stored in user library directory
 checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
 {
 
    # workaround
    cmd <- sprintf('%s <- NULL',pkgName)
+   evalr(cmd)
 
    cmd <- sprintf('require(%s)',pkgName)
    if (!evalr(cmd)) {
@@ -334,9 +336,21 @@ checkPkgLoaded <- function(pkgName,whereObtain='CRAN')
 
 }
 
-
+# run R call from string
 evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
 }
 
+# extract args from ...
 
+getDotsArgs <- defmacro(argName, expr=
+   {
+      v <- c(as.list(environment()), list(...))
+      if (is.null(v[[argName]])) {
+         stop(sprintf('%s argument missing',argName))
+      } else {
+         cmd <- sprintf('%s <<- v$%s',argName,argName)
+         evalr(cmd)
+      }
+   }
+)

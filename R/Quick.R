@@ -2979,6 +2979,8 @@ qeNCVregCV <- function(data,yName,
 
 predict.qeNCVregCV <- function(object,...) 
 {
+   getDotsArgs('newx')
+
    if (!is.matrix(newx)) {
       newx <- regtools::factorsToDummies(newx,omitLast = TRUE, 
          factorsInfo = object$factorsInfo)
@@ -2997,7 +2999,7 @@ predict.qeNCVregCV <- function(object,...)
 
 plot.qeNCVregCV <- function(x,...) 
 {
-   plot(object$cvout)
+   plot(x$cvout)
 }
 
 qencvregcv <- qeNCVregCV
