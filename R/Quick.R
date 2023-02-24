@@ -2770,7 +2770,7 @@ qeliquidSVM <- function(data,yName,yesYVal=NULL,predict.prob=FALSE,
    frml <- as.formula(paste0(yName,' ~ .'))
    dta <- if (is.null(holdout)) data else trn
    # svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob)
-   svmOut <- svm(frml,dta,predict.prob=predict.prob)
+   svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob)
 
    liqOut <- list(svmOut=svmOut,classif=classif,classif2=classif2,
       yesY=yesYVal,noY=noYVal)
