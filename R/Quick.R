@@ -1810,6 +1810,7 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    nComps=NULL,nNeighbors=NULL)
 {
    yNameSave <- yName
+   umap <- NULL  # avoid err msg later; umap actually set here:
    checkPkgLoaded('umap')
    # requireNamespace('umap')
 
@@ -2743,6 +2744,7 @@ predict.qeXGBoost <- function(object,x,...)
 qeliquidSVM <- function(data,yName,yesYVal=NULL,predict.prob=FALSE,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   svm <- NULL  # avoid err msg later; svm actually set here:
    checkPkgLoaded('liquidSVM','https://github.com/liquidSVM/liquidSVM')
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
