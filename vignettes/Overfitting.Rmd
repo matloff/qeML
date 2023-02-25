@@ -319,7 +319,7 @@ MSPE value by predicting our test set.
 Mean squared error is the sum of a decreasing quantity, squared bias,
 and an increasing quantity, variance.  This typically produces a
 U-shape, but there is no inherent reason that it must come out this way.
-A double-U can occur (see below), or for that matter, multiple-U.
+A double-U can occur (see below), or for that matter, multiple-U. 
 
 </br>
 </br>
