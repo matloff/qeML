@@ -49,9 +49,10 @@ famous Bias-Variance Tradeoff:
 > by the increase in variance, a net loss.  Somewhere in that sequence
 > of models is a best one, i.e. one with minimum MSPE.
 
-OK, but the bias and variance of WHAT?  Our treatment here is based on
-that notion, **with emphasis on what it is that we are really
-talking about** in discussing bias and variance.
+OK, but the bias and variance of WHAT?  Surprisingly, that question is
+seldom addressed.  Our treatment here is based on answering that
+question, **with emphasis on what it is that we are really talking
+about** in discussing bias and variance.
 
 ## Required Background
 
@@ -271,6 +272,9 @@ feel uneasy about taking the chance.
 The same is true in data science, and that in turn means that
 sampling variance is key.
 
+</br>
+</br>
+
 # A U-Shaped Curve
 
 We stated above that a linear model cannot be exactly correct, even with
@@ -297,7 +301,7 @@ a lot.
 
 Result:
 
-> If we plot MSPE vs. degree, we typically will get a
+> If we plot MSPE vs. degree, we typically will get a (roughly)
 > U-shaped curve.  Bias reduction dominates variance increase initially,
 > but eventually variance overpowers bias.  Once we pass the low point
 > of the curve, **we are overfitting**.
@@ -340,10 +344,10 @@ principle is the same; it still combines bias and variance.
 
 My goal was to show that:
 
-1.  As degree increases, MAPE at first falls but later rises, confirming the
-    "U-shape" discussed above.
+1.  As degree increases, variance *always increases*.
 
-2.  But as degree increases, variance *always* increases.
+2.  As degree increases, MAPE at first falls but later rises, confirming the
+    "U-shape" discussed above.
 
 Combining these two points, we can observe the battle between bias and
 variance in their impact on MAPE.  At first the reduction in bias
@@ -370,8 +374,6 @@ variance and MAPE in the top and bottom rows, respectively:
 [2,] 7.73367546 7.70928618 7.733230  7.793813681 9.980302 17.36951
 ```
 
-The code is [here](https://github.com/matloff/qeML/blob/master/inst/BiasVar.R).
-
 Starting with degree 10, there are serious numerical issues, arising
 from exact or nearly exact collinearity among the various terms in the
 polynomial.  Thus variance is not reported for degrees 11 and 12, and
@@ -381,6 +383,9 @@ In the top row, one can see variance steadily increasing through
 degree 9.  MAPE shows a general "U" trend, albeit a
 shallow one.  
 
+</br>
+</br>
+
 # Overfitting with Impunity--and Even Gain?
 
 Research in machine learning has, among other things, produced two major
@@ -389,8 +394,8 @@ mysteries, which we address now.
 ## Baffling behavior--drastic overfitting
 
 In many ML applications, especially those in which neural networks are
-used, there may be far more hyperparameters than data points, i.e. p >>
-n.  Yet excellent prediction accuracy on new data has often been
+used, there may be far more hyperparameters than data points.
+Yet excellent prediction accuracy on new data has often been
 reported in spite of such extreme overfitting.
 
 ## How could it be possible?
@@ -398,7 +403,7 @@ reported in spite of such extreme overfitting.
 Much speculation has been made as to why these phenomena can occur.  My
 own speculation is as follows.
 
-* **These phenomena occur in classification problems in which there is a
+* **The glowing reports typically occur in classification problems in which there is a
 very low error rate, 1 or 2% or even under 1%.**  
 
 * In other words, the classes are widely separated, i.e. there is a
@@ -430,7 +435,7 @@ overfitting is just not an issue, even with high-degree polynomials.
 
 ## Baffling behavior--"double descent"
 
-The phenomenon of *double descent* is sometimes observed, in which the
+The related phenomenon of *double descent* is sometimes observed, in which the
 familiar graph of test set accuracy vs. model complexity consists of
 *two* U shapes rather than one.  The most intriguing cases are those in
 which the first U ends at a point where the model fully interpolates the
@@ -439,7 +444,8 @@ actually reduces test set error.
 
 Below is an example again with the song data, but with a linear model
 rather than a polynomial one.  The horizontal axis is p, the number of
-predictors.  We see the double-U, though not with improvement in the
+predictors.  E.g. p = 6 means using the first six features of the 90
+available.  We see the double-U, though not with improvement in the
 second U over the first.
 
 ![alt text](https://matloff.files.wordpress.com/2020/11/overfit.png)

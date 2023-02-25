@@ -1,5 +1,4 @@
 
-
 # Clearing the Confusion:  A Closer Look at Overfitting
 
 * [Goals](#goals)
@@ -23,8 +22,8 @@ examples," which is a definition, not an explanation.  Or we hear that
 overfitting results from "fitting the training data too well" or that we
 are "fitting the noise," again rather unsatisfying.
 
-Somewhat better are the explanations based on the famous Bias-Variance
-Tradeoff:
+Somewhat better--but only somewhat-- are the explanations based on the
+famous Bias-Variance Tradeoff:
 
 > Mean squared prediction error (MSPE) is the sum of squared bias and variance.
 > Bias and variance are at odds with each other.  The lower the bias, the
@@ -33,33 +32,43 @@ Tradeoff:
 > by the increase in variance, a net loss.  Somewhere in that sequence
 > of models is a best one, i.e. one with minimum MSPE.
 
-OK, but the bias and variance of WHAT?  Our treatment here is based on
-that notion, **with emphasis on what it is that we are really
-talking about** in discussing bias and variance.
+OK, but the bias and variance of WHAT?  Surprisingly, that question is
+seldom addressed.  Our treatment here is based on answering that
+question, **with emphasis on what it is that we are really talking
+about** in discussing bias and variance.
 
 ## Required Background
 
 Very basic statistical concepts + patience (document is a bit long).
+Expected notation, E(), is used in a couple of places, but is explained
+intuitively in the given context, and is not vital to the exposition.
 
 ## Setting
 
 Let Y denote our outcome variable, and X represent the vector of our
-predictors/features.  For instance, Y might be human weight, with X
-being (height, age).  We include binary classification problems, with Y
-= 1 or 0.  (In multiclass problems, Y is a vectors of 1s and 0s, with
-only one component being 1 at a time.)
+predictors/features.  We are predicting Y from X.  For instance, Y might
+be human weight, with X being (height, age).  We include binary
+classification problems, with Y = 1 or 0.  (In multiclass problems, Y is
+a vector of 1s and 0s, with only one component being 1 at a time.)
 
 
 Overfitting is often described as arising when we go too far towards the
 low-bias end of the Bias-Variance Tradeoff.  Yes, but what does that
 really mean in the prediction context?
 
-# The "True" Relation between Y and X
+</br>
+</br>
+
+# The "true" relation between Y and X
 
 The *regression function of Y on X*, &rho;(t), is defined to be the mean
 Y for the given X values t.  In the weight/height/age example,
 &rho;(68.2,32.9) is the mean weight of all people of height 68.2 and age
-32.9.  
+32.9.   
+
+Though some books use the term "regression" to mean a
+linear model, the actual definition is unrestricted; it applies just as
+much to, say, random forests as to linear models.
 
 The &rho; function is the best (i.e. minimum MSPE) predictor of weight
 based on height and age, the ideal.  Note the phrase "based on," though.
@@ -67,22 +76,26 @@ If we had a third predictor variable/feature available, say waist size,
 there would be another &rho; for that 3-predictor setting, better than
 the 2-predictor one.
 
-Note that the &rho; function is a population entity, which we estimate
+Note too that the &rho; function is a population entity, which we estimate
 from our sample data.  Denote the estimated &rho;(t) by r(t).  Say we
 are studying diabetic people.  &rho;(t) gives us the relation of weight
 vs.  height and age in the entire population of diabetics; if our study
 involves 100 patients, that is considered a sample from the population,
 and our estimate r(t) is based on that sample.
 
-(Note:  "Sample" means our entire dataset; we say, "A sample of 100
-people," not "We have 100 samples.")
+(Note:  "Sample" will mean our entire dataset; we will say, "A sample of 100
+people," as in statistics courses, not "We have 100 samples.")
 
-Also, though some books use the term "regression" to mean a
-linear model, the actual definition is unrestricted; it applies just as
-much to, say, random forests as to linear models.
+The term *population* is used in the statistics community.  Those who
+come to ML from the computer science world tend to use terms like
+*probabilistic generating process*.  Either way, it is crucial to keep
+in mind that we treat our data as randomly generated.  If our data
+consists of 100 diabetes patients, we treat them as being randomly drawn
+from the conceptual population of all diabetics.
 
-In a binary classification problem, this function reduces to the
-probability of class 1.
+In a binary classification problem, the regression function reduces to the
+probability of class 1, since the mean of a 0,1 variable is the
+probability of a 1.
 
 ## Example: estimating the &rho; function via a linear model 
 
@@ -91,8 +104,8 @@ for &rho;(height) is
 
 &rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height
 
-(This is called a "parametric" model, in that it expresses &rho;(t) in terms
-of some parameters, in this case the &beta;<sub>i</sub>.)
+This is called a "parametric" model, in that it expresses &rho;(t) in terms
+of some parameters, in this case the &beta;<sub>i</sub>.
 
 Our sample-based estimate of the function &rho;(t) is a function r(t),
 with
@@ -109,6 +122,9 @@ classic k-Nearest Neighbors approach.  To estimate &rho;(t), we find the
 k closest rows in our dataset to t, and average the Y values of those
 data points.  Of course, k is a hyperparameter, chosen by the analyst.
 
+
+</br>
+</br>
 
 # Bias and Variance of WHAT
 
@@ -152,6 +168,8 @@ major issue in prediction, as we now discuss.
 
 ## Bias in prediction
 
+### Parametric methods
+
 Parametric methods such as linear and logistic models have a bias, in
 the sense of the fundamental inaccuracy of the model itself.  
 
@@ -165,18 +183,21 @@ best-fitting FUNCTION.
 This is *model bias*.  Consider predicting the height of a person who is
 68.2 inches tall.  Our best prediction would be &rho;(68.2), which we
 estimate from our data via r(68.2).  Averaged over all possible samples,
+our prediction r(68.2) will NOT be equal to the true value, i.e.
 
 Ei[r(68.2)] &ne; &rho;(68.2)
 
+### Nonparametric (i.e. ML) methods
+
 For model-free, i.e. nonparametric, methods, the bias is subtler.
 Consider k-NN, again predicting weight from height.  To calculate, say,
-r(68.6), we find the k points in our data closest to 68.6, then take as
-r(68.6) the average weight among those people.  
+r(70.6) with k=12, we find the 12 points in our data closest to 70.6, then take as
+r(70.6) the average weight among those 12 people.  
 
-Bias arises as follows:  Say we wish to predict the weight for
-a person of height 64.2, which is on the shorter end of the height range.
-Then most of the neighboring data points are likely to be taller than
-64, and since our prediction will consist of the mean weight among the
+Bias arises as follows:  Say we wish to predict weight for a person of
+height 64.2, which is on the shorter end of the height range.  Then most
+of the neighboring people in our dataset are likely to be taller than
+64.2, and since our prediction will consist of the mean weight among the
 neighbors, this 64.2-inch tall person's weight will likely be
 overestimated, i.e.  
 
@@ -193,17 +214,18 @@ Note too that for fixed n, smaller k will result in smaller bias.
 Fewer neighbors means that the ones we have are close by.
 
 The bias described above is *pointwise*, meaning specific to a
-particular value of t, e.g. t = 64.2 (or say t = (64.2,28.0 if we are
+particular value of t, e.g. t = 64.2 (or say t = (64.2,28.0) if we are
 predicting from both height and age).)  By contrast, the MSPE is
 averaged over the distribution of X, i.e.
 
 MSPE = E[(Y - &rho;(X))<sup>2</sup>]
 
-So, a linear model has bias, even asymptotically.  But on
-the other hand, a linear model will have a smaller variance, our next
-topic:
+So, a linear model has permanent bias, even for huge datasets, while for
+k-NN, random forests and so on the bias goes to 0 as the dataset grows.
+But on the other hand, a linear model will have a smaller variance, our
+next topic:
 
-# Variance in Prediction
+## Variance in prediction
 
 This refers to sampling variance, which measures the degree of
 instability of one's estimated r(t) from one sample to another.
@@ -233,6 +255,9 @@ feel uneasy about taking the chance.
 The same is true in data science, and that in turn means that
 sampling variance is key.
 
+</br>
+</br>
+
 # A U-Shaped Curve
 
 We stated above that a linear model cannot be exactly correct, even with
@@ -244,8 +269,7 @@ This includes the linear model as a special case (&beta;<sub>2</sub> =
 0), but also is more general.  In the population, the best-fitting
 quadratic model will be more accurate than the best-fitting linear one.
 How about one of degree 3?  With higher and higher degree polynomials,
-we can reduce the bias to smaller and smaller amounts--if we have
-infinitely many data points.
+we can reduce the bias to smaller and smaller amounts.
 
 But in finite samples, the higher the degree of the polynomial, the
 larger the variance.  (We have more parameters to estimate, and I like
@@ -260,7 +284,7 @@ a lot.
 
 Result:
 
-> If we plot MSPE vs. degree, we typically will get a
+> If we plot MSPE vs. degree, we typically will get a (roughly)
 > U-shaped curve.  Bias reduction dominates variance increase initially,
 > but eventually variance overpowers bias.  Once we pass the low point
 > of the curve, **we are overfitting**.
@@ -282,7 +306,10 @@ MSPE value by predicting our test set.
 Mean squared error is the sum of a decreasing quantity, squared bias,
 and an increasing quantity, variance.  This typically produces a
 U-shape, but there is no inherent reason that it must come out this way.
-A double-U can occur (see below), or for that matter, multiple-U.
+A double-U can occur (see below), or for that matter, multiple-U. 
+
+</br>
+</br>
 
 # Empirical Illustration
 
@@ -292,7 +319,7 @@ consists of 90 audio measurements on about 500,000 songs.  To reduce the
 amount of computation, I used only a random subset of 10,000 songs, and
 only two audio variables, fitting polynomial models in the two
 predictors, with increasing polynomial degree.  (The package includes the dataset
-**fiftyksongs**, a random subset of 50,000 songs.)
+**oneksongs**, a random subset of 1,000 songs.)
 
 As noted, mean squared prediction error is a sum of bias squared and
 variance.  I calculated mean absolute prediction error (MAPE), but the
@@ -300,10 +327,10 @@ principle is the same; it still combines bias and variance.
 
 My goal was to show that:
 
-1.  As degree increases, MAPE at first falls but later rises, confirming the
-    "U-shape" discussed above.
+1.  As degree increases, variance *always increases*.
 
-2.  But as degree increases, variance *always* increases.
+2.  As degree increases, MAPE at first falls but later rises, confirming the
+    "U-shape" discussed above.
 
 Combining these two points, we can observe the battle between bias and
 variance in their impact on MAPE.  At first the reduction in bias
@@ -330,8 +357,6 @@ variance and MAPE in the top and bottom rows, respectively:
 [2,] 7.73367546 7.70928618 7.733230  7.793813681 9.980302 17.36951
 ```
 
-The code is [here](https://github.com/matloff/qeML/blob/master/inst/BiasVar.R).
-
 Starting with degree 10, there are serious numerical issues, arising
 from exact or nearly exact collinearity among the various terms in the
 polynomial.  Thus variance is not reported for degrees 11 and 12, and
@@ -341,6 +366,9 @@ In the top row, one can see variance steadily increasing through
 degree 9.  MAPE shows a general "U" trend, albeit a
 shallow one.  
 
+</br>
+</br>
+
 # Overfitting with Impunity--and Even Gain?
 
 Research in machine learning has, among other things, produced two major
@@ -349,8 +377,8 @@ mysteries, which we address now.
 ## Baffling behavior--drastic overfitting
 
 In many ML applications, especially those in which neural networks are
-used, there may be far more hyperparameters than data points, i.e. p >>
-n.  Yet excellent prediction accuracy on new data has often been
+used, there may be far more hyperparameters than data points.
+Yet excellent prediction accuracy on new data has often been
 reported in spite of such extreme overfitting.
 
 ## How could it be possible?
@@ -358,7 +386,7 @@ reported in spite of such extreme overfitting.
 Much speculation has been made as to why these phenomena can occur.  My
 own speculation is as follows.
 
-* **These phenomena occur in classification problems in which there is a
+* **The glowing reports typically occur in classification problems in which there is a
 very low error rate, 1 or 2% or even under 1%.**  
 
 * In other words, the classes are widely separated, i.e. there is a
@@ -390,7 +418,7 @@ overfitting is just not an issue, even with high-degree polynomials.
 
 ## Baffling behavior--"double descent"
 
-The phenomenon of *double descent* is sometimes observed, in which the
+The related phenomenon of *double descent* is sometimes observed, in which the
 familiar graph of test set accuracy vs. model complexity consists of
 *two* U shapes rather than one.  The most intriguing cases are those in
 which the first U ends at a point where the model fully interpolates the
@@ -399,7 +427,8 @@ actually reduces test set error.
 
 Below is an example again with the song data, but with a linear model
 rather than a polynomial one.  The horizontal axis is p, the number of
-predictors.  We see the double-U, though not with improvement in the
+predictors.  E.g. p = 6 means using the first six features of the 90
+available.  We see the double-U, though not with improvement in the
 second U over the first.
 
 ![alt text](https://matloff.files.wordpress.com/2020/11/overfit.png)
