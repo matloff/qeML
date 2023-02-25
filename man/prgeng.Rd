@@ -1,7 +1,5 @@
 \name{prgeng}
 \alias{prgeng}
-\alias{peDumms}
-\alias{peFactors}
 \alias{pef}
 
 \title{
@@ -9,8 +7,6 @@ Silicon Valley programmers and engineers data
 }
 \usage{
 data(prgeng)
-data(peDumms)
-data(peFactors)
 }
 
 \description{
@@ -25,13 +21,6 @@ There are three versions:
 
     \item{\code{prgeng}, the original data, with categorical variables,
     e.g. Occupation, in their original codes}
-
-    \item{\code{peDumms}, same but with categorical variables
-    converted to dummies; due to the large number of levels the birth
-    and PUMA data is not included}
-
-    \item{\code{peFactors}, same but with categorical variables
-    converted to factors}
 
     \item{\code{pef}, same as \code{peFactors}, but having only columns
     for age, education, occupation, gender, wage income and weeks

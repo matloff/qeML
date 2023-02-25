@@ -340,7 +340,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    }
 
    if (!is.numeric(x)) {
-      x <- factorsToDummies(x,omitLast=TRUE)
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
       factorsInfo <- attr(x,'factorsInfo') 
    } else factorsInfo <- NULL
 
@@ -1810,7 +1810,8 @@ qeUMAP <- function(data,yName,qeName,opts=NULL,
    nComps=NULL,nNeighbors=NULL)
 {
    yNameSave <- yName
-   requireNamespace('umap')
+   checkPkgLoaded('umap')
+   # requireNamespace('umap')
 
    # eventual return value
    res <- list()
@@ -2770,7 +2771,7 @@ qeliquidSVM <- function(data,yName,yesYVal=NULL,predict.prob=FALSE,
    frml <- as.formula(paste0(yName,' ~ .'))
    dta <- if (is.null(holdout)) data else trn
    # svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob)
-   svmOut <- liquidSVM::svm(frml,dta,predict.prob=predict.prob)
+   svmOut <- svm(frml,dta,predict.prob=predict.prob)
 
    liqOut <- list(svmOut=svmOut,classif=classif,classif2=classif2,
       yesY=yesYVal,noY=noYVal)
@@ -2817,7 +2818,7 @@ qeDeepnet <- function(data,yName,hidden=c(10),activationfun='sigm',
    x <- data[,-ycol,drop=FALSE]
    y <- data[,yName]
    yLevels <- levels(y)
-   y <- factorsToDummies(y,omitLast=FALSE)
+   y <- regtools::factorsToDummies(y,omitLast=FALSE)
    output <- 'sigm'
    
    if (!allNumeric(x)) {
