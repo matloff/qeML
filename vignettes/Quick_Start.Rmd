@@ -8,7 +8,8 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-<img src="VertebraeUMAP.png" alt="drawing" width="400"/>
+# <img src="VertebraeUMAP.png" alt="drawing" width="400"/>
+<img src="EasyBeginPowerAdv.png" alt="drawing" width="400"/>
 
 # The qeML package: "Quick and easy" machine learning
 
