@@ -4,6 +4,7 @@
 plotClassesUMAP <- function(data,classVar) 
 {
    checkPkgLoaded('uwot')
+   umap <- NULL  # fake; actual def happens here:
    checkPkgLoaded('umap')
 
    if (is.character(classVar)) {  # name of a column in 'data'
