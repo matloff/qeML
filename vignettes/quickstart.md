@@ -1,11 +1,24 @@
 
-<img src="VertebraeUMAP.png" alt="drawing" width="400"/>
+---
+title: "Quick Start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Start}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
 
-# The qeML package: "Quick and easy" machine learning
+# <img src="Forest500UMAP.png" alt="drawing" width="400"/>
 
-## "Easy for learners, powerful for advanced users"
+# The qeML Package: "Quick and Easy" Machine Learning
 
-### Norm Matloff, UC Davis
+## <span style="color:blue"> "Easy for learners, powerful for advanced users"</span>
+
+</br>
+</br>
+</br>
+
+## Norm Matloff, UC Davis
 
 I am a professor of computer science, and a former professor of
 statistics, highly active in the areas of machine learning and
@@ -20,19 +33,19 @@ statistical computing, [bio](http://heather.cs.ucdavis.edu/matloff.html).
 
     * easy for learners, powerful/convenient for experts
 
-* Special Feature for ML Learners
+* <span style="color:purple">Ideal for teaching!</span>
+
+    * numerous built-in real datasetss.
 
     * includes **tutorials** on major ML methods
 
-* Special Features for Those Experienced in  ML 
+* Special features for those experienced in  ML 
 
     * variety of functions for feeature selection and model development
 
     * large variety of ML algorithms, including some novel/unusual ones
 
     * advanced plotting utilities
-
-    * includes **tutorials** on special ML topics
 
 ## Model fit
 
@@ -66,7 +79,7 @@ Here is what the data looks like:
 6 Second_Baseman     69    176 29.39
 ```
 
-The qe-series function calls are of the form
+The qe-series function calls are of the vewry simple form
 
 ``` r
 qe_function_name(dataset,variable_to_predict)
@@ -141,9 +154,6 @@ holdout data.
 ``` r
 > z <- qeRF(mlb1,'Weight')
 holdout set has  101 rows
-Loading required package: randomForest
-randomForest 4.6-14
-Type rfNews() to see new features/changes/bug fixes.
 > z$testAcc
 [1] 14.45285
 > z$baseAcc
@@ -184,11 +194,11 @@ topics.  A few example (showing how they are invoked):
 * **vignette('MLOverview')**; for those with no prior ML background
 
 * **vignette('Overfitting')**; plugging "overfitting" into Google
-  yielded 49,400,000 results!--but what REALLY occurs?
+  yielded 49,400,000 results!--but what is overfitting REALLY about?
 
 * **vignette('Feature_Selection')**; we often need to pare down our set
   of predictor variables, both to save computation and prevent
-  overfitting; how should this be done, especially in **qeML**?
+  overfitting; how can this be done, especially in **qeML**?
 
 * **vignette('PCA_and_UMAP')**; this vignette first takes a closer, more
   practical look at Principal Components Analysis, then gives an
