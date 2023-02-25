@@ -17,26 +17,28 @@ knitr::opts_chunk$set(
 
 # Clearing the Confusion: How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
 
-In many applications we may have a larger number of features---dozens,
+In many applications we may have a large number of features---dozens,
 hundreds or even more.  In machine learning contexts, where we are
 interested primarily in prediction, we typically don't want to use all
 the features, for a couple of reasons:
 
-* Avoiding overfitting.
+* *Avoiding overfitting.*
 
     As we add more and more features to a model, bias is reduced but
     variance increases.  At some point, variance overwhelms bias, and our
     predictive ability declines.
 
-* Avoiding large computation time and/or memory usage.
+* *Avoiding large computation time and/or memory usage.*
 
     Depending on the solution method used, computation time for a linear
-    model increases with the cube, or at least the square, of the number
-    of features.  Modern ML models can be even worse in terms of
-    computational burden.  In addition, large models may result in lack
-    of convergence or instability of the output.
+    model increases with at least the square of the number of features.  If
+    say we have 3 times as many features in one model than another,
+    computation time for the larger multiple will be roughly 9 times that of
+    the smaller one.  Modern ML models can be especially heavy in terms of
+    computational burden.  In addition, large models may result in lack of
+    convergence or instability of the output.
 
-# Which Method to Use?
+# Which Method to Use to Select Features?
 
 Many, many methods for feature selection have been developed over the
 years, and you will often hear someone claim that their favorite is *the*
@@ -45,7 +47,7 @@ conflicting claims as to "best" reflects the fact that no such Best
 method exists.  Indeed, much of the feature selection process is *ad hoc*.
 
 We will cover a few feature selection methods here, to explain their
-rationales and how to use them in qeML.  You may typically use two or
+rationale and how to use them in qeML.  You may typically use two or
 more of them in any given application.
 
 # How Many Is Too Many?
@@ -60,7 +62,8 @@ points in our dataset (i.e. number of rows) and the number of features
   variance increase overwhelms bias reduction.
 
 * However, that bias-variance tradeoff transition point for p depends on the
-  application. There is no magic formula for best p as a function of n.
+  application and the ML method. There is no magic formula for 
+  best p as a function of n.
 
 * Nevertheless, a commonly-used rule of thumb is to limit p to at most
   n<sup>0.5</sup>.  Some theoretical analyses even suggest the more
@@ -68,6 +71,9 @@ points in our dataset (i.e. number of rows) and the number of features
   but you may find them useful as guides to intuition.
 
 * The value of p depends on "expanded" versions of any categorical features.
+  A single categorical variable (R factor) with 10 levels with become 10
+  dummy/"one hot" variables.  The true value of p must ake this into 
+  account, as follows.
 
 ## Impact of categorical variables on p
 
@@ -85,26 +91,19 @@ Let's take a look:
 > dim(nyctaxi)
 [1] 10000     5
 > head(nyctaxi)
-        passenger_count trip_distance PULocationID DOLocationID PUweekday
-2969561               1          1.37          236           43         1
-7301968               2          0.71          238          238         4
-3556729               1          2.80          100          263         3
-7309631               2          2.62          161          249         4
-3893911               1          1.20          236          163         5
-4108506               5          2.40          161          164         5
-        DOweekday tripTime
-2969561         1      598
-7301968         4      224
-3556729         3      761
-7309631         4      888
-3893911         5      648
-4108506         5      977
+        trip_distance PULocationID DOLocationID tripTime DayOfWeek
+2969561          1.37          236           43      598         1
+7301968          0.71          238          238      224         4
+3556729          2.80          100          263      761         3
+7309631          2.62          161          249      888         4
+3893911          1.20          236          163      648         5
+4108506          2.40          161          164      977         5
 ```
 
-(Time-of-day, month etc. data is also available but not in this
-particular dataset.)
+(The 7-digit numbers on the left are row names.  Time-of-day, month etc.
+data is also available but not in this particular dataset.)
 
-So n = 10000, p = 5.  At first glance, one might guess that we could use
+So n = 10000, p = 4.  At first glance, one might guess that we could use
 all 5 features.  Let's try a linear model:
 
 ``` r
@@ -130,83 +129,89 @@ lm(formula = cbind(tripTime) ~ ., data = xy)
 
 Residuals:
     Min      1Q  Median      3Q     Max
--3807.5  -186.0   -49.8   131.8  3179.2
+-3741.0  -187.7   -49.1   133.0  3161.1 
 
 Coefficients: (4 not defined because of singularities)
                  Estimate Std. Error t value Pr(>|t|)
-(Intercept)     -2125.474    351.347  -6.049 1.51e-09 ***
-trip_distance     163.056      1.670  97.628  < 2e-16 ***
-PULocationID4    1424.775    345.770   4.121 3.81e-05 ***
-PULocationID7    1212.331    349.196   3.472 0.000520 ***
-PULocationID10    655.251    371.870   1.762 0.078097 .
-PULocationID12   1829.276    408.229   4.481 7.52e-06 ***
-PULocationID13   1271.201    338.220   3.758 0.000172 ***
-PULocationID17   1167.109    477.898   2.442 0.014619 *
-PULocationID24   1356.014    342.706   3.957 7.66e-05 ***
-PULocationID25   1381.439    354.736   3.894 9.92e-05 ***
-PULocationID26   1282.229    506.842   2.530 0.011429 *
-PULocationID33   1353.187    363.058   3.727 0.000195 ***
-PULocationID35    726.147    474.147   1.531 0.125687
-PULocationID36    972.828    391.276   2.486 0.012927 *
+trip_distance     159.650      1.664  95.943  < 2e-16 ***
+PULocationID4    1261.444    347.127   3.634 0.000281 ***
+PULocationID7    1090.701    349.090   3.124 0.001787 ** 
+PULocationID10    555.575    372.021   1.493 0.135370    
+PULocationID11   2224.466    526.747   4.223 2.44e-05 ***
+PULocationID12   1723.856    409.102   4.214 2.54e-05 ***
+PULocationID13   1131.894    339.186   3.337 0.000850 ***
+PULocationID17   1003.560    478.219   2.099 0.035887 *  
+PULocationID21   1272.560    453.341   2.807 0.005011 ** 
+PULocationID24   1248.627    343.352   3.637 0.000278 ***
 ...
-PULocationID260   972.537    375.500   2.590 0.009614 **
-PULocationID261  1334.116    340.437   3.919 8.97e-05 ***
-PULocationID262  1362.842    337.713   4.036 5.50e-05 ***
-PULocationID263  1343.784    337.113   3.986 6.77e-05 ***
-PULocationID264  1378.455    341.150   4.041 5.38e-05 ***
-PULocationID265  2163.796    370.248   5.844 5.27e-09 ***
-DOLocationID3     869.664    339.996   2.558 0.010549 *
-DOLocationID4     913.146    108.088   8.448  < 2e-16 ***
-DOLocationID7    1065.241    105.990  10.050  < 2e-16 ***
-DOLocationID10   1703.133    211.081   8.069 8.06e-16 ***
 ...
-DOLocationID119  1077.036    274.406   3.925 8.74e-05 ***
-DOLocationID121  1515.904    340.850   4.447 8.80e-06 ***
-DOLocationID123        NA         NA      NA       NA
-DOLocationID124  2707.981    339.513   7.976 1.70e-15 ***
-DOLocationID125  1123.702    105.203  10.681  < 2e-16 ***
+PULocationID263  1230.751    337.961   3.642 0.000272 ***
+PULocationID264  1192.486    341.763   3.489 0.000487 ***
+PULocationID265  1615.514    365.564   4.419 1.00e-05 ***
+DOLocationID3     761.949    340.481   2.238 0.025255 *  
+DOLocationID4     731.542    106.167   6.890 5.95e-12 ***
+DOLocationID7     870.916    107.784   8.080 7.34e-16 ***
+DOLocationID10   1396.929    211.307   6.611 4.05e-11 ***
+DOLocationID11    505.716    340.286   1.486 0.137275    
+DOLocationID12    616.109    216.917   2.840 0.004518 ** 
+DOLocationID13    736.207     99.368   7.409 1.39e-13 ***
+DOLocationID14    389.380    172.166   2.262 0.023744 *  
+DOLocationID15    569.084    341.053   1.669 0.095231 .  
+DOLocationID16    706.829    341.146   2.072 0.038302 *  
+DOLocationID17    926.875    139.426   6.648 3.16e-11 ***
+DOLocationID18    430.492    252.648   1.704 0.088432 .  
+DOLocationID20         NA         NA      NA       NA    
+DOLocationID21    339.841    292.195   1.163 0.244837    
+DOLocationID22    165.218    209.337   0.789 0.429990    
+DOLocationID24    780.893    109.440   7.135 1.04e-12 ***
 ...
-DOLocationID262   933.146     96.473   9.673  < 2e-16 ***
-DOLocationID263   885.520     94.578   9.363  < 2e-16 ***
-DOLocationID264   960.527    108.120   8.884  < 2e-16 ***
-DOLocationID265   169.068    123.391   1.370 0.170666
-DayOfWeek2         44.691     15.004   2.979 0.002903 **
-DayOfWeek3        100.480     14.188   7.082 1.53e-12 ***
-DayOfWeek4        105.223     13.990   7.522 5.95e-14 ***
-DayOfWeek5        133.312     13.775   9.678  < 2e-16 ***
-DayOfWeek6         97.030     14.461   6.710 2.07e-11 ***
-DayOfWeek7         57.133     14.579   3.919 8.97e-05 ***
+...
+DOLocationID258  1300.459    342.076   3.802 0.000145 ***
+DOLocationID259  -343.183    340.179  -1.009 0.313085    
+DOLocationID260   972.741    150.491   6.464 1.08e-10 ***
+DOLocationID261   814.888    105.780   7.704 1.47e-14 ***
+DOLocationID262   752.903     96.517   7.801 6.87e-15 ***
+DOLocationID263   700.357     94.741   7.392 1.58e-13 ***
+DOLocationID264   840.385    107.942   7.786 7.74e-15 ***
+DOLocationID265  -127.962    123.014  -1.040 0.298264    
+DayOfWeek2         45.682     15.025   3.040 0.002369 ** 
+DayOfWeek3        107.253     14.236   7.534 5.43e-14 ***
+DayOfWeek4        108.264     14.019   7.723 1.26e-14 ***
+DayOfWeek5        139.051     13.736  10.123  < 2e-16 ***
+DayOfWeek6        104.749     14.435   7.257 4.31e-13 ***
+DayOfWeek7         66.211     14.549   4.551 5.41e-06 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 327.2 on 8663 degrees of freedom
-Multiple R-squared:  0.7128,	Adjusted R-squared:  0.7017
-F-statistic:    64 on 336 and 8663 DF,  p-value: < 2.2e-16
-
+Residual standard error: 327.6 on 8657 degrees of freedom
+Multiple R-squared:  0.7056,	Adjusted R-squared:  0.694 
+F-statistic: 60.68 on 342 and 8657 DF,  p-value: < 2.2e-16
 ```
 
-There were 266 pickup/dropoff locations.  That means 265 dummy-variable
-features each for pickup and dropoff.  Similarly, there 6 more dummies
+Note the following:
+
+* There were 266 pickup/dropoff locations.  That means 265 dummy-variable
+features each for pickup and dropoff.  Similarly, there are 6 more dummies
 for day of the week.  R's **lm** function, which **qeLin** wraps,
 automatically converts factors to dummies.
 
-So, p is not 5 after all; it's 5 + 530 + 6 = 541!
+    So, p is not 4 after all; it's 4 + 530 + 6 = 540!
+    
+    We are assuming no interactions here.  But if some pickup/dropoff
+    location combinations behave quite differently from others, we ought to
+    consider interaction terms.  These will have their own dummy variables,
+    hugely increasing p if we include them all.
 
-We are assuming no interactions here.  But if some pickup/dropoff
-location combinations behave quite differently from others, we ought to
-consider interaction terms.  These will have their own dummy variables,
-hugely increasing p if we include them all.
-
-Now, in those warning messages, the term "rank-deficient" is referring
+* Now, in those warning messages, the term "rank-deficient" is referring
 to multicollinearity in the data, i.e. strong relations among the
 features, producing a possibly unstable result.  Note that the model was
-so unstable that the coefficient for DOLocationID123 turned out to be
+so unstable that the coefficient for DOLocationID20 turned out to be
 NA.
 
-A more subtle problem is in the warning, "7 rows removed from test set,
+* A more subtle problem is in the warning, "7 rows removed from test set,
 due to new factor levels."  By default, all **qeML** predictive
 functions split the data into training and holdout sets.  Say some
-pickup location had only two rows in our data, both of which happen to
+pickup location had only two rows in our data, neither of which happened to
 be in the holdout set.  Then the **lm** function would say, "Wait, I've
 never heard of these factor levels before," so **qeLin** removes them.
 If many rows are removed, our predictive ability suffers.
@@ -223,7 +228,7 @@ the following as goals:
 * **Desired Property C:** The method should produce an ordered sequence of
 candidate models. 
 
-    All the methods discussed here will have this property. 
+    All the methods discussed here will have this last property. 
     This is so important that we will give it its own subsection:
 
 ## Feature selection methods should produce an ordered sequence of candidate models
@@ -267,17 +272,18 @@ business.
 A classic approach for linear and generalized linear models is to first
 fit a full model, then retain only those features that are
 "statistically significant".  In the **nyctaxi** taxi data shown above,
-we would retain, for instance **PULocationID33** but not **PULocationID35**.
+we would retain, for instance **PULocationID11** but not **PULocationID10**.
 
 This would violate our Desired Property A above.  Use of p-values in
-geneeral is problematic (see the "NoPVals" vignette), and this is no
+general is problematic (see the "NoPVals" vignette), and this is no
 exception.  Just because &beta;<sub>i</sub> is nonzero does not mean
 that Feature i has strong predictive power; what if  &beta;<sub>i</sub>
 is nonzero but tiny?
 
 One could generate an ordered sequence of feature sets in the above
-manner by first setting the threshold for a p-value very low, then
-progressively higher  This is similar to  *stepwise regression*:  In the
+manner by first setting the threshold for a p-value very high, then
+progressively lower, bringing in more features each time we lower the
+threshold.  This is similar to  *stepwise regression*:  In the
 *forward* version, one starts with no features, but adds them one at a
 time.  At each step, one tests for the &beta; coefficient being 0.  When
 no new feature is found to be "significant," the process stops, and we
@@ -290,11 +296,17 @@ fundamental problems of p-values.
 
 ## The LASSO
 
-Here we fit a linear model, subject to the constraint that no estimated
-&beta;<sub>i</sub> is larger than &lambda;, a hyperparameter.  Starting
-at 0, we increase &lambda; to ever-larger values, having the effect that
-one estimated &beta;<sub>i</sub> becomes nonzero at a time.  This gives
-us an ordered sequence of candidate features, as desired.
+Here we fit a linear model, subject to the constraint that 
+the &;<sub>i</sub> are "small."  Specifically, we require that 
+
+&Sum; |b<sub>i</sub>| < &lambda;
+
+where b<sub>i</sub> is our sample estimate of &beta;<sub>i.</sub>.
+
+Here &lambda; is a hyperparameter.  Starting at 0, we increase &lambda;
+to ever-larger values, having the effect that one estimated
+&beta;<sub>i</sub> becomes nonzero at a time.  This gives us an ordered
+sequence of candidate features, as desired.
 
 This is similar to a forward stepwise method, but NOT based on p-values;
 instead, the decision of which feature to use next is based on
