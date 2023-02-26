@@ -260,10 +260,14 @@ according to that criterion.  Nevertheless, they still provide an
 ordered feature set.
 
 This last point is important because we may wish to use the selected
-feature set sequence as input to a different ML method.  There is no
-theoretical reason to believe the best feature set for one ML method is
-also best for another, but as noted, feature selection is an *ad hoc*
-business.
+feature set sequence as input to a different ML method.  We may, for
+instance, first use the LASSO to produce an ordered sequence of
+predictors, and then use that sequence with, say, a neural networks
+model.  We would apply **qeNN** to each set of features in the sequence,
+then choose whichever feature set has the smallest value of
+**qeNN()$testAcc**.  There is no theoretical reason to believe the best
+feature set for one ML method is also best for another, but as noted,
+feature selection is an *ad hoc* business.
 
 # Feature Selection Methodology Overview
 
@@ -389,9 +393,12 @@ trip_distance and PULocationID and DOLocationID and DayOfWeek
 Note that the algorithm chose the categorical variables as a whole here,
 not breaking down into their dummy variable components.
 
-Another example is  Prnciple Components Analysis (PCA).  Here our p
+Another example is  Prncipal Components Analysis (PCA).  Here our p
 features are replaced by p linear combinations (the "principle
 components," PCs) of the original features.  The PCs are uncorrelated.
+Note that this implies that the dataset is all numeric; you can use the
+**regtools::factorsToDummies** to convert.  (The **regtools** package is
+included by **qeML**.)
 
 The PCs form our new features, and are ordered by variance, largest to
 smallest.  Since a variable with small variance is essentially constant
@@ -435,7 +442,7 @@ FOCI is implemented in a CRAN package of the same name, and **qeML**'s
 
 ```
 
-Trip distance, dropoff location 72, Mondays and pickup location 151 were
+Trip distance, dropoff location 75, Mondays and pickup location 151 were
 chosen, in that order, after which the algorithm decided that adding any
 further features was counterproductive.  Again, we could simply take
 that 4-feature set for whatever ML method we wish, or we could use the
@@ -507,7 +514,7 @@ How much dimension reduction did we accomplish?
 [1] 43
 ```
 
-That's much less than the original 265.  Of course, we could reduce even
+That's much less than the original 266.  Of course, we could reduce even
 further by using a larger threshold.
 
 So, let's try out the new data:
@@ -519,8 +526,8 @@ So, let's try out the new data:
 > z <- qeLin(nyctaxi,'tripTime')
 ```
 
-Dimension reduction at least got us a stable solution.  Does it predict
-well?
+Dimension reduction at least got us a stable solution, no warning
+messages.  Does it predict well?
 
 ``` r
 > z$testAcc
