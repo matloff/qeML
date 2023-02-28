@@ -297,6 +297,33 @@ checkForNonDF <- defmacro(data,
    }
 ) 
 
+######################   factorToTopLevels etc.   ########################
+
+# VERY USEFUL! often a factor will have 1 or more rare levels in the
+# data; that already raises overfitting concerns (e.g. in a parametric
+# model, more dummy coefficients), but in doing cross-validation, there
+# may be "surprise" levels in the test set that were not there in the
+# training set
+
+# so we have these functions:
+
+#   levelCounts(data); simply applies table() to each column of 'data',
+#      returing the result as a list; if more than 10 levels, reports NA
+
+#   factorToTopLevels(f,lowCountThresh=0); inputs the factor f
+#      and replaces each instace of a rare level (defined by
+#      lowCountThresh) by the new level 'other'
+
+#   dataToTopLevels(data,lowCountThresholds); applies factorToTopLevels 
+#      to each column of 'data'; lowCountThresholds is an R list,
+#      indexed by the desired column names
+
+levelCounts <- function(data) {
+   makeTable <- function(col) if (is.factor(col)) table(col) else NA
+   tmp <- lapply(data,makeTable)
+   tmp
+}
+
 # simplify a factor to its top levels; input f, output f but with only
 # only the most-frequent levels explicit, with all others combined to
 # 'other'; any f level for which there lowCountThresh or fewer data points
@@ -316,6 +343,17 @@ factorToTopLevels <- function(f,lowCountThresh=0)
    fNew <- ifelse(f %in% newLevels,as.character(f),'other')
    as.factor(fNew)
 }
+
+dataToTopLevels <- defmacro(data,lowCountThresholds,expr=
+   {
+      for(nm in names(lowCountThresholds)) {
+         lct <- lowCountThresholds[[nm]]
+         data[[nm]] <- factorToTopLevels(data[[nm]],lct)
+      }
+   }
+)
+
+######################  end factorToTopLevels etc.   ########################
 
 # try to require() pkg; if not installed, tell user where to get it
 checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
