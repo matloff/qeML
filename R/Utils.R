@@ -347,8 +347,8 @@ factorToTopLevels <- function(f,lowCountThresh=0)
 dataToTopLevels <- defmacro(data,lowCountThresholds,expr=
    {
       for(nm in names(lowCountThresholds)) {
-         lct <- lowCountThresholds[[nm]]
-         data[[nm]] <- factorToTopLevels(data[[nm]],lct)
+         lctnm <- lowCountThresholds[[nm]]
+         data[[nm]] <- factorToTopLevels(data[[nm]],lctnm)
       }
    }
 )
