@@ -189,9 +189,9 @@ enough.
 
 The package includes tutorials for those with no
 background in machine learning, as well as tutorials on advanced
-topics.  A few example (showing how they are invoked):
+topics.  A few examples (showing how they are invoked):
 
-* **vignette('MLOverview')**; for those with no prior ML background
+* **vignette('ML_Overview')**; for those with no prior ML background
 
 * **vignette('Overfitting')**; plugging "overfitting" into Google
   yielded 49,400,000 results!--but what is overfitting REALLY about?
