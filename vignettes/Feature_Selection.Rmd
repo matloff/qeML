@@ -1,9 +1,9 @@
 
 ---
-title: "Feature Selection"
+title: "Feature_Selection"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Feature Selection}
+  %\VignetteIndexEntry{Feature_Selection}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---

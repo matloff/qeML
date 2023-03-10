@@ -1,6 +1,7 @@
 
 ---
-title: "Categorized Function List"
+title: 
+   plain: "Categorized Function List"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Categorized Function List}
