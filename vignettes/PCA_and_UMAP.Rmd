@@ -1,5 +1,15 @@
 
 
+---
+title: "PCA and UMAP"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PCA and UMAP}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
 #  Clearing the Confusion: PCA and UMAP--How Are They Used in Prediction, and What about Claims That They Require Scaling?
 
 Principal Components Analysis (PCA) is a well-established method of
