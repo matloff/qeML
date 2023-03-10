@@ -1,6 +1,6 @@
 
 ---
-title: "Feature Selection"
+title: "FeatureSelection"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{FeatureSelection}

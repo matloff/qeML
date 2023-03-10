@@ -1,5 +1,5 @@
 ---
-title: "MLOverview"
+title: "Machine Learning Overview"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Machine Learning Overview}

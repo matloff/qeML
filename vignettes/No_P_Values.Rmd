@@ -3,7 +3,7 @@
 title: "No P Values"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{No P Vals}
+  %\VignetteIndexEntry{No P Values}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---

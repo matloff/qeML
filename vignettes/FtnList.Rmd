@@ -3,7 +3,7 @@
 title: "Categorized Function List"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{FCategorized unction List}
+  %\VignetteIndexEntry{Categorized Function List}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
