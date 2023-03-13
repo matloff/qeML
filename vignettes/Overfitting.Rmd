@@ -370,8 +370,6 @@ variance and MAPE in the top and bottom rows, respectively:
 [2,] 7.73367546 7.70928618 7.733230  7.793813681 9.980302 17.36951
 ```
 
-The code is [here](https://github.com/matloff/qeML/blob/master/inst/BiasVar.R).
-
 Starting with degree 10, there are serious numerical issues, arising
 from exact or nearly exact collinearity among the various terms in the
 polynomial.  Thus variance is not reported for degrees 11 and 12, and
