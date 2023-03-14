@@ -23,10 +23,12 @@ plotClassesUMAP <- function(data,classVar)
 
 # plotting residuals against predictors, two at a time
 
-# qeOut: return object from the various 
+# qeOut: return object from the various qeML ftns; call must have had
+# holdout non-NULL
 
 plotPairedResids <- function(data,qeOut) 
 {
+   require(autoimage)
    qo <- qeOut
    if (qo$classif) stop('not for classification problems')
    yName <- qo$yName
