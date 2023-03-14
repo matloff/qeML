@@ -58,4 +58,4 @@ export(
    qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,qeliquidSVM,
    doubleD,qeFOCI,qeFOCIrand,qeKNNna,qeLinKNN,qeDeepnet,
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
-   levelCounts,dataToTopLevels)
+   levelCounts,dataToTopLevels,checkPkgLoaded)
