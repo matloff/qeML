@@ -31,6 +31,7 @@
 \alias{qeCompare}
 \alias{qeFT}
 \alias{qeDeepnet}
+\alias{qeNCVregCV}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
