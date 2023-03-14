@@ -10,8 +10,6 @@ Utilities to manipulate R factors, extending the ones in \code{regtools.}
 
 \usage{
 levelCounts(data)
-
-
 dataToTopLevels(data=stop("datanotsupplied"),lowCountThresholds=stop("lowCountThresholdsnotsupplied")
 factorToTopLevels(f,lowCountThresh=0)
 }
@@ -32,11 +30,10 @@ training set.  Toward this end, \code{factorToTopLevels} will remove
 rare levels form a factor; \code{dataToTopLevels} applies this to an
 entire data frame.
 
-Toward this end, 
-the function \code{levelCounts} simply applies \code{table()| to each
-column of \code{data}, returing the result as an R list. (If more than
-10 levels, it returns NA simply applies table() to each column of
-\code{data},
+Toward this end, the function \code{levelCounts} simply applies
+\code{table()} to each column of \code{data}, returing the result as an
+R list. (If more than 10 levels, it returns NA simply applies table() to
+each column of \code{data},
 
 }
 
