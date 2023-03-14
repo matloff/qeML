@@ -1,4 +1,5 @@
 \name{R Factor Utilities}
+\alias{levelCounts}
 \alias{dataToTopLevels}
 \alias{factorToTopLevels}
 
