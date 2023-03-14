@@ -2980,10 +2980,8 @@ qeNCVregCV <- function(data,yName,
    cvoutBig
 }
 
-predict.qeNCVregCV <- function(object,...) 
+predict.qeNCVregCV <- function(object,newx,...) 
 {
-   getDotsArgs('newx')
-
    if (!is.matrix(newx)) {
       newx <- regtools::factorsToDummies(newx,omitLast = TRUE, 
          factorsInfo = object$factorsInfo)
