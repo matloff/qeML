@@ -1,5 +1,5 @@
-\name{EPI GrowthData}
-\alias{EPIWgProduct}
+\name{Missed Appointments}
+\alias{MissedAppts}
 
 \title{
 EPI Growth Data
