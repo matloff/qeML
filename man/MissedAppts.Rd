@@ -11,8 +11,8 @@ data(EPIWgProduct)
 
 \description{
 
-US economic growth measures.
+Well-known Kaggle data, from Kaggle,
+https://www.kaggle.com/joniarroba/noshowappointments.
 
-Courtesy of the Economic Policy Institute.
 }
 
