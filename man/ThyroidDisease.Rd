@@ -1,13 +1,12 @@
 \name{ThyroidDisease}
-\alias{td}
+\alias{ThyroidDisease}
 
 \title{
 Thyroid Disease
 }
 
 \usage{
-data(td)
-}
+data(ThyroidDisease}
 
 \description{
 

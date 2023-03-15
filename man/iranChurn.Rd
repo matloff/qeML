@@ -1,4 +1,4 @@
-\name{Iran Churn}
+\name{iranChurn}
 \alias{iranChurn}
 
 \title{
