@@ -28,7 +28,10 @@ plotClassesUMAP <- function(data,classVar)
 
 plotPairedResids <- function(data,qeOut) 
 {
-   require(autoimage)
+   # require(autoimage)
+   autopoints <- NULL  # fake; actual def happens here:
+   checkPkgLoaded('autoimage')
+
    qo <- qeOut
    if (qo$classif) stop('not for classification problems')
    yName <- qo$yName

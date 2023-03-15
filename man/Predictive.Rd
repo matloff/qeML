@@ -32,6 +32,7 @@
 \alias{qeFT}
 \alias{qeDeepnet}
 \alias{qeNCVregCV}
+\alias{qePolyLinKNN}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
@@ -54,6 +55,8 @@
 \alias{predict.qeskSVM}
 \alias{predict.qeDeepnet}
 \alias{predict.qeParallel}
+\alias{predict.qeNCVregCV}
+\alias{predict.qePolyLinKNN}
 \alias{plot.qePoly}
 \alias{plot.qeRF}
 \alias{plot.qeLASSO}
