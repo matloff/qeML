@@ -213,11 +213,8 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{kernel}{In the case of \code{qeSVM}, this is 
      One of 'linear','radial','polynomial' and 'sigmoid'.}  
   \item{degree}{Degree of SVM polynomial kernel, if any.}
-  \item{qeFtnList}{Character vector of \code{qe*} names.}
-  \item{nReps}{Number of holdout sets to generate.}
   \item{opts}{R list of optional arguments for none, some or all of th
      functions in \code{qeFtnList}.}
-  \item{seed}{Seed for random number generation.}
   \item{qeftn}{Quoted string, specifying the name of a qe-series
      machine learning method.}
   \item{pars}{R list of hyperparameter ranges.  See 
