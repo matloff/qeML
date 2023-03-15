@@ -11,16 +11,17 @@ Utilities to manipulate R factors, extending the ones in \code{regtools.}
 
 \usage{
 levelCounts(data)
-dataToTopLevels(data=stop("datanotsupplied"),
-   lowCountThresholds=stop("lowCountThresholdsnotsupplied")
+dataToTopLevels(data=stop("data not supplied"),
+   lowCountThresholds=stop("lowCountThresholds not supplied")
 factorToTopLevels(f,lowCountThresh=0)
 }
 
 \arguments{
   \item{data}{A data frame or equivalent.}
+  \item{f}{An R factor.}
   \item{lowCountThresh}{Factor levels will counts below this value will
      not be used for this factor.}
-  \item{lowCountThreshs}{An R list of column names and their
+  \item{lowCountThresholds}{An R list of column names and their
   corresponding values of \code{lowCountThresh}.}
 }
 
