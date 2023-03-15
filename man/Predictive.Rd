@@ -34,6 +34,7 @@
 \alias{qeNCVregCV}
 \alias{qePolyLinKNN}
 \alias{qeliquidSVM}
+\alias{checkPkgLoaded}
 
 \alias{predict.qeLogit}
 \alias{predict.qeLin}
@@ -126,12 +127,13 @@ qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
 qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeROC(dataIn,qeOut,yName,yLevelName)
-qeXGBoost(data,yName,nRounds=250,params=list(),yesYVal,
+qeXGBoost(data,yName,nRounds=250,params=list(),
    holdout=floor(min(1000,0.1*nrow(data))))
 qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
    learningrate=0.8,momentum=0.5,learningrate_scale=1,
    numepochs=3,batchsize=100,hidden_dropout=0,yesYVal=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
+checkPkgLoaded(pkgName,whereObtain='CRAN') 
 \method{predict}{qeLogit}(object,newx,...)
 \method{predict}{qeLin}(object,newx,useTrainRow1=TRUE,...)
 \method{predict}{qeKNN}(object,newx,newxK=1,...)
@@ -253,6 +255,8 @@ qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
   \item{yLevelName}{Name of the class to be considered a positive
      response in a classification problem.}
   \item{params}{Tuning parameters for \code{xgboost}.}
+  \item{pkgName}{Name of wrapped package.}
+  \item{whereObtain='CRAN'}{Location.}
 }
 
 \details{

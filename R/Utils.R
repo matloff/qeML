@@ -353,27 +353,6 @@ dataToTopLevels <- defmacro(data,lowCountThresholds,expr=
    }
 )
 
-######################  end factorToTopLevels etc.   ########################
-
-# try to require() pkg; if not installed, tell user where to get it
-checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
-{
-
-   # workaround
-   cmd <- sprintf('%s <- NULL',pkgName)
-   evalr(cmd)
-
-   cmd <- sprintf('require(%s)',pkgName)
-   if (!evalr(cmd)) {
-      pkgErr <- sprintf('%s is required',pkgName)
-      print(pkgErr)
-      obtain <- paste0('if not installed, obtain from ',whereObtain)
-      stop(sprintf('if not installed, obtain from %s',whereObtain))
-   }
-   requireNamespace(pkgName)
-
-}
-
 # run R call from string
 evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
@@ -392,3 +371,21 @@ getDotsArgs <- defmacro(argName, expr=
       }
    }
 )
+
+# try to require() pkg; if not installed, tell user where to get it
+checkPkgLoaded <- function(pkgName,whereObtain='CRAN') 
+{
+      # workaround
+      cmd <- sprintf('%s <- NULL',pkgName)
+      evalr(cmd)
+   
+      cmd <- sprintf('require(%s)',pkgName)
+      if (!evalr(cmd)) {
+         pkgErr <- sprintf('%s is required',pkgName)
+         print(pkgErr)
+         obtain <- paste0('if not installed, obtain from ',whereObtain)
+         stop(sprintf('if not installed, obtain from %s',whereObtain))
+      }
+      requireNamespace(pkgName)
+}
+

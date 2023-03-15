@@ -2864,13 +2864,13 @@ qeDeepnet <- function(data,yName,hidden=c(10),activationfun='sigm',
 
 }
 
-predict.qeDeepnet <- function(object,x,...) 
+predict.qeDeepnet <- function(object,newx,...) 
 {
-   if (!allNumeric(x)) 
-      x <- regtools::factorsToDummies(x,omitLast=TRUE,
+   if (!allNumeric(newx)) 
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=object$factorsInfo)
-   else x <- as.matrix(x)
-   probs <- deepnet::nn.predict(object,x)
+   else newx <- as.matrix(newx)
+   probs <- deepnet::nn.predict(object,newx)
    colnames(probs) <- object$yLevels
    predClassIdxs <- apply(probs,1,which.max)
    predClasses <- object$yLevels[predClassIdxs]

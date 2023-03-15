@@ -51,3 +51,22 @@ plotPairedResids <- function(data,qeOut)
       if (ans == 'q') break
    }
 }
+
+# run R call from string
+evalr <- function(toexec) {
+   eval(parse(text=toexec),parent.frame())
+}
+
+# extract args from ...
+
+getDotsArgs <- defmacro(argName, expr=
+   {
+      v <- c(as.list(environment()), list(...))
+      if (is.null(v[[argName]])) {
+         stop(sprintf('%s argument missing',argName))
+      } else {
+         cmd <- sprintf('%s <<- v$%s',argName,argName)
+         evalr(cmd)
+      }
+   }
+)
