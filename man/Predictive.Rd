@@ -147,8 +147,8 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
 \method{predict}{qePCA}(object,newx,...)
 \method{predict}{qeUMAP}(object,newx,...)
 \method{predict}{qeDeepnet}(object,newx,...)
-\method{plot}{qeLASSO}(object,...)
-\method{plot}{qeRF}(object,...)
+\method{plot}{qeLASSO}(x,...)
+\method{plot}{qeRF}(x,...)
 }
 
 \arguments{
