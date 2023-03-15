@@ -15,10 +15,9 @@ plotClassesUMAP(data,classVar)
 
 \arguments{
   \item{data}{A data frame or equivalent.}
-  \item{lowCountThresh}{Factor levels will counts below this value will
-     not be used for this factor.}
-  \item{lowCountThreshs}{An R list of column names and their
-  corresponding values of \code{lowCountThresh}.}
+  \item{qeOut}{An object returned from one of the qe-series
+     predictive functions..}
+  \item{classVar}{Name of the column containing class information.}
 }
 
 \details{
