@@ -6,7 +6,8 @@ Employee Attrition Data
 }
 
 \usage{
-data(empAttrition}
+data(empAttrition)
+}
 
 \description{
 

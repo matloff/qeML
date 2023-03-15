@@ -6,7 +6,8 @@ New York City Taxi Data
 }
 
 \usage{
-data(nyctaxi}
+data(nyctaxi)
+}
 
 \description{
 

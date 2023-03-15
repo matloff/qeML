@@ -6,7 +6,8 @@ One Thousand Songs
 }
 
 \usage{
-data(oneksongs}
+data(oneksongs)
+}
 
 \description{
 

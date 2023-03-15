@@ -6,7 +6,8 @@ Thyroid Disease
 }
 
 \usage{
-data(ThyroidDisease}
+data(ThyroidDisease)
+}
 
 \description{
 
