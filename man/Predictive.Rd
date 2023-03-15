@@ -15,7 +15,6 @@
 \alias{qePolyLog}
 \alias{qePoly}
 \alias{qeIso}
-% \alias{qeCompare}
 \alias{qePCA}
 \alias{qeUMAP}
 \alias{qeskRF}
@@ -28,7 +27,6 @@
 \alias{qePolyLASSO}
 \alias{qeROC}
 \alias{qeXGBoost}
-\alias{qeCompare}
 \alias{qeFT}
 \alias{qeDeepnet}
 \alias{qeNCVregCV}
@@ -109,7 +107,6 @@ qePolyLin(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 qePolyLog(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeCompare(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 qePCA(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
@@ -471,24 +468,6 @@ lmout <- qeLin(pef,'occ')
 predict(lmout,pef[1,-3])  # occ 100, prob 0.3316
 lmout <- qeLin(pef,'wageinc')
 predict(lmout,pef[1,-5])  # 70857.79
-
-qeCompare(mlb,'Weight',c('qeLin','qeKNN','qeRF'),25)
-#   qeFtn  meanAcc
-# 1 qeLin 13.30490
-# 2 qeKNN 13.72708
-# 3  qeRF 13.46515
-qeCompare(mlb,'Weight',c('qeLin','qeKNN','qeRF'),25,
-   list(qeKNN='k=5',qeRF='nTree = 100, minNodeSize = 15'))
-#   qeFtn  meanAcc
-# 1 qeLin 13.30490
-# 2 qeKNN 14.34051
-# 3  qeRF 13.02334
-
-data(pef)
-# investigate values of k, 1 through 25, in predicting occupation using
-# k-NN; holdout set size is 1000, with 5 sets run for each k
-ftout <- qeFT(data=pef,yName='wageinc',qeftn='qeKNN',
-   pars=list(k=1:25),nTst=1000,nXval=5)
 
 }
 
