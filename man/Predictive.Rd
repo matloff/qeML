@@ -58,6 +58,7 @@
 \alias{predict.qeNCVregCV}
 \alias{predict.qePolyLinKNN}
 \alias{predict.qeliquidSVM}
+\alias{predict.qePoly}
 \alias{plot.qePoly}
 \alias{plot.qeRF}
 \alias{plot.qeLASSO}
@@ -156,7 +157,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{batchsize}{Batch size.}
   \item{numepochs}{Number of iterations to conduct.}
   \item{learningrate}{Learning rate.}
-  \item{momemtum}{Momemtum}
+  \item{momentum}{Momemtum}
   \item{learningrate_scale}{Learning rate will be multiplied by this at
      each iteration, allowing for decay.}
   \item{activationfun}{Can be 'sigm', 'tanh' or 'linear'.}
@@ -253,7 +254,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      response in a classification problem.}
   \item{params}{Tuning parameters for \code{xgboost}.}
   \item{pkgName}{Name of wrapped package.}
-  \item{whereObtain='CRAN'}{Location.}
+  \item{whereObtain}{Location.}
 }
 
 \details{
