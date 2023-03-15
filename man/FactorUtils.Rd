@@ -11,8 +11,7 @@ Utilities to manipulate R factors, extending the ones in \code{regtools.}
 
 \usage{
 levelCounts(data)
-dataToTopLevels(data=stop("data not supplied"),
-   lowCountThresholds=stop("lowCountThresholds not supplied")
+dataToTopLevels(data,lowCountThresholds)
 factorToTopLevels(f,lowCountThresh=0)
 }
 
