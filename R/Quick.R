@@ -1672,9 +1672,9 @@ predict.qeLASSO <- function(object,newx,...)
    list(predClasses=predClasses,probs=tmp)
 }
 
-plot.qeLASSO <- function(x,...) 
+plot.qeLASSO <- function(object,...) 
 {
-   plot(x)
+   plot(object)
 }
 
 ### to facilitate CRAN adherence, temporarily removed
