@@ -252,6 +252,6 @@ which in this context means that if you wish to analyze k different
 aspects of a setting, divide your chosen &alpha; value by k.  This is
 the simplest of a class of methods known as *simultaneous inference
 techniques* or *multiple comparison techniques*.  See for instance the 
-[book by Jason Hsu](https://www.taylorfrancis.com/chapters/introduction-simultaneous-statistical-inference-jason-hsu/10.1201/b15074-6).
-
+[book by Jason Hsu](https://www.taylorfrancis.com/chapters/mono/10.
+1201/b15074-6/introduction-simultaneous-statistical-inference-jason-hsu).
 
