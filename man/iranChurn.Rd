@@ -5,7 +5,7 @@
 Iranian Customer Churn Data
 }
 
-\usage(
+\usage{
 data(iranChurn)
 }
 
