@@ -78,6 +78,10 @@ The qeML package:  Categorized Function List
 * qeRFranger: variable.importance component of output
 * qeROC: ROC computed on output of qe-series function
 
+# missing value methods
+
+* qeLinMV, qeLogitMV, qeKNNMV: nonimputational methods for predicting
+   new cases; both the training data AND the new cases may have NAs
 
 # Utilities
 
