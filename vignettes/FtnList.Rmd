@@ -23,17 +23,19 @@ The qeML package:  Categorized Function List
 * qeRFgrf: random forests; bias correction
 * qeRFranger: random forests
 * qeskRF: sklearn, needs Python
+* qeXGBoost: XGBoost
 
 ## Nearest neighbors
 
 * qeKNN: k-NN; bias correction; can give different weights
 * qeKNNna: k-NN, dealing with NAs
 * qeLinKNN: linear model with kNN correction
+* qePolyLinKNN: polynomial linear model with kNN correction
 
 ## Neural networks
 
-* qeNeural: neural networks, using Keras, CNN included, Python needed
 * qeDeepnet: neural networks, basic, Python-free
+* qeNeural: neural networks, using Keras, CNN included, Python needed
 
 ## Linear/generalized/regularized linear
 
@@ -58,6 +60,10 @@ The qeML package:  Categorized Function List
 
 # Model Fitting, parameter tuning, dimension reduction
 
+* plotClassesUMAP: 2-D plot of UMAP applied to any dataset
+* plotPairedResids: for any qe-series output object, finds the
+   residuals in the holdout set, and plots them against pairs
+   of predictor variables
 * qeCompare: compare several qe-series functions on a dataset
 * qeFOCI:  advanced nonparametric feature selection
 * qeFOCIrand: multiple random runs of qeFOCI
@@ -71,11 +77,10 @@ The qeML package:  Categorized Function List
 * qeUMAP: UMAP, followed by qe-series function on result
 * qeRFranger: variable.importance component of output
 * qeROC: ROC computed on output of qe-series function
-* plotClassesUMAP: 2-D plot of UMAP applied to any dataset
-* plotPairedResids: for any qe-series output object, finds the
-   residuals in the holdout set, and plots them against pairs
-   of predictor variables
 
-# Other
 
-* doubleD: investigate "double descent" phenomenon
+# Utilities
+
+* levelCounts, factorToTopLevels, dataToTopLevels: deletion of rare
+   factor levels
+
