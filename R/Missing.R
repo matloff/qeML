@@ -35,3 +35,4 @@ qeKNNMV <- function(data,yName,kmax)
 }
 
 predict.qeLogitMV <- predict.qeLinMV
+predict.qeKNNMV <- predict.qeLinMV
