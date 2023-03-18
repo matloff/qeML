@@ -28,7 +28,6 @@ The qeML package:  Categorized Function List
 ## Nearest neighbors
 
 * qeKNN: k-NN; bias correction; can give different weights
-* qeKNNna: k-NN, dealing with NAs
 * qeLinKNN: linear model with kNN correction
 * qePolyLinKNN: polynomial linear model with kNN correction
 
