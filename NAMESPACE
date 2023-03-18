@@ -48,6 +48,9 @@ S3method(predict,qePolyLinKNN)
 S3method(predict,qeXGBoost)
 S3method(predict,qeliquidSVM)
 S3method(predict,qeNCVregCV)
+S3method(predict,qeLinMV)
+S3method(predict,qeLogitMV)
+S3method(predict,qeKNNMV)
 
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
@@ -57,4 +60,5 @@ export(
    qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,qeliquidSVM,
    doubleD,qeFOCI,qeFOCIrand,qeLinKNN,qeDeepnet,
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
-   levelCounts,dataToTopLevels)
+   levelCounts,dataToTopLevels,checkPkgLoaded,
+   qeLinMV,qeLogitMV,qeKNNMV)
