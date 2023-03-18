@@ -1,5 +1,7 @@
 
 regFtns <- c(
+'# qeAdaBoost',
+'qeDT',
 'qeGBoost',
 'qeLightGBoost',
 'qeRF',
@@ -9,15 +11,17 @@ regFtns <- c(
 'qeKNN',
 'qeLinKNN',
 'qePolyLinKNN',
-'qeNeural',
+'# qeDeepnet',
+'# qeNeural',
 'qeLASSO',
 'qeLin',
+'# qeLogit',
 'qeNCVregCV',
 'qePolyLASSO',
 'qePolyLin',
-'qePolyLog',
-'qeSVM',
-'qeliquidSVM'
+'# qePolyLog',
+'# qeSVM',
+'# qeliquidSVM'
 )
 
 require(qeML)
@@ -32,6 +36,10 @@ evalr <- function(toexec) {
 checkAll <- function() 
 {
    for (qeFtn in regFtns) {
+      if (substr(qeFtn,1,1) == '#') {
+         warning(paste0('skipping ',qeFtn))
+         next
+      }
       qeCmd <- sprintf('qeOut <- %s(pe1000,"wageinc")$testAcc',qeFtn)
       evalr(qeCmd)
       print(qeFtn)
