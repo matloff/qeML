@@ -1,6 +1,5 @@
 
 regFtns <- c(
-'qeDT',
 'qeGBoost',
 'qeLightGBoost',
 'qeRF',
@@ -8,10 +7,8 @@ regFtns <- c(
 'qeRFranger',
 'qeXGBoost',
 'qeKNN',
-'qeKNNna',
 'qeLinKNN',
 'qePolyLinKNN',
-'qeDeepnet',
 'qeNeural',
 'qeLASSO',
 'qeLin',
