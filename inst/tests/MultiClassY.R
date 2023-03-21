@@ -3,7 +3,7 @@ regFtns <- c(
 'qeAdaBoost',
 'qeDT',
 'qeGBoost',
-'# qeLightGBoost',
+'qeLightGBoost',
 'qeRF',
 'qeRFgrf',
 'qeRFranger',
@@ -40,10 +40,10 @@ checkAll <- function()
          warning(paste0('skipping ',qeFtn))
          next
       }
-      qeCmd <- sprintf('qeOut <- %s(pe1000,"sex")$testAcc',qeFtn)
+      qeCmd <- sprintf('qeOut <- %s(pe1000,"occ")$testAcc',qeFtn)
       res <- try(evalr(qeCmd))
       print(qeFtn)
-      print(qeOut)
+      if (length(res) == 0) print(qeOut)
       ans <- readline('next')
    }
 }
