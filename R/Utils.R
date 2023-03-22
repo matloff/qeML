@@ -161,9 +161,9 @@ predictHoldoutKNN <- defmacro(res,
          predClasses <- preds$predClasses
          probs <- preds$probs
          preds <- list(predClasses=predClasses,probs=probs)
-         tmp <- apply(tsty,1,which.max)
-         charTsty <- colnames(tsty)[tmp]
-         res$testAcc <- mean(predClasses != charTsty,na.rm=TRUE)
+         tstY <- origY[holdIdxs]   ###
+         tstY <- paste0('dfr.',tstY)   ###
+         res$testAcc <- mean(predClasses != tstY,na.rm=TRUE)
       }
 
       if (classif2) {

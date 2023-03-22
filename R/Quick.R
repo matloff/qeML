@@ -307,6 +307,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol]
+   origY <- y
 
    # housekeeping for classification case
    if (is.factor(y)) {
@@ -417,7 +418,6 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    class(knnout) <- c('qeKNN','kNN')
    if (!is.null(holdout)) {
       yName <- 'yTst'
-      tst[,ycol] <- y[holdIdxs]
       predictHoldoutKNN(knnout)
       knnout$holdIdxs <- holdIdxs
    } else knnout$holdIdxs <- NULL
