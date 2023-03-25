@@ -164,6 +164,7 @@ predictHoldoutKNN <- defmacro(res,
          tstY <- origY[holdIdxs]   ###
          tstY <- paste0('dfr.',tstY)   ###
          res$testAcc <- mean(predClasses != tstY,na.rm=TRUE)
+         res$baseAcc <- 1 - max(colMeans(trny))
       }
 
       if (classif2) {
