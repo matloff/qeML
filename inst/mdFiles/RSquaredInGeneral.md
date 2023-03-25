@@ -121,4 +121,10 @@ The interpretation of R<sup>2</sup> is then just as valid as before,
 just as easy to compute, and just as easy to explain to those with
 limited (if any) stat background.
 
+## Variants
 
+Other than a bit of elegant mathematical theory, there is nothing
+magical about the role of squared quantities in R<sup>2</sup>.  One
+could define it is the proportional reduction in Mean Absolute
+Prediction Error, for instance, or in the categorical Y case,
+proportional reduction in Overall Misclassification Error.
