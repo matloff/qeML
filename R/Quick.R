@@ -2432,7 +2432,6 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 
 #    dataIn:  data frame that was input to a qe* ML function
 #    qeOut:  return object from qe* ML functions
-#    yName:  as in the qe* args
 #    yLevelName:  name of the class to be considered positive
 
 
@@ -2441,9 +2440,10 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    if (!qeOut$classif) stop("for classification problems only")
    checkPkgLoaded('ROCR')
    holdout <- dataIn[qeOut$holdIdxs,]
+   yName <- qeOut$yName
    holdY <- holdout[[yName]]
-   # ys <- as.factor(holdY == yLevelName)
    ys <- as.numeric(holdY == yLevelName)
+   if (length((ys)) == 0) stop('yLevelName not found')
    probs <- qeOut$holdoutPreds$probs
    if (is.null(probs)) stop('no holdoutPreds$probs')
    if (is.vector(probs) || nrow(probs) == 1 || ncol(probs) == 1) {
@@ -2468,9 +2468,10 @@ qeROC <- function(dataIn,qeOut,yName,yLevelName)
    # perf@alpha.name <- paste('Cutoffs expansion factor =',expand)
    plot(perf,colorize=TRUE)
    abline(0,1)
+   qerocOut <- list(rocrOut=perf)
    tmp <- performance(pred, measure = "auc")
-   perf$auc <- tmp@y.values[[1]]
-   perf
+   qerocOut$auc <- tmp@y.values[[1]]
+   qerocOut
 }
 
 ######################  qeToweranNA()  #############################
