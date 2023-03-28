@@ -2434,8 +2434,7 @@ buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL)
 #    qeOut:  return object from qe* ML functions
 #    yLevelName:  name of the class to be considered positive
 
-
-qeROC <- function(dataIn,qeOut,yName,yLevelName) 
+qeROC <- function(dataIn,qeOut,yLevelName) 
 {
    if (!qeOut$classif) stop("for classification problems only")
    checkPkgLoaded('ROCR')
