@@ -1,6 +1,7 @@
-```
 
-# Clearing the Confusion: How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
+# Clearing the Confusion:
+
+How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
 
 In many applications we may have a larger number of features---dozens,
 hundreds or even more.  In machine learning contexts, where we are
@@ -85,6 +86,7 @@ Let's take a look:
 3893911         5      648
 4108506         5      977
 ```
+
 
 (Time-of-day, month etc. data is also available but not in this
 particular dataset.)
