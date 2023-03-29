@@ -1,7 +1,5 @@
 
-# Clearing the Confusion:
-
-How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
+# Clearing the Confusion: How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
 
 In many applications we may have a larger number of features---dozens,
 hundreds or even more.  In machine learning contexts, where we are
