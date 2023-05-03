@@ -464,6 +464,8 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
       noYVal <- object$noYVal
       predClasses[predClasses == 1] <- yesYVal
       predClasses[predClasses == 0] <- noYVal
+      probs <- as.vector(probs)
+      predClasses <- as.vector(predClasses)
       return(list(predClasses=predClasses,probs=probs))
    }
 
