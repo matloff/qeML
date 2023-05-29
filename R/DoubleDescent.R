@@ -38,6 +38,12 @@
 
 # will plot testAcc and trainAcc, in red and blue
 
+# example
+
+# doubleD('qePolyLin(mlb[,2:3],"Weight",xPts[i])',1:4,100) 
+
+# qePolyLin will be called as indicated, with degree = 1,2,3,4
+
 doubleD <- function(qeFtnCall,xPts,nReps,makeDummies=NULL,classif=FALSE)
 {
    if (!is.null(makeDummies)) {
@@ -49,7 +55,7 @@ doubleD <- function(qeFtnCall,xPts,nReps,makeDummies=NULL,classif=FALSE)
       cmd <- paste0(dta, ' <- as.data.frame(',dta,')')
       eval(parse(text=cmd))
    }
-   cmd <- paste0('tmp <- ',cmd,'; c(tmp$testAcc,tmp$trainAcc)')
+   cmd <- paste0('tmp <- ',qeFtnCall,'; c(tmp$testAcc,tmp$trainAcc)')
    res <- matrix(nrow=length(xPts),ncol=3)
    res[,1] <- xPts
    tmp <- matrix(nrow=nReps,ncol=2)
