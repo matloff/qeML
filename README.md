@@ -301,7 +301,7 @@ be overly optimistic.
     * **replicMeans()**: (from **regtools**, included in **qeML**)
       averages output, e.g. **testAcc**, over many holdout sets
 
-    * **qeDoubleD()**: computation and plotting for exploring Double Descent
+    * **doubleD()**: computation and plotting for exploring Double Descent
 
     * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
 
