@@ -244,8 +244,6 @@ be overly optimistic.
 
     * **qeGBoost()**: gradient boosting, wraps **gbm** pkg
 
-    * **qeISO()**: isotonice regression
-
     * **qeKNN()**: k-Nearest Neighbors, wraps **regtools** pkg; includes
       predictor importance settings; allows linear interpolation within
       a bin
@@ -255,7 +253,7 @@ be overly optimistic.
 
     * **qeLASSO()**: LASSO and ridge regression, wraps **glmment** pkg
 
-    * **qelightGBoost()**: gradient boosting, wraps **lightgbm** pkg
+    * **qeLightGBoost()**: gradient boosting, wraps **lightgbm** pkg
 
     * **qeLin()**: wraps R's **lm()**; can be used for multiclass
       classification, for speed
