@@ -248,9 +248,6 @@ be overly optimistic.
       predictor importance settings; allows linear interpolation within
       a bin
 
-    * **qeKNNna()**: k-Nearest Neighbors for NA-ridden data, special
-      algorithm
-
     * **qeLASSO()**: LASSO and ridge regression, wraps **glmment** pkg
 
     * **qeLightGBoost()**: gradient boosting, wraps **lightgbm** pkg
