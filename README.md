@@ -283,9 +283,6 @@ be overly optimistic.
 
     * **qeSVMliquid()**: SVM, wraps **liquid SVM** pkg
 
-    * k-NN, dec. trees, random forests, gradient boosting,
-      SVM, linear/gen. linear models, ridge, LASSO, NNs, CNNs
-
 * feature selection and model-fitting
 
     * **qeFOCI()**: fully nonparametric method for feature selection
