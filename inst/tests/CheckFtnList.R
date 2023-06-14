@@ -30,3 +30,7 @@ extractFromNAMESPACE <- function() {
    ls(package:qeML)
 }
 
+fl <- extractFromFtnList()
+ns <- extractFromNAMESPACE()
+setdiff(fl,ns)
+
