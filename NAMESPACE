@@ -61,4 +61,4 @@ export(
    doubleD,qeFOCI,qeFOCIrand,qeLinKNN,qeDeepnet,
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
    levelCounts,dataToTopLevels,checkPkgLoaded,
-   qeLinMV,qeLogitMV,qeKNNMV,qeISO)
+   qeLinMV,qeLogitMV,qeKNNMV)
