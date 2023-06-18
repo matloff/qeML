@@ -3,7 +3,7 @@
 
 qeLinMV <- function(data,yName) 
 {   
-   require(toweranNA)
+   requireNamespace('toweranNA')
    obj <- makeTower(data,yName,regFtnName='lm')
    class(obj) <- c('qeLinMV',class(obj))
    obj
@@ -17,7 +17,7 @@ predict.qeLinMV <- function(object,newx,...)
 
 qeLogitMV <- function(data,yName,yesYVal) 
 {   
-   require(toweranNA)
+   requireNamespace('toweranNA')
    obj <- makeTower(data,yName,regFtnName='glm',yesYVal=yesYVal)
    class(obj) <- c('qeLogitMV',class(obj))
    obj
@@ -28,7 +28,7 @@ predict.qeLogitMV <- predict.qeLinMV
 
 qeKNNMV <- function(data,yName,kmax) 
 {   
-   require(toweranNA)
+   requireNamespace('toweranNA')
    obj <- makeTower(data,yName,regFtnName='towerKNN',opts=list(kmax=kmax))
    class(obj) <- c('qeKNNMV',class(obj))
    obj

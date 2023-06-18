@@ -3,6 +3,7 @@ Version: 1.1
 Title: Quick and Easy Machine Learning Tools
 Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu",
    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")))
+Author: Norm Matloff [aut,cre] (<https://orcid.org/0000-0001-9179-6785>)
 Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
 Depends: R (>= 3.5.0),regtools (>= 0.8.0),partools,FOCI,gtools,rmarkdown
 Imports: grf,gbm
