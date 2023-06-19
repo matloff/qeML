@@ -251,6 +251,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{params}{Tuning parameters for \code{xgboost}.}
   \item{pkgName}{Name of wrapped package.}
   \item{whereObtain}{Location.}
+  \item{x}{A qe-series function return object.}
 }
 
 \details{
