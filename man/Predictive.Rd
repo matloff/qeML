@@ -27,7 +27,6 @@
 \alias{qePolyLASSO}
 \alias{qeROC}
 \alias{qeXGBoost}
-\alias{qeFT}
 \alias{qeDeepnet}
 \alias{qeNCVregCV}
 \alias{qePolyLinKNN}

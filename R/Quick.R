@@ -2471,7 +2471,7 @@ qeROC <- function(dataIn,qeOut,yLevelName)
    plot(perf,colorize=TRUE)
    abline(0,1)
    qerocOut <- list(rocrOut=perf)
-   tmp <- performance(pred, measure = "auc")
+   tmp <- ROCR::performance(pred, measure = "auc")
    qerocOut$auc <- tmp@y.values[[1]]
    qerocOut
 }
