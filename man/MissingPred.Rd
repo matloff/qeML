@@ -1,7 +1,9 @@
 \name{Prediction with Missing Values}
 \alias{qeKNNna}
-
 \alias{predict.qeKNNna}
+\alias{qeLinMV}
+\alias{qeLogitMV}
+\alias{qeKNNMV}
 
 \title{Prediction with Missing Values}
 
@@ -13,6 +15,9 @@ values.
 \usage{
 qeKNNna(data,yName,k=25,minNonNA=1,holdout=floor(min(1000,0.1*nrow(data))))
 \method{predict}{qeKNNna}(object,newx,kPred=1,...)
+qeLinMV(data,yName)
+qeLogitMV(data,yName,yesYVal)
+qeKNNMV(data,yName,kmax)
 }
 
 \arguments{
@@ -28,6 +33,8 @@ qeKNNna(data,yName,k=25,minNonNA=1,holdout=floor(min(1000,0.1*nrow(data))))
   \item{minNonNA}{For row y to be considered a neighbor of row x,
 #       y must have at least \code{minNonNA} non-NAs in common with x}
   \item{kPred}{Number of nearest neighbors in prediction.}
+  \item{yesYVal}{Y value to be considered "yes," to be coded 1 rather than 0.}
+  \item{kmax}{Number of nearest neighbors.}
 }
 
 \details{
