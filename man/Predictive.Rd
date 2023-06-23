@@ -1,4 +1,4 @@
-\name{qe-Series Predictive Functions}
+\name{qe-Series Predictive Functions} 
 \alias{qeLogit}
 \alias{qeLin}
 \alias{qeKNN}
@@ -345,6 +345,12 @@ Some notes on specific functions:
    but also classification problems as multivariate-outcome linear
    models. If one's goal is prediction, it can be much faster than
    \code{qeLogit}, often with comparable accuracy.
+
+   \item Regularization in linear/generalized linear models is
+   implemented in \code{qeLASSO} and other functions with names
+   containing 'LASSO', as well as \code{qeNCVregCV}.  The latter,
+   wrappping the MCP and other regularization methods, wraps the package
+   of the same name.
    
    \item Several functions fit polynomial models.  The \code{qePolyLin}
    function does polynomial regression of the indicated degree. In the
@@ -357,7 +363,8 @@ Some notes on specific functions:
    \item Several SVM implementations are offered:  \code{qeSVM} wraps
    the SVM algorithm in the \pkg{e1071} package; \code{qeskSVM} wraps
    \code{svm.SVC} in the Python \pkg{sklearn}.  (Both \code{qeSVM} and
-   \code{qeskSVM} use the \code{libsvm} C library.)
+   \code{qeskSVM} use the \code{libsvm} C library.)  There is also
+   \code{qeliquidSVM}, wrapping the package \pkg{liquidSVM}.
 
    \item Several random forests implementations are offered:
    \code{qeRF} wraps \code{randomForest} in the package of the same name; 
@@ -365,20 +372,33 @@ Some notes on specific functions:
    \code{qeRFgrf} wraps \code{regression_forest} and 
    \code{ll_regression_forest} in \pkg{grf} (the latter does local
    linear smoothing); \code{qeskRF} wraps \code{ensemble.RandomForestRegressor}
-   and \code{RandomForestClassifier} in the Python \pkg{sklearn}.
+   and \code{RandomForestClassifier} in the Python \pkg{sklearn}.  There
+   is also \code{qeDT}, using the \pkg{party} package.
 
-   \item Two implementations of gradient boosting are offered, with
-   \code{qeGBoost} using the \code{gbm} package, and with
-   \code{qelightGBoost} using \code{lightgbm}.
+   \item Several implementations of gradient boosting are offered,
+   including \code{qeGBoost} using the \pkg{gbm} package, 
+   \code{qelightGBoost} using \pkg{lightgbm}, and \code{qeXGBoost}
+   wrapping \pkg{xgboost}.
 
-   \item Pre-mapping to lower-dimensional manifolds can be done via
+   \item Several functions involve dimension reduction/feature
+   selection.  Pre-mapping to lower-dimensional manifolds can be done via
    \code{qePCA} and \code{qeUMAP}.  For instance, the former will first
    extract the specified number of principal components, then fit the
    user's desired ML model, say k-NN (\code{qeKNN}) or gradient boosting
-   (\code{qeGBoost}).
+   (\code{qeGBoost}).  The \code{qeFOCI} function does feature selection
+   in a basically assumption-free manner.
+
+   \item Neural network models are implemented by \code{qeNeural}
+   and \code{qeDeepnet}, based on \pkg{keras} and \pkg{deepnet}.
+
+   \item The \code{qeLinKNN} function offers a hybrid approach.  It
+   first fits a linear model, then applies k-Nearest Neighbors to the
+   residuals.  The \code{qePolyLinKNN} function does the same in with a
+   polynomial fit.
    
    \item The \code{qeIso} function is intended mainly for use as a
    smoothing method in calibration actions.  }
+}
 
 In most cases, the full basket of options in the wrapped function is not
 reflected.  Use of arguments not presented in the qe function requires
