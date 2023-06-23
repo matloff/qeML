@@ -35,6 +35,8 @@ evalr <- function(toexec) {
 
 checkAll <- function() 
 {
+
+   errMsgs <- NULL
    for (qeFtn in regFtns) {
       if (substr(qeFtn,1,1) == '#') {
          warning(paste0('skipping ',qeFtn))
@@ -43,8 +45,10 @@ checkAll <- function()
       qeCmd <- sprintf('qeOut <- %s(pe1000,"sex")$testAcc',qeFtn)
       res <- try(evalr(qeCmd))
       print(qeFtn)
-      print(qeOut)
+      if (!inherits(res,'try-error')) print(qeOut)
+      else errMsgs <- c(errMsgs,res)
       ans <- readline('next')
    }
+   return(errMsgs)
 }
 
