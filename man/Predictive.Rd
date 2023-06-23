@@ -345,6 +345,12 @@ Some notes on specific functions:
    but also classification problems as multivariate-outcome linear
    models. If one's goal is prediction, it can be much faster than
    \code{qeLogit}, often with comparable accuracy.
+
+   \item Regularization in linear/generalized linear models is
+   implemented in \code{qeLASSO} and other functions with names
+   containing 'LASSO', as well as \code{qeNCVregCV}.  The latter,
+   wrappping the MCP and other regularization methods, wraps the package
+   of the same name.
    
    \item Several functions fit polynomial models.  The \code{qePolyLin}
    function does polynomial regression of the indicated degree. In the
@@ -387,7 +393,8 @@ Some notes on specific functions:
 
    \item The \code{qeLinKNN} function offers a hybrid approach.  It
    first fits a linear model, then applies k-Nearest Neighbors to the
-   residuals.
+   residuals.  The \code{qePolyLinKNN} function does the same in with a
+   polynomial fit.
    
    \item The \code{qeIso} function is intended mainly for use as a
    smoothing method in calibration actions.  }
