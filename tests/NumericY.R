@@ -1,5 +1,5 @@
 
-regFtns <- c(
+NumericRegFtns <- c(
 '# qeAdaBoost',
 'qeDT',
 'qeGBoost',

@@ -8,7 +8,7 @@ evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
 }
 
-checkAll <- function(pause=FALSE) 
+checkAll <- function(regFtns,pause=FALSE) 
 {
 
    errMsgs <- NULL
@@ -24,7 +24,6 @@ checkAll <- function(pause=FALSE)
       else errMsgs <- c(errMsgs,res)
       if (pause) ans <- readline('next')
    }
-   browser()
    return(errMsgs)
 }
 

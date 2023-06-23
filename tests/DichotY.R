@@ -1,5 +1,5 @@
 
-regFtns <- c(
+dichotRegFtns <- c(
 'qeAdaBoost',
 'qeDT',
 'qeGBoost',

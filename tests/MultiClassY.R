@@ -1,5 +1,5 @@
 
-regFtns <- c(
+multiclassRegFtns <- c(
 'qeAdaBoost',
 'qeDT',
 'qeGBoost',
