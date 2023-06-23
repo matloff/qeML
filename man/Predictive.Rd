@@ -1,4 +1,4 @@
-\name{qe-Series Predictive Functions}
+\name{qe-Series Predictive Functions} 
 \alias{qeLogit}
 \alias{qeLin}
 \alias{qeKNN}
