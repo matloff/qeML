@@ -13,7 +13,7 @@ dichotRegFtns <- c(
 '# qePolyLinKNN',
 'qeDeepnet',
 '# qeNeural',
-'qeLASSO',
+'# qeLASSO',
 '# qeLin',
 'qeLogit',
 'qeNCVregCV',
