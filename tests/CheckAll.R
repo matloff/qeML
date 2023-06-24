@@ -8,7 +8,7 @@ evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
 }
 
-checkAll <- function(regFtns,pause=FALSE) 
+checkAll <- function(regFtns,yName,pause=FALSE) 
 {
 
    errMsgs <- NULL
@@ -17,7 +17,7 @@ checkAll <- function(regFtns,pause=FALSE)
          warning(paste0('skipping ',qeFtn))
          next
       }
-      qeCmd <- sprintf('qeOut <- %s(pe1000,"sex")$testAcc',qeFtn)
+      qeCmd <- sprintf('qeOut <- %s(pe1000,"%s")$testAcc',qeFtn,yName)
       res <- try(evalr(qeCmd))
       print(qeFtn)
       if (!inherits(res,'try-error')) print(qeOut)
