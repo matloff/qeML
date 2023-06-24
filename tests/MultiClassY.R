@@ -3,7 +3,7 @@ multiclassRegFtns <- c(
 'qeAdaBoost',
 'qeDT',
 'qeGBoost',
-'qeLightGBoost',
+'# qeLightGBoost',
 'qeRF',
 'qeRFgrf',
 'qeRFranger',
