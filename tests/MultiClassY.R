@@ -16,7 +16,7 @@ multiclassRegFtns <- c(
 'qeLASSO',
 '# qeLin',
 'qeLogit',
-'qeNCVregCV',
+'# qeNCVregCV',
 'qePolyLASSO',
 '# qePolyLin',
 '# qePolyLog',

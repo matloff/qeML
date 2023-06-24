@@ -2,7 +2,7 @@
 The main test code is in DichotY.R, MultiClassY.R and NumericY.R,
 categorized by type of Y value, as seen in the file names.
 
-CheckFtnList.R is used to identify discrepancies between the function
+CompareFtnlists.R is used to identify discrepancies between the function
 list in the documentation and the NAMESPACE file.
 
 VimSim.R implements Vim editor actions in R, with the goal of automating
