@@ -9,6 +9,3 @@ qe* functions on a given dataset.
 CompareFtnlists.R is used to identify discrepancies between the function
 list in the documentation and the NAMESPACE file.
 
-VimSim.R implements Vim editor actions in R, with the goal of automating
-Vim ops for testing.
-
