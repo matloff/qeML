@@ -1,6 +1,4 @@
 \name{Prediction with Missing Values}
-\alias{qeKNNna}
-\alias{predict.qeKNNna}
 \alias{qeLinMV}
 \alias{qeLogitMV}
 \alias{qeKNNMV}
@@ -13,8 +11,6 @@ values.
 }
 
 \usage{
-qeKNNna(data,yName,k=25,minNonNA=1,holdout=floor(min(1000,0.1*nrow(data))))
-\method{predict}{qeKNNna}(object,newx,kPred=1,...)
 qeLinMV(data,yName)
 qeLogitMV(data,yName,yesYVal)
 qeKNNMV(data,yName,kmax)
@@ -25,7 +21,6 @@ qeKNNMV(data,yName,kmax)
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
   \item{yName}{Name of the class labels column.}
-  \item{object}{An object of class 'qeKNNna'.}
   \item{newx}{New data to be predicted.}
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
@@ -39,24 +34,19 @@ qeKNNMV(data,yName,kmax)
 
 \details{
 
-The \code{qeKNNna} function may be useful in datasets with a large
-portion of NA values.  For a new case to be predicted, it finds the
-nearest neighbors of the intact components of that case.  As with
-\code{qeKNN}, at the training stage, predicted values are found and
-retained at each point in the training data, based on the \code{k}
-neighbors of that point.  For a new case, the \code{kPred} neighbors of
-that case are found, and their predicted values are averaged.
+These are wrappers to the \pkg{toweranNA} package.  Linear, logistic and
+kNN interfaces are available.
 
 }
 
 \examples{
 
-z <- qeKNNna(airquality,'Ozone',holdout=NULL)
 sum(is.na(airquality))  # 44 NAs, good test example
+z <- qeKNNMV(airquality,'Ozone',10)
 # example of new case, insert an NA in 1st row
 aq2 <- airquality[2,-1]
 aq2$Wind <- NA
-predict(z,aq2)  # 32.68
+predict(z,aq2)  # 28.1
 
 }
 
