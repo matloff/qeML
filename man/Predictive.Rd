@@ -21,6 +21,7 @@
 \alias{qeskSVM}
 \alias{qeParallel}
 \alias{qeDT}
+\alias{qeFT}
 \alias{qeFOCI}
 \alias{qeFOCIrand}
 \alias{qeLinKNN}
@@ -123,7 +124,7 @@ qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
    holdout=floor(min(1000,0.1*nrow(data))))
 qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeROC(dataIn,qeOut,yName,yLevelName)
+qeROC(dataIn,qeOut,yLevelName)
 qeXGBoost(data,yName,nRounds=250,params=list(),
    holdout=floor(min(1000,0.1*nrow(data))))
 qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
