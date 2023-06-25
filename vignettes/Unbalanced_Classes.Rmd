@@ -257,7 +257,7 @@ with quite different frequencies:
 <br>
 >   Z           0.07
 
-([source](https://math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html)).  One can obtain these numbers in `regtools`:
+One can obtain these numbers in `regtools`:
 
 ``` r
 > data(ltrfreqs)
