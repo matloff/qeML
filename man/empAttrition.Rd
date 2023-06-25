@@ -12,7 +12,7 @@ data(empAttrition)
 \description{
 
 IBM data from Kaggle,
-\link{https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset}.
+\url{https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset}.
 
 }
 

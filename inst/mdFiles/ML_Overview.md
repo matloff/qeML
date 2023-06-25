@@ -62,10 +62,10 @@ or 0.  We may for instance predict weight from height, age and gender,
 the latter being 1 for female, 0 for male.
 
 If Y represents a binary variable, we represent it as an indicator
-variable.  In the famous Pima Diabetes dataset in the
-[UCI Machine Learning
-Repository](https://archive.ics.uci.edu/ml/index.php), 1 means diabetic,
-0 means not.
+variable.  In the famous Pima Diabetes dataset in the [UCI Machine
+Learning
+Repository](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database),
+1 means diabetic, 0 means not.
 
 If Y itself is categorical, we represent it by several indicator
 variables, one for each category.  In another disease-related UCI
