@@ -397,7 +397,7 @@ Some notes on specific functions:
    polynomial fit.
    
    \item The \code{qeIso} function is intended mainly for use as a
-   smoothing method in calibration actions.  }
+   smoothing method in calibration actions.  
 }
 
 In most cases, the full basket of options in the wrapped function is not
