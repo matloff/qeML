@@ -1,6 +1,10 @@
 
 The main test code is in DichotY.R, MultiClassY.R and NumericY.R,
-categorized by type of Y value, as seen in the file names.
+categorized by type of Y value, as seen in the file names.  The function
+checkAll() in CheckAll.R does the work.
+
+One can also use checkAll() to perform a quick comparison of all the
+qe* functions on a given dataset.
 
 CompareFtnlists.R is used to identify discrepancies between the function
 list in the documentation and the NAMESPACE file.
