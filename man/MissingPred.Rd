@@ -14,6 +14,9 @@ values.
 qeLinMV(data,yName)
 qeLogitMV(data,yName,yesYVal)
 qeKNNMV(data,yName,kmax)
+\method{predict}{qeLinMV}(object,newx,...)
+\method{predict}{qeLogitMV}(object,newx,...)
+\method{predict}{qeKNNMV}(object,newx,...)
 }
 
 \arguments{
