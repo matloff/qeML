@@ -2,6 +2,9 @@
 \alias{qeLinMV}
 \alias{qeLogitMV}
 \alias{qeKNNMV}
+\alias{predict.LinMV}
+\alias{predict.LogitMV}
+\alias{predict.KNNMV}
 
 \title{Prediction with Missing Values}
 
