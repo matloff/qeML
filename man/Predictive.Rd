@@ -213,18 +213,6 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{degree}{Degree of SVM polynomial kernel, if any.}
   \item{opts}{R list of optional arguments for none, some or all of th
      functions in \code{qeFtnList}.}
-  \item{qeftn}{Quoted string, specifying the name of a qe-series
-     machine learning method.}
-  \item{pars}{R list of hyperparameter ranges.  See 
-     \code{regtools::fineTuning}.}
-  \item{nCombs}{Number of hyperparameter combinations to run.  
-     See \code{regtools::fineTuning}.}
-  \item{nTst}{Number of data points to be in the test set..  
-     See \code{regtools::fineTuning}.}
-  \item{nXval}{Number of cross-validations to run.  
-     See \code{regtools::fineTuning}.}
-  \item{showProgress}{If TRUE, show results as they arise.  
-     See \code{regtools::fineTuning}.}
   \item{nComps}{Number of UMAP components to extract.}
   \item{nNeighbors}{Number of nearest neighbors to use in UMAP.}
   \item{ll}{If TRUE, use local linear forest.}
