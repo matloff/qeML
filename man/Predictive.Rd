@@ -21,7 +21,6 @@
 \alias{qeskSVM}
 \alias{qeParallel}
 \alias{qeDT}
-\alias{qeFT}
 \alias{qeFOCI}
 \alias{qeFOCIrand}
 \alias{qeLinKNN}
@@ -108,7 +107,6 @@ qePolyLin(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
 qePolyLog(data,yName,deg=2,maxInteractDeg = deg,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeFT(data,yName,qeftn,pars,nCombs,nTst,nXval,showProgress=TRUE)
 qePCA(data,yName,qeName,opts=NULL,pcaProp,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeUMAP(data,yName,qeName,opts=NULL,
