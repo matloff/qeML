@@ -22,14 +22,8 @@ qeKNNMV(data,yName,kmax)
      via labels column being an R factor.}
   \item{yName}{Name of the class labels column.}
   \item{newx}{New data to be predicted.}
-  \item{holdout}{If not NULL, form a holdout set of the specified size.
-     After fitting to the remaining data, evaluate accuracy on the test set.}
-  \item{k}{Number of nearest neighbors in training set.} 
-  \item{minNonNA}{For row y to be considered a neighbor of row x,
-#       y must have at least \code{minNonNA} non-NAs in common with x}
-  \item{kPred}{Number of nearest neighbors in prediction.}
+  \item{kmax}{Number of nearest neighbors in training set.} 
   \item{yesYVal}{Y value to be considered "yes," to be coded 1 rather than 0.}
-  \item{kmax}{Number of nearest neighbors.}
 }
 
 \details{
