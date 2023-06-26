@@ -5,10 +5,6 @@
 Iranian Customer Churn Data
 }
 
-\usage{
-data(iranChurn)
-}
-
 \description{
 
 From \url{https://github.com/sharmaroshan/Churn-Modelling-Dataset}.
