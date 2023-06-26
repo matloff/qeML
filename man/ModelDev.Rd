@@ -2,7 +2,6 @@
 \alias{qeText}
 \alias{qeTS}
 \alias{qeCompare}
-\alias{qeFT}
 
 \alias{predict.qeText}
 \alias{predict.qeTS}
