@@ -2956,3 +2956,33 @@ predict.qeParallel <- function(object,newx,...)
    colnames(probsAvg)[winners]
 }
 
+# assess feature importance in the given setting (data, yName, qeFtn) by
+# fitting the model p times, leaving out one feature each time
+
+# holdout is done Nreps times for each variable; 'opts' refers to
+# nondefault argument values for qeFtn; not implemented yet
+
+qeLeaveOut1Var <- function(data,yName,qeFtnName,Nreps,opts=list()) 
+{
+   # full model
+   fullTestAcc <- get(qeFtnName)(data,yName)$testAcc
+   yCol <- which(names(data) == yName)
+   output <- vector(length=ncol(data)-1)
+   names(output) <- names(data)[-yCol]
+   j <- 1
+   for (i in 1:ncol(data)) {
+      if (i != yCol) {
+         datai <- data[,-i]
+         cmd <- sprintf('%s(datai,"%s")$testAcc',qeFtnName,yName)
+         # output[j] <- replicMeans(Nreps,cmd)
+         tmp <- replicate(Nreps,evalr(cmd))
+         output[j] <- mean(tmp)
+         j <- j + 1
+      }
+   }
+   output <- c(fullTestAcc,output)
+   names(output)[1] <- 'full'
+   output
+}
+
+
