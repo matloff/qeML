@@ -10,7 +10,8 @@
 \title{Feature Selection and Model Building}
 
 \description{
-Utilties to help build models.
+Utilties to help build models, both in specific applications such as
+time series and text analysis, and in general tools..
 }
 
 \usage{
@@ -38,7 +39,8 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
   \item{yName}{Name of the class labels column.}
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
-  \item{qeFtnList}{Character vector of \code{qe*} names.}
+  \item{qeFtnList}{Character vector of \code{qe*} function names.}
+  \item{qeFtnName}{Quoted \code{qe*} function name.}
   \item{nReps}{Number of holdout sets to generate.}
   \item{opts}{R list of optional arguments for none, some or all of th
      functions in \code{qeFtnList}.}
@@ -53,6 +55,26 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
      See \code{regtools::fineTuning}.}
   \item{showProgress}{If TRUE, show results as they arise.  
      See \code{regtools::fineTuning}.}
+}
+
+\details{
+r
+Overviews of the functions:
+
+\itemize{
+
+   \item \code{qeTs} is a tool for time series modeling
+
+   \item \code{qeText} is a tool for textual modeling
+
+   \item \code{qeCompare} facilitates comparison among models
+
+   \item \code{qeFT} does a random grid search for optimal hyperparameter
+   values
+
+}
+
+
 }
 
 \author{
