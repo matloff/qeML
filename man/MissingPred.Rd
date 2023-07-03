@@ -2,9 +2,9 @@
 \alias{qeLinMV}
 \alias{qeLogitMV}
 \alias{qeKNNMV}
-\alias{predict.LinMV}
-\alias{predict.LogitMV}
-\alias{predict.KNNMV}
+\alias{predict.qeLinMV}
+\alias{predict.qeLogitMV}
+\alias{predict.qeKNNMV}
 
 \title{Prediction with Missing Values}
 
@@ -24,6 +24,7 @@ qeKNNMV(data,yName,kmax)
 
 \arguments{
   \item{...}{Further arguments.}
+  \tiem{object}{An object returned by one of the \code{qe*MV} functions.
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
   \item{yName}{Name of the class labels column.}
