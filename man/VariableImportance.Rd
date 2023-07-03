@@ -1,5 +1,5 @@
 \name{Variable Importance Measures}
-\alias{qeLeave1VarOut}
+\alias{qeLeaveOut1Var}
 
 \title{Variable Importance Measures}
 
