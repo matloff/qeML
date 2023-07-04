@@ -311,10 +311,10 @@ be overly optimistic.
 
     * **qeTS():**  time series
     
-    * *Image classification*:  Our **imageClassR** package uses qe
+    * *image classification*:  Our **imageClassR** package uses qe
       functions for this.  (Under construction.)
 
-* utilities
+* utilities, exploratory tools
 
     * **qeCompare()**:  compare the accuracy various ML methods on a 
       given dataset
@@ -322,8 +322,7 @@ be overly optimistic.
     * **qeParallel()**:  apply "Software Alchemy" to parallize
       qe functions
 
-    * **qePCA()**:  apply PCA before running specified qe ML function
-
-    * **qeUMAP()**:  apply UMAP before running specified qe ML function
+    * **levelCounts()**:  performs a census of levels for each R factor in
+      the dataawr
 
 
