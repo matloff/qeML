@@ -57,24 +57,34 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
 }
 
 \details{
-r
+
 Overviews of the functions:
 
-\itemize{
-
-   \item \code{qeTs} is a tool for time series modeling
-
-   \item \code{qeText} is a tool for textual modeling
-
-   \item \code{qeCompare} facilitates comparison among models
-
-   \item \code{qeFT} does a random grid search for optimal hyperparameter
-   values
+   \itemize{
+   
+      \item \code{qeTs} is a tool for time series modeling
+   
+      \item \code{qeText} is a tool for textual modeling
+   
+      \item \code{qeCompare} facilitates comparison among models
+   
+      \item \code{qeFT} does a random grid search for optimal hyperparameter
+      values
+   
+   }
 
 }
 
+\examples{
+
+data(mlb1)
+# predict Weight in the mlb1 dataset, using qeKNN, with k = 5 and 25,
+# with 10 cross-validations
+qeFT(mlb1,'Weight','qeKNN',list(k=c(5,25)),nTst=100,nXval=10)
+
 
 }
+
 
 \author{
 Norm Matloff
