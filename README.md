@@ -319,10 +319,12 @@ be overly optimistic.
     * **qeCompare()**:  compare the accuracy various ML methods on a 
       given dataset
 
-    * **qeParallel()**:  apply "Software Alchemy" to parallize
+    * **qeParallel()**:  apply "Software Alchemy" to parallelize
       qe functions
 
     * **levelCounts()**:  performs a census of levels for each R factor in
-      the dataawr
+      the dataset
 
+    * **plotPairedResids()**  plots model residuals against pairs of
+      features, useful e.g. for assessing model validity
 
