@@ -24,7 +24,7 @@ qeKNNMV(data,yName,kmax)
 
 \arguments{
   \item{...}{Further arguments.}
-  \tiem{object}{An object returned by one of the \code{qe*MV} functions.
+  \item{object}{An object returned by one of the \code{qe*MV} functions.
   \item{data}{Dataframe, training set. Classification case is signaled
      via labels column being an R factor.}
   \item{yName}{Name of the class labels column.}
