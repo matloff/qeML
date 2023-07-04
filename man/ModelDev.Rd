@@ -40,7 +40,6 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
   \item{qeFtnList}{Character vector of \code{qe*} function names.}
-  \item{qeFtnName}{Quoted \code{qe*} function name.}
   \item{nReps}{Number of holdout sets to generate.}
   \item{opts}{R list of optional arguments for none, some or all of th
      functions in \code{qeFtnList}.}
