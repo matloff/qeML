@@ -33,9 +33,9 @@ Some methods rely on reweighting:
 
 \itemize{
 
-\item \code{qeKNN} 
+   \item \code{qeKNN} 
 
-\item \code{qeRFranger}
+   \item \code{qeRFranger}
 
 }
 
@@ -44,11 +44,18 @@ model:
 
 \itemize{
 
-\item \code{qeFOCI}
+   \item \code{qeFOCI}
 
-\item \code{qeLASSO}
+   \item \code{qeLASSO}
 
 }
+
+}
+
+\examples{
+
+qeLeaveOut1Var(pef,'wageinc','qeKNN',5)
+# in order of impact, wkswrkd largest, then education etc.
 
 }
 
