@@ -21,17 +21,19 @@ plotClassesUMAP(data,classVar)
 }
 
 \details{
-Often one has an R factor in which one or more levels are rare in the
-data.  This could cause problems, say in performing cross-validation; a
-level in the test set might be "new," not having appeared in the
-training set.  Toward this end, \code{factorToTopLevels} will remove
-rare levels form a factor; \code{dataToTopLevels} applies this to an
-entire data frame.
 
-Toward this end, the function \code{levelCounts} simply applies
-\code{table()} to each column of \code{data}, returing the result as an
-R list. (If more than 10 levels, it returns NA simply applies table() to
-each column of \code{data},
+The \code{plotPairedResids} function plots model residuals against pairs
+of features, for example for model validation.  Pairs are chosen
+randomly.
+
+}
+
+\examples{
+
+data(pef)
+linout <- qeLin(pef,'wageinc')
+plotPairedResids(pef,linout)
+
 
 }
 
