@@ -30,10 +30,11 @@ randomly.
 
 \examples{
 
+\dontrun{
 data(pef)
 linout <- qeLin(pef,'wageinc')
 plotPairedResids(pef,linout)
-
+}
 
 }
 
