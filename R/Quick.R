@@ -1335,7 +1335,7 @@ predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=object$factorsInfo)
    }
-   preds <- predict.krsFit(object,newx)
+   preds <- regtools::predict.krsFit(object,newx)
    probs <- attr(preds,'probs')  # may be NULL
    if (kludge1row) preds <- preds[1]
    if (!object$classif) {
@@ -1349,7 +1349,7 @@ predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
       if (!is.null(k)) {
          # not ideal, but no apparent easy way to get this during 
          # training phases
-         trnScores <- predict.krsFit(object,object$x)
+         trnScores <- regtools::predict.krsFit(object,object$x)
          trnScores <- attr(trnScores,'probs')
          newScores <- matrix(probs,ncol=length(classNames))
          probs <- knnCalib(object$yFactor,trnScores,newScores,k)
