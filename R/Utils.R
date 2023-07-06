@@ -88,7 +88,7 @@ predictHoldout <- defmacro(res,
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
       tsty <- tst[,ycol]
-      newLvls <- regtools:::checkNewLevels(trnx,tstx)
+      newLvls <- checkNewLevels(trnx,tstx)
       if (length(newLvls) > 0) {
          tstx <- tstx[-newLvls,,drop=FALSE]
          tst <- tst[-newLvls,,drop=FALSE]
@@ -388,5 +388,32 @@ checkPkgLoaded <- function(pkgName,whereObtain='CRAN')
          stop(sprintf('if not installed, obtain from %s',whereObtain))
       }
       requireNamespace(pkgName)
+}
+
+# from regtools, but included here due to package rules
+checkNewLevels <- function (info1, data2) 
+{
+    tmp <- sapply(data2, is.factor)
+    factorNames <- names(data2)[tmp]
+    if (is.data.frame(info1)) {
+        tmp <- sapply(info1, is.factor)
+        tmp <- names(info1)[tmp]
+        levelsPresent1 <- lapply(info1[tmp], function(t) unique(t))
+    }
+    else if (setequal(names(info1), names(data2))) {
+        levelsPresent1 <- info1
+    }
+    else {
+        levelsPresent1 <- info1$factorLevelsPresent
+    }
+    res <- NULL
+    for (nm in factorNames) {
+        tmp <- setdiff(levels(data2[[nm]]), levelsPresent1[[nm]])
+        if (length(tmp) > 0) {
+            matches <- which(data2[[nm]] %in% tmp)
+            res <- union(res, matches)
+        }
+    }
+    res
 }
 
