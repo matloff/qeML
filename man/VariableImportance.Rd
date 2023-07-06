@@ -55,7 +55,7 @@ model:
 \examples{
 
 data(pef)
-qeLeaveOut1Var(pef,'wageinc','qeKNN',5)
+qeLeaveOut1Var(pef,'wageinc','qeLin',5)
 # in order of impact, wkswrkd largest, then education etc.
 
 }
