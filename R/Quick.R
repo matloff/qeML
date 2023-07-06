@@ -1335,7 +1335,7 @@ predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=object$factorsInfo)
    }
-   preds <- regtools::predict.krsFit(object,newx)
+   preds <- predict.krsFit(object,newx)
    probs <- attr(preds,'probs')  # may be NULL
    if (kludge1row) preds <- preds[1]
    if (!object$classif) {
@@ -1349,7 +1349,7 @@ predict.qeNeural <- function(object,newx=NULL,k=NULL,...)
       if (!is.null(k)) {
          # not ideal, but no apparent easy way to get this during 
          # training phases
-         trnScores <- regtools::predict.krsFit(object,object$x)
+         trnScores <- predict.krsFit(object,object$x)
          trnScores <- attr(trnScores,'probs')
          newScores <- matrix(probs,ncol=length(classNames))
          probs <- knnCalib(object$yFactor,trnScores,newScores,k)
@@ -2297,7 +2297,7 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
 
 plot.qeFT <- function(x,...) 
 {
-   regtools::plot.tuner(x)
+   plot.tuner(x)
 }
 
 #########################  qeDT()  #################################
