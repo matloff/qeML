@@ -427,7 +427,7 @@ predict.krsFit <- function (object, ...)
     model <- object$model
     mm <- object$mmScaleX
     if (!is.null(mm)) 
-        newx <- mmscale(newx, mm)
+        newx <- regtools::mmscale(newx, mm)
     if (!is.null(object$xShape)) {
         newx <- matrixToTensor(newx, object$xShape)
     }
@@ -470,7 +470,7 @@ plot.tuner <- function (x, ...)
             dfCol <- outdf[, i]
             if (is.numeric(dfCol)) {
                 rng <- max(dfCol) - min(dfCol)
-                outdf[, i] <- dfCol + jit * rng * runif(length(dfCol), 
+                outdf[, i] <- dfCol + jit * rng * stats::runif(length(dfCol), 
                   -0.5, 0.5)
             }
         }

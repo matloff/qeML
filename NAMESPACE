@@ -4,13 +4,15 @@ importFrom("stats", 'as.formula', "binomial", "coef", "cor", "cov", "glm", "lm",
              "loglin", "na.omit", "numericDeriv", "predict", "rbinom",
              "var", "loess")
 importFrom('regtools','kNN', 'allNumeric', 'factorToDummies', 'charsToFactors',    'krsFit', 'penrosePoly', 'hasFactors', 'getDFclasses',
-    'confusion', 'fineTuning')
+    'confusion', 'fineTuning', 'mmscale')
 
 importFrom('grf','regression_forest','ll_regression_forest')
 
 importFrom('gbm','gbm.perf')
 
 import('FOCI','gtools','partools','rmarkdown')
+
+importFrom("stats", "runif")
 
 S3method(predict,qeLogit)
 S3method(predict,qeLin)
