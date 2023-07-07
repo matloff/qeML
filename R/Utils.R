@@ -390,7 +390,8 @@ checkPkgLoaded <- function(pkgName,whereObtain='CRAN')
       requireNamespace(pkgName)
 }
 
-# from regtools, but included here due to package rules
+# from regtools, but included here due to package rules:
+
 checkNewLevels <- function (info1, data2) 
 {
     tmp <- sapply(data2, is.factor)
@@ -415,5 +416,76 @@ checkNewLevels <- function (info1, data2)
         }
     }
     res
+}
+
+predict.krsFit <- function (object, ...) 
+{
+    arglist <- list(...)
+    newx <- arglist[[1]]
+    if (!inherits(newx, "matrix")) 
+        newx <- as.matrix(newx)
+    model <- object$model
+    mm <- object$mmScaleX
+    if (!is.null(mm)) 
+        newx <- mmscale(newx, mm)
+    if (!is.null(object$xShape)) {
+        newx <- matrixToTensor(newx, object$xShape)
+    }
+    preds <- predict(model, newx)
+    if (object$classif) {
+        probs <- preds
+        preds <- apply(preds, 1, which.max) - 1
+        attr(preds, "probs") <- probs
+    }
+    else {
+        mm <- object$mmScaleY
+        if (!is.null(mm)) 
+            preds <- mm[1] + preds * (mm[2] - mm[1])
+    }
+    preds
+}
+
+
+plot.tuner <- function (x, ...) 
+{
+    arglist <- list(...)
+    tmp <- arglist["col"][[1]]
+    col <- if (!is.null(tmp)) 
+        tmp
+    else "meanAcc"
+    tmp <- arglist["disp"][[1]]
+    disp <- if (!is.null(tmp)) 
+        tmp
+    else 0
+    tmp <- arglist["jit"][[1]]
+    jit <- if (!is.null(tmp)) 
+        tmp
+    else 0.05
+    outdf <- x$outdf
+    macol <- which(names(outdf) == "meanAcc")
+    outdf <- outdf[, 1:macol]
+    if (jit > 0) {
+        nc <- ncol(outdf)
+        for (i in 1:(nc - 3)) {
+            dfCol <- outdf[, i]
+            if (is.numeric(dfCol)) {
+                rng <- max(dfCol) - min(dfCol)
+                outdf[, i] <- dfCol + jit * rng * runif(length(dfCol), 
+                  -0.5, 0.5)
+            }
+        }
+    }
+    if (col == "smoothed") 
+        outdf$meanAcc <- NULL
+    else outdf$smoothed <- NULL
+    if (disp != 0) {
+        nc <- ncol(outdf)
+        if (abs(disp) < nc - 1) 
+            stop("disp too small")
+        ord <- order(outdf[, nc], decreasing = (disp > 0))
+        outdf <- outdf[ord[1:abs(disp)], ]
+    }
+    nr <- nrow(outdf)
+    cdparcoord::discparcoord(outdf, k = nr, differentiate = TRUE)
 }
 
