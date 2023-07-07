@@ -456,7 +456,8 @@ matrixToTensor <- function (x, xShape)
         nch <- ncol(x)/(nrw * ncl)
         xShape <- c(xShape, nch)
     }
-    res <- keras::array <- reshape(x, c(nrow(x), nrw, ncl, nch))
+    # res <- keras::array <- reshape(x, c(nrow(x), nrw, ncl, nch))
+    res <- reshape(x, c(nrow(x), nrw, ncl, nch))
     attr(res, "xShape") <- xShape
     res
 }

@@ -12,7 +12,7 @@ importFrom('gbm','gbm.perf')
 
 import('FOCI','gtools','partools','rmarkdown')
 
-importFrom("stats", "runif")
+importFrom("stats", "runif", 'reshape')
 
 S3method(predict,qeLogit)
 S3method(predict,qeLin)
