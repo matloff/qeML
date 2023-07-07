@@ -445,6 +445,21 @@ predict.krsFit <- function (object, ...)
     preds
 }
 
+matrixToTensor <- function (x, xShape) 
+{
+    nrw <- xShape[1]
+    ncl <- xShape[2]
+    if (length(xShape) == 3) {
+        nch <- xShape[3]
+    }
+    else {
+        nch <- ncol(x)/(nrw * ncl)
+        xShape <- c(xShape, nch)
+    }
+    res <- keras::array <- reshape(x, c(nrow(x), nrw, ncl, nch))
+    attr(res, "xShape") <- xShape
+    res
+}
 
 plot.tuner <- function (x, ...) 
 {
