@@ -305,6 +305,10 @@ be overly optimistic.
 
     * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
 
+    * **qeLeaveOut1Var**, **qeLASSO**, **qeFOCI**, **qeRFranger** and
+      **qeKNN**, all can be used for assessing or setting variable
+      importance
+
 * application-specific functions (elementary)
     
     * **qeText()**  text classification
