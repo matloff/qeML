@@ -10,6 +10,8 @@ statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
 
 # What this package is about
 
+Functions and tutorials on the basic predictive functions of machine
+learning (ML).
 
 * "Quick and Easy" ML
 

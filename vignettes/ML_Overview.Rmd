@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 (The title here alludes to Andriy Burkov's excellent work,
 *The Hundred-Page Machine Learning Book*.  Note too my own 
-forthcoming book, *The Art of Machine Learning: Algorithms+Data+R*.)
+book, *The Art of Machine Learning: Algorithms+Data+R*.)
 
 Here we give an overview of the most widely used predictive methods in
 statistical/machine learning (ML).  For each one, we present
@@ -31,6 +31,9 @@ statistical/machine learning (ML).  For each one, we present
 * function in the R package, **qeML** (readers without R background or
   who simply wish to acquire an overview of ML may skip the R code
 without loss of comprehehnsion of the text)
+
+Advanced methods, e.g. Generative Adversial Networks, and specialized
+methods for language models and image analysis, are not covered.
 
 # Contents
 
@@ -53,11 +56,12 @@ without loss of comprehehnsion of the text)
 
 # Notation
 
-For convenience, we'll let Y denote the variable to be predicted, i.e.
-the response variable, and let X denote the set of predictor
-variables/features.  (ML people tend to use the term *features*,
-while In stat, the term *predictors* is common.  In applied fields, e.g.
-economics or psychology, some use the term *independent variables*.)
+For convenience, we'll let Y denote the variable to be predicted, often
+termed the *response variable* or *outcome*, and let X denote the set of
+predictor variables/features.  (ML people tend to use the term
+*features*, while In statistics, the term *predictors* is common.  In applied
+fields, e.g.  economics or psychology, some use the term *independent
+variables*.)
 
 We develop our prediction rule from available 
 *training data*, consisting of n data points, denoted by
@@ -67,7 +71,7 @@ Y<sub>n</sub>).  We wish to predict new cases
 is known but Y<sub>new</sub> needs to be predicted.
 
 So, we may wish to predict human weight Y from height X, or from height
-and age in a 2-component vector X.  Say we have the latter situation,
+and age in a two-component vector X.  Say we have the latter situation,
 and data on n = 100 people.  Then for instance X<sub>23</sub> would be
 the vector of height and age for the 23rd person in our training data,
 and Y<sub>23</sub> would be that person's weight.
@@ -80,7 +84,8 @@ If Y represents a binary variable, we represent it as an indicator
 variable.  In the famous Pima Diabetes dataset in the
 [UCI Machine Learning
 Repository](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database), 1 means diabetic,
-0 means not.
+0 means not.  (The 0,1 form is statistical; often in ML circles the
+coding -1,1 is used.)
 
 If Y itself is categorical, we represent it by several indicator
 variables, one for each category.  In another disease-related UCI
