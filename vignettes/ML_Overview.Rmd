@@ -70,6 +70,11 @@ Y<sub>n</sub>).  We wish to predict new cases
 (X<sub>new</sub>,Y<sub>new</sub>) in the future, in which X<sub>new</sub>
 is known but Y<sub>new</sub> needs to be predicted.
 
+> If our data is in the form of an R data frame, then we will have n
+> rows.  The number of columns, other than our Y column, is generally
+> denoted by p.  Both n and p could be very large in some applications,
+> say in the millions for n and the hundreds for p.
+
 So, we may wish to predict human weight Y from height X, or from height
 and age in a two-component vector X.  Say we have the latter situation,
 and data on n = 100 people.  Then for instance X<sub>23</sub> would be
@@ -92,6 +97,10 @@ variables, one for each category.  In another disease-related UCI
 dataset, Y is status of a person's vertebrae condition; there are three
 classes: normal (NO), disk hernia (DH), or spondilolysthesis (SP).  Y =
 (1,0,0) for a normal person, for instance.  Thus Y can be a vector too.
+
+> If we have data on an indicator variable, note that its mean is the
+> proportion of 1s in the data.  On the population level, this becomes the
+> probability of a 1.
 
 # Running example
 
@@ -248,13 +257,13 @@ hyperparameter is the number of neighbors k.  As with any
 hyperparameter, the user aims to set a "Goldilocks" level--not too big,
 not too small.  Setting k too small will result in our taking the
 average of just a few Y values, too small a sample.  On the other hand,
-too large a value for k will some distant data points may be used that
-are not representative.
+too large a value for k will mean that some distant data points may be
+used that are not representative.
 
 To choose k, we could try various values, run **qeKNN** on each one,
 then use the value that produced the best (i.e. smallest) **testAcc**.
 
-If Y is an indicator variable, its average works out to be the
+Again, if Y is an indicator variable, its average works out to be the
 proportion of 1s.  This will then be the estimated probability that Y =
 1 for a new case.  If that is greater than 0.5 in the neighborhood of
 the new case, we guess Y = 1 for the new case, otherwise 0.  
@@ -289,8 +298,8 @@ the hyperparameters.
 
 ### K-NN edge bias
 
-One potential problem is bias at the edge of a neighborhood.  Say we are
-predict weight from height, and a new case involving a very tall person.
+One potential problem is bias at the edge of our dataset  Say we are
+predicting weight from height, and a new case involving a very tall person.
 Most data points in the neighborhood of this particular height value
 will be for people who are shorter than the new case.  Those neighbors
 are thus likely to be lighter than the new case, making our predicted
@@ -299,7 +308,7 @@ value for that case biased downward.
 Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
 Setting the argument **smoothingFtn = loclin** removes a linear trend
 within the neighborhood, and may improve predictive accuracy for new
-cases that are located near the edege of the training set.
+cases that are located near the edge of the training set.
 
 ## Random forests
 
@@ -309,16 +318,18 @@ statisticians in the 1080s, and which were extended to random forests in
 *random subspaces* work of Tin Kam Ho, who did her PhD in computer
 science.
 
+### Decision trees
+
 This is a natural extension of k-NN, in that it too creates a
 neighborhood and averages Y values within the neighborhood.  However, it
 does so in a different way, creating tree structures.
 
 Say in some dataset we are predicting blood pressure from height, weight
-and age.  We first ask whether the height is above or below a certain
-threshold.  After that, we ask whether weight is above or below a
-certain (different) threshold.  This partitions height-weight space into
-4 sectors.  We then might subdivide each sector according to whether age
-is above or below a threshold, now creating 8 sectors of
+and age.  We could, say, first ask whether the height is above or below
+a certain threshold.  After that, we ask whether weight is above or
+below a certain (different) threshold.  This partitions height-weight
+space into 4 sectors.  We then might subdivide each sector according to
+whether age is above or below a threshold, now creating 8 sectors of
 height-weight-age space.  Each sector is now a "neighborhood."  To
 predict a new case, we see which neighborhood it belongs to, then take
 our prediction to be the average Y value among training set points in
@@ -326,19 +337,19 @@ that neighborhood.
 
 The word *might* in the above paragraph alludes to the fact that the
 process may stop early, if the current subdivision is judged by the
-algorithm to be fine enough to produce good accuracy.  So we might end
-up using only height and weight, not age.
+algorithm to be fine enough to produce good accuracy.  So we might, say,
+end up using only height and weight, not age.
 
-And one generally wants to avoid having neighborhoods (*nodes* in the
-tree) that don't have many data points; this is controlled by a
-hyperparameter, say setting a minimum number of data points per node; if
-a split would violate that rule, then don't split.  Of course, if we set
-out threshold too high, we won't do enough splits, so again we need to
-try to find a "Goldilocks" level.
+This produces a tree structure, as shown below.  Each "neighborhood" is
+termed a *node*, and terminal nodes are called *leaves*.
 
-Here is an example using the vertebrae dataset.  There are 6
+*Example:*
+
+Here is an illustration using a vertebrae dataset.  There are 6
 predictor variables, named V1 through V6, consisting of various bone
 measurements.  A single tree is shown.
+
+> This picture was generated using the **rpart.plot** package.
 
 ![alt text](RpartVert.png)
 
@@ -349,6 +360,26 @@ The 0.74 etc. mean that for the training data that happen to fall into
 that leaf, 74% of them are in class DH, 26% are NO and 0% are SL.  So we
 gues DH, based on there being an estimated 74% chance that this new case
 is of type DH..
+
+*A hyperparameter:*
+
+Remember, in some settings we may have dozens, or even hundreds of
+predictor variables, so our decision tree could have many levels.  One
+of the hyperparameters common in RF software indirectly controls the
+number of levels, as follows.
+
+One generally wants to avoid having leaves that don't have many data
+points.  This is like setting k to too small a value in k-NN.  This is
+oftne controlled by a hyperparameter in form of a minimum number of data
+points per node. If a split would violate that rule, then don't split.
+So a small minimum leaf size is analogous to a small k, and the same is
+true for large minimum leaf size and large ki.
+
+Of course, if we set
+out threshold too high, we won't do enough splits, so again we need to
+try to find a "Goldilocks" level.
+
+### Random forests
 
 In RF, many trees are generated at ranomd, using for instance random
 orders of entry of the features.  To predict a new case, we find its
