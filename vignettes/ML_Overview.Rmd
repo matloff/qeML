@@ -365,35 +365,29 @@ is of type DH..
 
 Remember, in some settings we may have dozens, or even hundreds of
 predictor variables, so our decision tree could have many levels.  One
-of the hyperparameters common in RF software indirectly controls the
+of the hyperparameters common in tree software indirectly controls the
 number of levels, as follows.
 
 One generally wants to avoid having leaves that don't have many data
 points.  This is like setting k to too small a value in k-NN.  This is
-oftne controlled by a hyperparameter in form of a minimum number of data
-points per node. If a split would violate that rule, then don't split.
-So a small minimum leaf size is analogous to a small k, and the same is
-true for large minimum leaf size and large ki.
-
-Of course, if we set
-out threshold too high, we won't do enough splits, so again we need to
+often controlled by a hyperparameter in the form of a minimum number of
+data points per node. If a split would violate that rule, then don't
+split.  A small minimum leaf size is analogous to a small k, and the
+same is true for large minimum leaf size and large k.  Again we need to
 try to find a "Goldilocks" level.
 
 ### Random forests
 
-In RF, many trees are generated at ranomd, using for instance random
-orders of entry of the features.  To predict a new case, we find its
-preditions in the various trees, then average them.  For indicator or
-categorical Y, each try gives a prodiction, and we predict whatever
-class is most common among the trees.
+In the above discussion, the user decides the input order of predictor
+variables used in constructing the tree.  But of course, some orders may
+be better than others.
 
-Clearly, the order in which the predictor variables are evaluated (e.g.
-height, weight and age in the **mlb** data) can matter a lot.  So, more
-than one tree is constructed, with random orders.  The number of trees
-is another hyperparameter.  Each tree gives us a prediction for the
-unknown Y.  In a regression setting, those predictions are averaged to
-get our final prediction.  In a classification setting, we see which
-class was predicted most often among all those trees.
+In random forests (RFs), many trees are generated at random, using f
+random orders of entry of the features.  The number of trees is another
+hyperparameter.  Each tree gives us a prediction for the unknown Y.  In
+a regression setting, those predictions are averaged to get our final
+prediction.  In a classification setting, we see which class was
+predicted most often among all those trees.
 
 The thresholds used at each node are determined through a complicated
 process, depending on which implementation of RF one uses.
