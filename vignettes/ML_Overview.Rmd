@@ -126,7 +126,7 @@ The call form is
 model fit <- qe<model name>(<data name>,<Y name>)
 ```
 
-As noted, no prior calls are needed to define the model, etc.
+Just a one-liner!
 
 ## Example
 
@@ -139,6 +139,9 @@ mlb1 <- mlb[,4:6]  # columns for height, weight and age
 knnout <- qeKNN(mlb1,'Weight')  # fit k-Nearest Neighbor model
 rfout <- qeRF(mlb1,'Weight')  # fit random forests model
 ```
+
+It's that easy.  As noted, no prior calls are needed to define the
+model, etc.
 
 Most methods have *hyperparameters*, values that can be used to tweak
 the analysis in various ways.  In **qeML**, default values of
@@ -161,8 +164,9 @@ using our random forests model created above, run
 
 Such a player would be predicted to weigh about 184 pounds.
 
-The data is partitioned into a training set and a holdout set, with the
-model being fit on the former and then tested on the latter. 
+By default, the data is partitioned into a training set and a holdout
+set, with the model being fit on the former and then tested on the
+latter. 
 
 ``` r
 > rfout$testAcc  # mean absolute prediction error
@@ -185,22 +189,26 @@ default, or suppressed entirely.)
 
 ## Regression and classification problems, regression functions
 
-Prediction applications in which Y is a continuous variable, say weight,
-or at least ordinal, are called *regression settings*.  Applications in
-which Y is categorical, i.e. Y is a factor variable in R, say predicting
-the player's position (e.g. pitcher) are *classification settings*.
+Prediction applications in which Y is a continuous variable, or at least
+ordinal, are called *regression settings*.  Applications in which Y is
+categorical, i.e. Y is a factor variable in R, are *classification
+settings*.  In the **mlb** dataset, for instance, prediction of player
+weight is a regression application, while predicting a player's position
+would be a classification application.
 
 Somewhat confusingly, both settings make use of the *regression function*,
 m(t) = E(Y | X = t), the mean value of Y in the subpopulation defined by
 X = t.  If say we are predicting weight in the **mlb** data, then for instance
-m(71,23) would be the mean weight among all players of height 71 inches
+m(71,23) would denote the mean weight among all players of height 71 inches
 and 23 years old.  To predict the weight of a new player, say height 77
 and age 19, we use m(77,19).
+
+> Readers who have seen **linear regression** models should note that the
+> term **regression** is much more general than that linear case.
 
 In classification problems, Y is converted to a set of indicator
 variables.  For the position 'pitcher' in the **mlb** data, we would have
 Y = 1 or 0, depending on whether the player is a pitcher or not.
-(Position is in column 3 of the original dataset.)
 Then  E(Y | X = t) reduces to P(Y = 1 | X = t), the probability that the
 player is a pitcher given the player's height, weight and age, say.  We
 would typically find probabilities for each position, then guess the one
@@ -217,7 +225,7 @@ the regression function m(t).
 
 The **qe** series function sense whether the user is specifying a
 regression setting or a classification setting, by noting whether the Y
-variable (second argument) is numeric or an R factor.
+variable is numeric or an R factor.
 
 # ML predictive methods
 
@@ -237,7 +245,7 @@ value of k in **qeKNN** is 25.
 
 The **qeKNN** function wraps **kNN** in **regtools**.  The main
 hyperparameter is the number of neighbors k.  As with any
-hyperparameter, the user aims to set a "Goldilocks" level, not too big,
+hyperparameter, the user aims to set a "Goldilocks" level--not too big,
 not too small.  Setting k too small will result in our taking the
 average of just a few Y values, too small a sample.  On the other hand,
 too large a value for k will some distant data points may be used that
