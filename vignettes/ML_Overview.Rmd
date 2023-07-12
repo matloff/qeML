@@ -241,7 +241,7 @@ variable is numeric or an R factor.
 We now present the "30,000 foot" view of the major statistical/machine
 learning methods.
 
-## k-Nearest Neighbors
+## k-nearest neighbors
 
 This method was originally developed by statisticians, starting in the 1950s
 and 60s.
@@ -320,9 +320,9 @@ science.
 
 ### Decision trees
 
-This is a natural extension of k-NN, in that it too creates a
-neighborhood and averages Y values within the neighborhood.  However, it
-does so in a different way, creating tree structures.
+This is a natural extension of k-NN, in that it too creates
+neighborhoods and averages Y values within the neighborhoods.  However,
+it does so in a different way, by creating tree structures.
 
 Say in some dataset we are predicting blood pressure from height, weight
 and age.  We could, say, first ask whether the height is above or below
@@ -335,11 +335,6 @@ predict a new case, we see which neighborhood it belongs to, then take
 our prediction to be the average Y value among training set points in
 that neighborhood.
 
-The word *might* in the above paragraph alludes to the fact that the
-process may stop early, if the current subdivision is judged by the
-algorithm to be fine enough to produce good accuracy.  So we might, say,
-end up using only height and weight, not age.
-
 This produces a tree structure, as shown below.  Each "neighborhood" is
 termed a *node*, and terminal nodes are called *leaves*.
 
@@ -347,9 +342,12 @@ termed a *node*, and terminal nodes are called *leaves*.
 
 Here is an illustration using a vertebrae dataset.  There are 6
 predictor variables, named V1 through V6, consisting of various bone
-measurements.  A single tree is shown.
+measurements.  The variable to be predicted is disease status, a
+categorical variable with levels DH, NO, SL and VC.  (NO designates a
+normal patient, no disease.)
 
-> This picture was generated using the **rpart.plot** package.
+> This picture was generated using the **rpart.plot** package,
+> via **qeRpart()**.
 
 ![alt text](RpartVert.png)
 
@@ -360,6 +358,14 @@ The 0.74 etc. mean that for the training data that happen to fall into
 that leaf, 74% of them are in class DH, 26% are NO and 0% are SL.  So we
 gues DH, based on there being an estimated 74% chance that this new case
 is of type DH..
+
+Note that the process may stop early, if the current subdivision is
+judged by the algorithm to be fine enough to produce good accuracy.  In
+the above example, for instance, if V6 is at least 16, we do not check
+other variables.  On the other hand, if V6 is smaller, then we next
+check V4, and if it is less than 25, then again we stop early.
+
+We also might check a feature more than once, as seen above.
 
 *A hyperparameter:*
 
@@ -395,7 +401,7 @@ process, depending on which implementation of RF one uses.
 The **qeRF** function wraps the function of the same name in the
 **randomForests** package.  
 
-### RF edge bias
+### Tree and RF edge bias
 
 The package also offers other implementations of RF, notably
 **qeRFgrf**, as follows.  
