@@ -244,6 +244,8 @@ be overly optimistic.
 
     * **qeDT()**: decision trees, wraps **party** pkg
 
+    * **qeRpart()**: decision trees, wraps **Rpart** pkg; colorful tree plot
+
     * **qeGBoost()**: gradient boosting, wraps **gbm** pkg
 
     * **qeKNN()**: k-Nearest Neighbors, wraps **regtools** pkg; includes

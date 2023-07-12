@@ -10,7 +10,7 @@ importFrom('grf','regression_forest','ll_regression_forest')
 
 importFrom('gbm','gbm.perf')
 
-import('FOCI','gtools','partools','rmarkdown')
+import('FOCI','gtools','partools','rmarkdown',rpart,rpart.plot)
 
 importFrom("stats", "runif", 'reshape')
 
@@ -38,7 +38,9 @@ S3method(plot,qeDT)
 S3method(plot,qeFT)
 S3method(plot,doubleD)
 S3method(plot,qeNCVregCV)
+S3method(plot,qeRpart)
 S3method(print,qeDT)
+S3method(predict,qeRpart)
 S3method(predict,qePolyLASSO)
 S3method(predict,qePCA)
 S3method(predict,qeUMAP)
@@ -63,4 +65,4 @@ export(
    doubleD,qeFOCI,qeFOCIrand,qeLinKNN,qeDeepnet,
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
    levelCounts,dataToTopLevels,checkPkgLoaded,
-   qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var)
+   qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart)

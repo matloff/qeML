@@ -2985,4 +2985,63 @@ qeLeaveOut1Var <- function(data,yName,qeFtnName,nReps,opts=list())
    output
 }
 
+#########################  qeRpart()  #################################
+
+# decision trees, wrapper to rpart::rpart, one of the early CART
+# implementations
+
+# arguments:  see above, plus
+
+#     alpha: threshold for p-value
+#     minsplt: minimum number of data points in a node
+#     minbucket: minimum number of data points in a terminal node
+#     mtry: number of variables randomly tried at each split
+#     maxdepth: maximum number of levels to tree
+
+# value:  see above
+ 
+qeRpart <- function(data,yName,minBucket=10,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+   classif <- is.factor(data[[yName]])
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) splitData(holdout,data)
+   requireNamespace('rpart')
+   xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
+   cmd <- sprintf("rpart::rpart(%s ~.,data=data,control=list(minbucket=%d))",
+      yName,minBucket)
+   rpout <- evalr(cmd)
+   rpout$classif <- classif
+   if (!is.null(holdout)) {
+      predictHoldout(rpout)
+      rpout$holdIdxs <- holdIdxs
+   }
+   class(rpout) <- c('qeRpart','rpart')
+   rpout
+}
+
+predict.qeRpart <- function(object,newx,...)
+{
+   class(object) <- class(object)[-1] 
+   browser()
+   # newx <- setTrainFactors(object,newx)
+   newx <- setTrainFactors(object,newx)
+   tmp <- predict(object,newx)
+   if (object$classif) list(predClasses=tmp)
+   else tmp
+}
+
+plot.qeRpart <- function(object,
+   boxPalette=c('red','yellow','green','blue'),...) 
+{
+   requireNamespace('rpart.plot')
+   class(object) <- class(object)[-1] 
+   rpart.plot::rpart.plot(object,box.palette=boxPalette)
+}
+
+print.qeDT <- function(x,...) 
+{
+   print(x$ctout)
+}
+
 
