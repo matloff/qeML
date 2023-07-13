@@ -152,10 +152,6 @@ rfout <- qeRF(mlb1,'Weight')  # fit random forests model
 It's that easy.  As noted, no prior calls are needed to define the
 model, etc.
 
-Most methods have *hyperparameters*, values that can be used to tweak
-the analysis in various ways.  In **qeML**, default values of
-hyperparameters are set but can be overridden.
-
 Prediction of new cases is equally easy, in the form
 
 ``` r
@@ -173,10 +169,6 @@ using our random forests model created above, run
 
 Such a player would be predicted to weigh about 184 pounds.
 
-By default, the data is partitioned into a training set and a holdout
-set, with the model being fit on the former and then tested on the
-latter. 
-
 ``` r
 > rfout$testAcc  # mean absolute prediction error
 [1] 15.16911
@@ -191,10 +183,28 @@ the k-NN model?
 ```
 
 Seems to be better, though we should try other values of the
-hyperparameters.
+*hyperparameters*.  (See below.)
 
-(The size of the holdout set size can be set differently from the
-default, or suppressed entirely.)
+## Hyperparameters
+
+Most methods have *hyperparameters*, values that can be used to tweak
+the analysis in various ways.  In k-NN, for instance, the number of
+neighbors k is a hyperparameter for the algorithm.
+
+In **qeML**, default values of hyperparameters, e.g. k = 25 for k-NN,
+are set but can and should  be overridden.
+
+By default, the data is partitioned by the qe- functions into a
+*training set* and a *holdout set*, with the model being fit on the
+former and then tested on the latter.  The point is that, in assessing
+the predictive accuracy of our fit, we should do so on "fresh, new"
+data.  This is known as *cross-validation* (there are many variants).
+The size of the holdout set size can be set differently from the
+default, or suppressed entirely.
+
+The typical strategy regarding selection of the values of
+hyperparameters is to perform a *grid search*, trying all possible
+combinations.  This computation can be quite voluminous.
 
 ## Regression and classification problems, mean functions
 
@@ -665,32 +675,42 @@ problems.
 
 ## Shrinkage methods for linear/generalized linear models
 
-Some deep mathematical theory implies that in linear models it may be
-advantageous to shrink the estimated b<sub>i</sub>.  *Ridge* regression
-and the LASSO do this in a mathematically rigorous manner.  Each of them
-minimizes the usual sum of squared prediction errors, subject to a
-limit being placed on the size of the b vector; for ridge, the size is
-defined as the sum of the b<sub>i</sub><sup>2</sup>, while for the LASSO
-it's the sum of {b<sub>i</sub>|.  Limiting the size of some statistical
-estimator in general is termed *regularization*.
+### Overview
 
-The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
-package.  The main hyperparameter **alpha** specifies ridge (0) or the
-LASSO (1, the default).
+Some deep [mathematical theory due to James and
+Stein](https:en.wikipedia.org/wiki/Stein%27s_example) implies that in
+linear models it may be advantageous to shrink the estimated
+b<sub>i</sub>.  *Ridge* regression and the *LASSO* do this in a
+mathematically rigorous manner.  Each of them minimizes the usual sum of
+squared prediction errors, subject to a limit being placed on the size
+of the b vector; for ridge, the size is defined as the sum of the
+b<sub>i</sub><sup>2</sup>, while for the LASSO it's the sum of
+|b<sub>i</sub>|.  
 
-There are various other shrinkage methods, such as Minimax Convex
-Penalty (MCP).  This and some others are available via **qeNCVregCV**,
-which wraps the **ncvreg** package.
+Limiting the size of some statistical estimator in general is termed
+*regularization*.  Shrinkage methods are often also applied to other ML
+algorithms, such as we previously mentioned for XGBoost.
 
-Shrinkage methods are often also applied to other ML algorithms.
+The function **qeLASSO** wraps **cvglmnet** in the **glmnet** package.
+The main hyperparameter **alpha** specifies ridge (0) or the LASSO (1,
+the default).  There are various other shrinkage methods, such as
+Minimax Convex Penalty (MCP).  This and some others are available via
+**qeNCVregCV**, which wraps the **ncvreg** package.
 
-The LASSO tends to produce solutions in which some of the b<sub>i</sub>
-are 0.  Thus it is popular as a tool for predictor variable selection.
+Why regularize?
+
+* As mentioned, mathematically theory suggests it.
+
+* Ridge regression was originally proposed as a remedy for
+  *multicollinearity*, a situation in which high intercorrelations among
+  the features can make predictions numerically and statistically
+  unstable.
+
+* The LASSO has the appealing property that it can be used for feature
+  selection; it tends to produce solutions in which some of the 
+  b<sub>i</sub> are 0.  
 
 ### LASSO for feature selection
-
-The LASSO tends to produce solutions in which some of the b<sub>i</sub>
-are 0.  Thus it is popular as a tool for predictor variable selection.
 
 Here is an example using **pef**, a dataset from the US Census, included
 with **qeML**.  The features consist of age, education, occupation and
@@ -922,23 +942,56 @@ The usual answer given for this question is, "The best method is very
 dependent on which dataset you have."  True, but are there some general
 principles?
 
-ML people often distinguish between "tabular" and "nontabular" data.
-A disease diagnosis application may be considered tabular--rows of
-patients, and columns of measurements such as blood glucose, body
-temperature and so on.  On the other hand, a facial recognition
-application is considered nontabular, which is confusing, since it too
-has the form of a table--one row per picture, and one column per pixel
-position.
+* Let's first consider the views of ML specialists (CMLSs).  In our view
+  they tend to be biased by their focus on image and language settings
+  (see below), and by an assumption that the user can and will do
+  voluminous hyperparameter optimization, but their views are of course
+  well worth considering.
 
-Where the two kinds of applications may differ, though, is whether there
-are general monotonic relationships between Y and the features.  In
-predicting diabetes, say, the higher the glucose level, the more likely
-the patient is diabetic.  Though monotonic relations may exist in image
-classification, they maybe more localized.
+  * CMLSs tend to distinguish between "tabular" and "nontabular" data.
+    A disease diagnosis application may be considered tabular--rows of
+    patients, and columns of measurements such as blood glucose, body
+    temperature and so on.  On the other hand, CMLSs view  a facial
+    recognition application as nontabular, which is confusing, since it
+    too has the form of a table--one table row per row of the picture,
+    and one column per pixel position within a picture row.
 
-The point then, is that generally "monotonic" applications may be best
-served by ML methods that have either linear components or low-degree
-polynomials, such as linear or generalized linear models, SVM and
-polynomial versions of these.  For other applications, one might try
-k-NN, NNs etc.
+    * The strategies currently in vogue among CMLSs is:
 
+        * Use XGBoost for tabular applications.
+
+        * Use deep NNs or other advanced, application-specific methods
+          in image and language settings.
+
+    * SVM is definitely not in vogue among CMLSs.  
+    
+    * CMLSs view linear and generalized linear models as valuable,
+      especially as initial analyses of a given dataset or in settings
+      in which elaborate hyperparameter optimization will be done.  They
+      would view k-NN and RFs similarly.
+
+* Here are some views (general, not CMLSs) to consider:
+
+    * XGBoost is nice but in a typical application the default values
+      for the hyperparameters will not give impressive results.
+      Extensive, application-specific hyperparameter tuning will be
+      needed.
+
+    * A key question is whether there is a ageneral monotonic
+      relationship between Y and the features.  In predicting diabetes,
+      say, the higher the glucose level, the more likely the patient is
+      diabetic.  Though monotonic relations may exist in image
+      classification, they maybe more localized.
+
+    * "Monotonic" applications may be best served by ML methods that
+      have either linear components or low-degree polynomials, such as
+      linear or generalized linear models, SVM and low-degree polynomial
+      versions of these.  For other applications, one might try k-NN,
+      NNs etc.
+
+As the saying goes, "Your mileage may vary," depending on your
+application and data.  Our recommended strategy would be to first try a
+linear or logistic model, possibly with a quadratic term.  If you then
+wish to go further, you'll need a grid search for each ML algorithm of
+interest.  The **qeFT** function can alleviate you of a lot of the work
+here.
