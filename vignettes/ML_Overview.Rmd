@@ -38,7 +38,7 @@ methods for language models and image analysis, are not covered.
 # Contents
 
 * [Example](#example)
-* [Regression and classification problems, regression functions](#regression-and-classification-problems,-regression-functions)
+* [Regression and classification problems, mean functions](#regression-and-classification-problems,-regression-functions)
 * [k-Nearest Neighbors](#k-nearest-neighbors)
   * [K-NN edge bias](#k-nn-edge-bias)
 * [Random forests](#random-forests)
@@ -196,7 +196,7 @@ hyperparameters.
 (The size of the holdout set size can be set differently from the
 default, or suppressed entirely.)
 
-## Regression and classification problems, regression functions
+## Regression and classification problems, mean functions
 
 Prediction applications in which Y is a continuous variable, or at least
 ordinal, are called *regression settings*.  Applications in which Y is
@@ -212,8 +212,11 @@ m(71,23) would denote the mean weight among all players of height 71 inches
 and 23 years old.  To predict the weight of a new player, say height 77
 and age 19, we use m(77,19).
 
-> Readers who have seen **linear regression** models should note that the
-> term **regression** is much more general than that linear case.
+> Readers who have seen **linear regression** models should note that
+> the term **regression** is much more general than that linear case.
+> In the general context, the regression function is simply the mean
+> function, expressing the mean of one variable in terms of the values
+> of other variables.
 
 In classification problems, Y is converted to a set of indicator
 variables.  For the position 'pitcher' in the **mlb** data, we would have
@@ -343,11 +346,9 @@ termed a *node*, and terminal nodes are called *leaves*.
 Here is an illustration using a vertebrae dataset.  There are 6
 predictor variables, named V1 through V6, consisting of various bone
 measurements.  The variable to be predicted is disease status, a
-categorical variable with levels DH, NO, SL and VC.  (NO designates a
-normal patient, no disease.)
-
-> This picture was generated using the **rpart.plot** package,
-> via **qeRpart()**.
+categorical variable with levels DH, NO, SL and VC.  NO designates a
+normal patient, no disease.  (This picture was generated using the
+**rpart.plot** package, via **qeRpart()**.)
 
 ![alt text](RpartVert.png)
 
@@ -457,9 +458,13 @@ find and plot the mean weight at each height.)
 
 ![alt text](WtVsHt.png)
 
-The means seem to lie near a straight line.  (Remember, though, that
-these are sample means.)  That suggests modeling m(t) is a linear
-function.
+The means seem to lie near a straight line.  That suggests modeling m(t)
+is a linear function.
+
+> The points don't **exactly** line on a straight line.  It's important
+> to keep in mind:  (a) We are merely setting up an approximate
+> model, one that is close enough to reality to be useful; and 
+> (b) these are sample means, subject to sampling variation.
 
 For example, a model for mean weight, given height and age, would be
 
