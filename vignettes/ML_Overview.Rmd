@@ -313,7 +313,7 @@ cases that are located near the edge of the training set.
 ## Random forests
 
 This method stems from *decision trees*, which were developed mainly by
-statisticians in the 1080s, and which were extended to random forests in
+statisticians in the 1980s, and which were extended to random forests in
 1990s.  Note too the related (but unfortunately seldom recognized)
 *random subspaces* work of Tin Kam Ho, who did her PhD in computer
 science.
@@ -355,19 +355,32 @@ At the root, if the variable V6 in our new case to be predicted is < 16,
 we go left, otherwise right.  Say we go left.  Then if V4 < 28 in the
 new case, we go left again, getting to a leaf, in which we guess DH.
 The 0.74 etc. mean that for the training data that happen to fall into
-that leaf, 74% of them are in class DH, 26% are NO and 0% are SL.  So we
-gues DH, based on there being an estimated 74% chance that this new case
-is of type DH..
+that leaf, 74% of them are in class DH, 26% are NO and 0% are SL.  
 
-Note that the process may stop early, if the current subdivision is
-judged by the algorithm to be fine enough to produce good accuracy.  In
-the above example, for instance, if V6 is at least 16, we do not check
-other variables.  On the other hand, if V6 is smaller, then we next
-check V4, and if it is less than 25, then again we stop early.
+*Constructing the tree:*
+
+In generating the tree, the algorithm decides whether to split the
+current node, according to the current feature.  (There are various
+methods used for this, so that choice of method becomes a
+hyperparameter.) Thus the the process may stop early, if the current
+subdivision is judged by the algorithm to be fine enough to produce good
+accuracy.  
+
+In the above example, for instance, if V6 is at least 16, we do not check
+other variables, and the next node becomes a leaf.  
 
 We also might check a feature more than once, as seen above.
 
-*A hyperparameter:*
+*Prediction:*
+
+When presented with a new case X<sub>new</sub>, for which we wish to
+predict Y<sub>new</sub>, we check to see which leaf X<sub>new</sub>
+belongs to.  For instance, say this new case has V6 = 12 and V4 = 8.
+Then following the tree links, we see that this case falls into the
+leftmost leaf, and we predict Y<sub>new</sub> to be DH, with there being
+an estimated 74% chance that this new case is of type DH.
+
+*Another hyperparameter:*
 
 Remember, in some settings we may have dozens, or even hundreds of
 predictor variables, so our decision tree could have many levels.  One
@@ -388,7 +401,7 @@ In the above discussion, the user decides the input order of predictor
 variables used in constructing the tree.  But of course, some orders may
 be better than others.
 
-In random forests (RFs), many trees are generated at random, using f
+In random forests (RFs), many trees are generated at random, using 
 random orders of entry of the features.  The number of trees is another
 hyperparameter.  Each tree gives us a prediction for the unknown Y.  In
 a regression setting, those predictions are averaged to get our final
@@ -403,7 +416,7 @@ The **qeRF** function wraps the function of the same name in the
 
 ### Tree and RF edge bias
 
-The package also offers other implementations of RF, notably
+The qeML package also offers other implementations of RF, notably
 **qeRFgrf**, as follows.  
 
 The leaves in any tree method, such as random forests and boosting, are
@@ -420,15 +433,18 @@ latter have been involved mainly in *gradient* boosting, the technique
 used here.
 
 The basic idea is to iteratively build up a sequence of trees, each of
-which is an improved update of the last.  At the end, all the trees are
-combined, with more weight given to the more recent trees.
+which is an update of the last, hopefully an improved one.  At the end,
+all the trees are combined, with more weight given to the more recent
+trees.
 
 The **qeGBoost** wraps **gbm** in the package of the same name.  It is
 gradient tree-based, with hyperparameters similar to the random forests
 case, plus a *learning rate*.  The latter controls the size of iteration
 steps; more on this  below.
 
-The package also offers other implementations of boosting.
+The package also offers other implementations of boosting, including
+**qeXGBoost**, based on the popular XGBoost algorithm that incorporates
+*regularization* into the tree-building process.  (Discussed below.)
 
 ## Linear model
 
@@ -613,7 +629,8 @@ and the LASSO do this in a mathematically rigorous manner.  Each of them
 minimizes the usual sum of squared prediction errors, subject to a
 limit being placed on the size of the b vector; for ridge, the size is
 defined as the sum of the b<sub>i</sub><sup>2</sup>, while for the LASSO
-it's the sum of {b<sub>i</sub>|.
+it's the sum of {b<sub>i</sub>|.  Limiting the size of some statistical
+estimator in general is termed *regularization*.
 
 The function **qeLASSO** wraps **cvglmnet** in the **glmnet**
 package.  The main hyperparameter **alpha** specifies ridge (0) or the
