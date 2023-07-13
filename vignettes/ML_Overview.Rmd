@@ -242,7 +242,24 @@ variable is numeric or an R factor.
 # ML predictive methods
 
 We now present the "30,000 foot" view of the major statistical/machine
-learning methods.
+learning methods.  But first, a point on the nature of prediction.
+
+### A note on prediction
+
+In most ML applications, our goal is prediction of an outcome variable
+Y, in contrast to statistics, in which most applications center on
+estimates effects of the features on Y.  Say we have data on diabetes.
+In ML, we will likely be interested in how to *diagnose* the disease,
+based on features such blood glucose, body mass index and family
+history.  In statistics, we would be typically interested in estimating,
+for instance, the *effect* of BMI on the likelihood of developing
+diabetes.
+
+The significance of this distinction is that in predictive applications,
+issues of model validity, say homogeneous Y variance in the linear model
+setting, are not of much interest.  If our model predicts well, we are
+happy.  In an effect measurement setting, the assumptions may matter a
+lot, in terms of validity of confidence intervals and hypothesis tests.
 
 ## k-nearest neighbors
 
@@ -461,10 +478,11 @@ find and plot the mean weight at each height.)
 The means seem to lie near a straight line.  That suggests modeling m(t)
 is a linear function.
 
-> The points don't **exactly** line on a straight line.  It's important
-> to keep in mind:  (a) We are merely setting up an approximate
-> model, one that is close enough to reality to be useful; and 
-> (b) these are sample means, subject to sampling variation.
+> The points don't **exactly** lie on a straight line.  It's important
+> to keep in mind:  (a) We are merely setting up an approximate model,
+> one that is close enough to reality to be useful (see "A note on
+> prediction" above); and (b) these are sample means, subject to
+> sampling variation.
 
 For example, a model for mean weight, given height and age, would be
 
@@ -474,7 +492,7 @@ m(height,age) =
 &beta;<sub>2</sub> age
 
 for unknown population constants &beta;<sub>i</sub>, which are estimated
-from our training data, using the classic *least-squares* approach.  Our
+from our training data using the classic *least-squares* approach.  Our
 estimates of the &beta;<sub>i</sub>, denoted b<sub>i</sub>, are
 calculated by minimizing
 
@@ -498,7 +516,7 @@ below), this may work as well or better than the logistic model (see
 below).
 
 The function **qeLin** wraps the ordinary **lm**.  It mainly
-just calls the latter, but does some little fixess.
+just calls the latter, but does some little fixes.
 
 ## Logistic model
 
@@ -510,10 +528,15 @@ now 1 or 0, its mean becomes the probability of 1.  Since m(t) is now a
 probability, we need it to have values in the interval [0,1].  This is
 achieved by feeding a linear model into the *logistic function*,
 l(u) = (1 + exp(-u))<sup>-1</sup>, which does take values in (0,1).  
+Here u will be a linear form in the features.
+
 So for instance, to predict whether a player is a catcher (Y = 1 if 
 yes, Y = 0 if no), we fit the model 
 
-P(catcher | height, weight, age) = m(height,weight,age) = 
+probability of catcher given height, weight, age = 
+
+m(height,weight,age) = 
+
 1 / [1 + exp{-(&beta;<sub>0</sub> +
 &beta;<sub>1</sub> height + 
 &beta;<sub>2</sub> weight +
@@ -553,7 +576,13 @@ Here is an example using the UCI vertebrae data;
 [1] 0.1935484
 > u$baseAcc
 [1] 0.5053763
+```
 
+So, we would have a misclassification rate of about 19%, whereas the
+error rate would be about 50% if we didn't use the features.  Where does
+this latter figure come from?  Look at this tabulation:
+
+``` r
 > table(spine$Classif3) 
 
  DH  NO  SL 
@@ -561,7 +590,13 @@ Here is an example using the UCI vertebrae data;
 ```
 
 If we were to not use the body measurements V1 etc., we would always
-guess SL, resulting in an error rate of about 50%.  By making use of
+guess SL, the most prevalent class.  We would be wrong
+
+(60+100)/(60+100+150) = 0.51629
+
+of the time, similar to the 0.5053763 value found above.  (The
+discrepancy is due to the latter figure being based on a holdout set.)
+By making use of
 the measurement data, we can reduce the misclassification rate to about
 19%.
 
@@ -580,11 +615,11 @@ $probs
 [1,] 0.7432193 0.2420913 0.01468937
 ```
 
-We would predict the DH class, as our estimated probability for the lass
+We would predict the DH class, as our estimated probability for the class
 is 0.74, the largest among the three classes.
 
-Some presentations describe the logistic model as "modeling the
-logarithm of the odds of Y = 1 vs. Y = 0 as linear."  While this is
+Some presentations describe the logistic model as "linearly modeling the
+logarithm of the odds of Y = 1 vs. Y = 0"  While this is
 correct, it is less informative, in our opinion.  Why would we care
 about a logarithm being linear?  The central issue is that the logistic
 function models a probability, just what we need.
@@ -604,21 +639,23 @@ m(height,age) =
 
 where presumably &beta;<sub>3</sub> < 0.
 
-We may even include a height X age product term, allowing for interactions.
+We may even include a height x age product term, allowing for interactions.
 Polynomials of degree 3 and so on could also be considered.  The choice
 of degree is a hyperparameter; in **qeSVM** it is named, of course,
 **degree**.
 
-This would seem nonlinear, but that would be true only in the sense of
-being nonlinear in age.  It is still linear in the &beta;<sub>i</sub> --
-e.g. if we double each &beta;<sub>i</sub> in the above expression, the
-value of the expression is doubled -- so **qeLin** can be used, or
-**qeLogit** for classification settings.
+Such model for mean weight for given height and age
+would at first seem nonlinear, but that would be true only
+in the sense of being nonlinear in age.  It is still linear in the
+&beta;<sub>i</sub> -- e.g. if we double each &beta;<sub>i</sub> in the
+above expression, the value of the expression is doubled -- so **qeLin**
+could in principle be used, or **qeLogit** for classification settings.
 
-Forming the polynomial terms by hand would be tedious, especially since
-we would also have to do this for predicting new cases.  Instead, we use
-**qePolyLin** (regression setting) and **qePolyLog**
-(classification).  They make use of the package **polyreg**.
+But forming the polynomial terms by hand would be tedious, especially
+since we would also have to do this for predicting new cases.  Instead,
+we use **qePolyLin** (regression setting) and **qePolyLog**
+(classification), which do all that work for us.  They make use of the
+package **polyreg**.
 
 Polynomial models can in many applications hold their own with the fancy
 ML methods.  One must be careful, though, about overfitting, just as
