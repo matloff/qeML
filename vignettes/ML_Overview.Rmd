@@ -48,7 +48,6 @@ methods for language models and image analysis, are not covered.
 * [Logistic model](#logistic-model)
 * [Polynomial-linear models](#polynomial-linear-models)
 * [Shrinkage methods for linear/generalized linear models](#shrinkage-methods-for-linear/generalized-linear-models)
-  * [LASSO for feature selection](#lasso-for-feature-selection)
 * [Support Vector Machines](#support-vector-machines)
 * [Neural networks](#neural-networks)
 * [Overfitting](#overfitting)
