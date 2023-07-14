@@ -54,6 +54,8 @@ methods for language models and image analysis, are not covered.
 * [Overfitting](#overfitting)
 * [Which ML method to use?](#which-ml-method-to-use?)
 
+
+
 # Notation
 
 For convenience, we'll let Y denote the variable to be predicted, often
@@ -121,7 +123,7 @@ Here is a glimpse of the data:
 6   Brian_Roberts  BAL Second_Baseman     69    176 29.39   Infielder
 ```
 
-# The qeML package's **qe***-series functions
+# The qeML package's qe-series functions
 
 Here "qe" stands for **"quick and easy,"** and we really mean that!
 
