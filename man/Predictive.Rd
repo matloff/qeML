@@ -31,6 +31,7 @@
 \alias{qeNCVregCV}
 \alias{qePolyLinKNN}
 \alias{qeliquidSVM}
+\alias{qeRpart}
 \alias{checkPkgLoaded}
 
 \alias{predict.qeLogit}
@@ -58,9 +59,11 @@
 \alias{predict.qePolyLinKNN}
 \alias{predict.qeliquidSVM}
 \alias{predict.qePoly}
+\alias{predict.Rpart}
 \alias{plot.qePoly}
 \alias{plot.qeRF}
 \alias{plot.qeLASSO}
+\alias{plot.qeRpart}
 
 \title{Quick-and-Easy Machine Learning Wrappers}
 
