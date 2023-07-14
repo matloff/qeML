@@ -3012,6 +3012,7 @@ qeRpart <- function(data,yName,minBucket=10,
       yName,minBucket)
    rpout <- evalr(cmd)
    rpout$classif <- classif
+   rpout$trainRow1 <- getRow1(data,yName)
    if (!is.null(holdout)) {
       predictHoldout(rpout)
       rpout$holdIdxs <- holdIdxs
