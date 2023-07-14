@@ -153,7 +153,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
 \method{predict}{qeRpart}(object,newx,...)
 \method{plot}{qeLASSO}(x,...)
 \method{plot}{qeRF}(x,...)
-\method{plot}{qeRpart}(object,boxPalette=c("red","yellow","green","blue"),...) 
+\method{plot}{qeRpart}(x,boxPalette=c("red","yellow","green","blue"),...) 
 }
 
 \arguments{
