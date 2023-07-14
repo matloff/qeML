@@ -3023,8 +3023,6 @@ qeRpart <- function(data,yName,minBucket=10,
 predict.qeRpart <- function(object,newx,...)
 {
    class(object) <- class(object)[-1] 
-   browser()
-   # newx <- setTrainFactors(object,newx)
    newx <- setTrainFactors(object,newx)
    tmp <- predict(object,newx)
    if (object$classif) list(predClasses=tmp)
