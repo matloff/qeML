@@ -153,8 +153,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
 \method{predict}{qeRpart}(object,newx,...)
 \method{plot}{qeLASSO}(x,...)
 \method{plot}{qeRF}(x,...)
-\method{plot}{qeRpart}(object,boxPalette=c("red","yellow","green","blue"),
-    ...) 
+\method{plot}{qeRpart}(object,boxPalette=c("red","yellow","green","blue"),...) 
 }
 
 \arguments{
@@ -246,7 +245,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      response in a classification problem.}
   \item{params}{Tuning parameters for \code{xgboost}, e.g. 
      \code{params=list(eta=0.1,max_depth=8)}.}
-  \item{boxPaletre}{Color palette.}
+  \item{boxPalette}{Color palette.}
   \item{pkgName}{Name of wrapped package.}
   \item{whereObtain}{Location.}
   \item{x}{A qe-series function return object.}
