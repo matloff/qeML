@@ -3033,12 +3033,12 @@ predict.qeRpart <- function(object,newx,...)
    else tmp
 }
 
-plot.qeRpart <- function(object,
+plot.qeRpart <- function(x,
    boxPalette=c('red','yellow','green','blue'),...) 
 {
    requireNamespace('rpart.plot')
-   class(object) <- class(object)[-1] 
-   rpart.plot::rpart.plot(object,box.palette=boxPalette)
+   class(x) <- class(x)[-1] 
+   rpart.plot::rpart.plot(x,box.palette=boxPalette)
 }
 
 print.qeDT <- function(x,...) 
