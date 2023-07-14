@@ -70,7 +70,7 @@ Y<sub>n</sub>).  We wish to predict new cases
 (X<sub>new</sub>,Y<sub>new</sub>) in the future, in which X<sub>new</sub>
 is known but Y<sub>new</sub> needs to be predicted.
 
-> If our data is in the form of an R data frame, then we will have n
+> ~ If our data is in the form of an R data frame, then we will have n
 > rows.  The number of columns, other than our Y column, is generally
 > denoted by p.  Both n and p could be very large in some applications,
 > say in the millions for n and the hundreds for p.
@@ -98,7 +98,7 @@ dataset, Y is status of a person's vertebrae condition; there are three
 classes: normal (NO), disk hernia (DH), or spondilolysthesis (SP).  Y =
 (1,0,0) for a normal person, for instance.  Thus Y can be a vector too.
 
-> If we have data on an indicator variable, note that its mean is the
+> ~ If we have data on an indicator variable, note that its mean is the
 > proportion of 1s in the data.  On the population level, this becomes the
 > probability of a 1.
 
@@ -121,7 +121,7 @@ Here is a glimpse of the data:
 6   Brian_Roberts  BAL Second_Baseman     69    176 29.39   Infielder
 ```
 
-# The  R package's **qe***-series functions
+# The qeML package's **qe***-series functions
 
 Here "qe" stands for **"quick and easy,"** and we really mean that!
 
@@ -185,7 +185,7 @@ the k-NN model?
 Seems to be better, though we should try other values of the
 *hyperparameters*.  (See below.)
 
-## Hyperparameters
+# Hyperparameters
 
 Most methods have *hyperparameters*, values that can be used to tweak
 the analysis in various ways.  In k-NN, for instance, the number of
@@ -206,7 +206,7 @@ The typical strategy regarding selection of the values of
 hyperparameters is to perform a *grid search*, trying all possible
 combinations.  This computation can be quite voluminous.
 
-## Regression and classification problems, mean functions
+# Regression and classification problems, mean functions
 
 Prediction applications in which Y is a continuous variable, or at least
 ordinal, are called *regression settings*.  Applications in which Y is
@@ -222,7 +222,7 @@ m(71,23) would denote the mean weight among all players of height 71 inches
 and 23 years old.  To predict the weight of a new player, say height 77
 and age 19, we use m(77,19).
 
-> Readers who have seen **linear regression** models should note that
+> ~ Readers who have seen **linear regression** models should note that
 > the term **regression** is much more general than that linear case.
 > In the general context, the regression function is simply the mean
 > function, expressing the mean of one variable in terms of the values
@@ -254,7 +254,7 @@ variable is numeric or an R factor.
 We now present the "30,000 foot" view of the major statistical/machine
 learning methods.  But first, a point on the nature of prediction.
 
-### A note on prediction
+## A note on prediction
 
 In most ML applications, our goal is prediction of an outcome variable
 Y, in contrast to statistics, in which most applications center on
@@ -488,7 +488,7 @@ find and plot the mean weight at each height.)
 The means seem to lie near a straight line.  That suggests modeling m(t)
 is a linear function.
 
-> The points don't **exactly** lie on a straight line.  It's important
+> ~ The points don't **exactly** lie on a straight line.  It's important
 > to keep in mind:  (a) We are merely setting up an approximate model,
 > one that is close enough to reality to be useful (see "A note on
 > prediction" above); and (b) these are sample means, subject to
@@ -530,8 +530,8 @@ just calls the latter, but does some little fixes.
 
 ## Logistic model
 
-This is a generalization of the linear model, developed by statisticians
-and economists.
+This is a generalization of the linear model (hence a *generalized
+linear model*), developed by statisticians and economists.
 
 This model is only for classification settings.  As noted, since Y is
 now 1 or 0, its mean becomes the probability of 1.  Since m(t) is now a
@@ -706,7 +706,7 @@ Why regularize?
   the features can make predictions numerically and statistically
   unstable.
 
-* The LASSO has the appealing property that it can be used for feature
+* The LASSO;s appealing property is that it can be used for feature
   selection; it tends to produce solutions in which some of the 
   b<sub>i</sub> are 0.  
 
@@ -714,8 +714,14 @@ Why regularize?
 
 Here is an example using **pef**, a dataset from the US Census, included
 with **qeML**.  The features consist of age, education, occupation and
-gender.  Those last three are categorical variables, which are converted
-to indicator varaibles.  Let's predict wage income.
+gender.  Those last three are categorical variables, which are
+automatically converted by most qe-series functions to indicator
+variables.  
+
+> ~ The function **regtools::factorsToDummies** can be used to do this
+> conversion manually.
+
+Let's predict wage income.
 
 ``` r
 > w <- qeLASSO(pef,'wageinc')
@@ -743,7 +749,12 @@ engineers),
 [1] "100" "101" "102" "106" "140" "141"
 ```
 
-thus five indicator variables.  The LASSO gave coefficients of 0 for
+thus five indicator variables.  By inspection, we see no indicator
+variable for occupation 141, so it is the base, e.g. it is estimated
+that on average, holding other feature values constant, occupation 102
+pays about $3795 more than than does occupation 141.
+
+The LASSO gave coefficients of 0 for
 occupations 106 and 140, so we might decide not to use them, even if we
 utimately use some other ML algorithm.
 
@@ -772,7 +783,8 @@ we predict setosa, otherwise non-setosa.
 SVM philosophy is that we'd like a wide buffer separating the classes,
 called the *margin*, denoted by the dashed lines.  Data points lying on
 the edge of the margin are termed *support vectors*, so called because
-if any other data point were to change, the margin would not change.
+if any other data point were to change, the margin would not change, so
+these points on the edge of margin "support" the margin..
 
 In most cases, the two classes are not linearly separable.  So we allow
 curved boundaries, implemented through polynomial (or similar)
@@ -789,6 +801,8 @@ package also offers various other implementations.
 ## Neural networks
 
 These were developed almost exclusively in the AI community.
+
+*Structure:*
 
 An NN consists of *layers*, each of which consists of a number of
 *neurons* (also called *units* or *nodes*).  Say for concreteness we
@@ -821,7 +835,23 @@ Another popular choice is ReLU, r(t) = max(0,t).  No matter what we
 choose for A(t), the point is that we have set up a nonlinear model for
 m(t).
 
-Here's an example, again with the Vertebrae data:  The predictor
+*Estimation, role of weights:*
+
+At the training stage, the coefficients ("weights") of the linear
+combinations are computed by least squares, but in an iterative manner.
+Then to predict Y<sub>new</sub> for a new case
+X<sub>new</sub>, we run the latter through the layers, taking linear
+combinations of inputs at each layer, using the coefficients found in
+the training stage.
+
+The **qeNeural** function allows specifying the numbers of layers and
+neurons per layer, and the number of iterations.  It wraps **krsFit**
+from the **regtools** package, which in turn wraps the R **keras**
+package (and there are further wraps involved after that).
+
+*Example:*
+
+Here's an example, again with the vertebrae data:  The predictor
 variables V1, V2 etc. for a new case to be predicted enter on the left,
 and the predictions come out the right; whichever of the 3 outputs
 is largest, that will be our predicted class.
@@ -838,21 +868,18 @@ units per layer (which need not be the same in each layer), and the
 activation function.  Most NN software also includes various other
 hyperparameters.
 
-The linear combination coefficients, shown as numeric labels in the
-picture, are known as *weights*.  How are they calculated?  Again least
-squares is used, minimizing 
+The linear combination coefficients are shown as numeric labels in the
+picture. 
 
-&Sigma;<sub>i</sub> 
-(Y<sub>i</sub> - finaloutput<sub>i</sub>)
-<sup>2</sup>
+*More on the estimation process; learning rate:*
 
 Let n<sub>w</sub> denote the number of weights.  This can be quite
 large, even in the millions.  Moreover, the n<sub>w</sub>
 equations we get by setting the partial derivatives to 0 are not linear.
 
-Thus this is no longer a "simple" calculus problem.  Iterative methods
-must be used, and it can be extremely tricky to get them to converge.
-Here's why:
+Due to the nonlinearity of A(t), estimation of the weights is no longer
+a "simple" calculus problem.  Iterative methods must be used, and it can
+be extremely tricky to get them to converge.  Here's why:
 
 Though far more complex than in the linear case, we are still in the
 calculus realm.  We compute the partial derivatives of the sum of
@@ -889,19 +916,21 @@ wrong direction, let's limit our loss.  The amount we move is called the
 *step size* in general math, but the preferred ML term is
 the *learning rate*.  And, this is yet another hyperparameter.
 
+Typical NN methods also use *back propogation*, in which the accuracy
+found in one iteration is used to aid in making the next one better.
+
+*Summary:*
+
 So, NNs are arguably the most complex of all the methods described here,
 and tend to use huge amounts of computing time, even weeks!
-
-The **qeNeural** function allows specifying the numbers of layers and
-neurons per layer, and the number of iterations.  It wraps **krsFit**
-from the **regtools** package, which in turn wraps the R **keras**
-package (and there are further wraps involved after that).
 
 Since any continuous activation function can be approximated by a
 polynomial, the outputs of the layers are approximately polynomials, of
 higher and higher degree with each layer.  Thus they are subject to the
 same issues on the edges of the dataset as were described for polynomial
-models above.
+models above.  This is ameliorated by the boundedness of the popular
+activation functions.  Or one might transform the Y values to a bounded
+interval in the first place.
 
 ## Overfitting
 
@@ -910,9 +939,17 @@ power.  "More complex" can mean adding more predictor variables, using a
 higher-degree polynomial, adding more layers etc.
 
 As we add more and more complexity, the *model bias* will decrease,
-meaning that our models become closer to the actual m(t), in principle.
+meaning that our models become closer--in the sense of expected value
+over all possible samples--to the actual m(t), in principle.
 But the problem is that at the same time, the *variance* of a
 predicted Y<sub>new</sub> is increasing.  
+
+In other words, let M(t) denote our estimation of the true m(t).  M(t)
+has a distribution over all possible samples.  For fixed n,
+the greater than
+complexity, the closer this distribution will be center on m(t)--smaller
+bias--BUT the
+larger will be the variance of that distribution.
 
 Say again we are predicting human weight from height, with 
 polynomial models.  With a linear model, we use our training data to
@@ -942,11 +979,11 @@ The usual answer given for this question is, "The best method is very
 dependent on which dataset you have."  True, but are there some general
 principles?
 
-* Let's first consider the views of ML specialists (CMLSs).  In our view
+* Let's first consider the views of core ML specialists (CMLSs).  In our view
   they tend to be biased by their focus on image and language settings
   (see below), and by an assumption that the user can and will do
   voluminous hyperparameter optimization, but their views are of course
-  well worth considering.
+  still worth considering.
 
   * CMLSs tend to distinguish between "tabular" and "nontabular" data.
     A disease diagnosis application may be considered tabular--rows of
@@ -954,7 +991,7 @@ principles?
     temperature and so on.  On the other hand, CMLSs view  a facial
     recognition application as nontabular, which is confusing, since it
     too has the form of a table--one table row per row of the picture,
-    and one column per pixel position within a picture row.
+    and one column per pixel position within a picture row.  
 
     * The strategies currently in vogue among CMLSs is:
 
@@ -967,17 +1004,20 @@ principles?
     
     * CMLSs view linear and generalized linear models as valuable,
       especially as initial analyses of a given dataset or in settings
-      in which elaborate hyperparameter optimization will be done.  They
+      in which elaborate hyperparameter optimization will not be done.  They
       would view k-NN and RFs similarly.
 
 * Here are some views (general, not CMLSs) to consider:
+
+    * Many analysts find that SVM works well for them, in spite of
+      disdain by the CMLSs.
 
     * XGBoost is nice but in a typical application the default values
       for the hyperparameters will not give impressive results.
       Extensive, application-specific hyperparameter tuning will be
       needed.
 
-    * A key question is whether there is a ageneral monotonic
+    * A key question is whether there is a general monotonic
       relationship between Y and the features.  In predicting diabetes,
       say, the higher the glucose level, the more likely the patient is
       diabetic.  Though monotonic relations may exist in image
@@ -987,7 +1027,7 @@ principles?
       have either linear components or low-degree polynomials, such as
       linear or generalized linear models, SVM and low-degree polynomial
       versions of these.  For other applications, one might try k-NN,
-      NNs etc.
+      RFs, NNs etc.
 
 As the saying goes, "Your mileage may vary," depending on your
 application and data.  Our recommended strategy would be to first try a
