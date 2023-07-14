@@ -132,6 +132,8 @@ qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
    learningrate=0.8,momentum=0.5,learningrate_scale=1,
    numepochs=3,batchsize=100,hidden_dropout=0,yesYVal=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
+qeRpart(data,yName,minBucket=10,holdout=floor(min(1000,
+   0.1*nrow(data)))) 
 checkPkgLoaded(pkgName,whereObtain='CRAN') 
 \method{predict}{qeLogit}(object,newx,...)
 \method{predict}{qeLin}(object,newx,useTrainRow1=TRUE,...)
@@ -148,8 +150,11 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
 \method{predict}{qePCA}(object,newx,...)
 \method{predict}{qeUMAP}(object,newx,...)
 \method{predict}{qeDeepnet}(object,newx,...)
+\method{predict}{qeRpart}(object,newx,...)
 \method{plot}{qeLASSO}(x,...)
 \method{plot}{qeRF}(x,...)
+\method{plot}{qeRpart}(object,boxPalette=c("red","yellow","green","blue"),
+    ...) 
 }
 
 \arguments{
