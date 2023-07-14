@@ -59,7 +59,7 @@
 \alias{predict.qePolyLinKNN}
 \alias{predict.qeliquidSVM}
 \alias{predict.qePoly}
-\alias{predict.Rpart}
+\alias{predict.qeRpart}
 \alias{plot.qePoly}
 \alias{plot.qeRF}
 \alias{plot.qeLASSO}
@@ -176,6 +176,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{object}{An object returned by a qe-series function.}
   \item{minsplit}{Minimum number of data points in a node.}
   \item{minbucket}{Minimum number of data points in a terminal node.}
+  \item{minBucket}{Minimum number of data points in a terminal node.}
   \item{maxdepth}{Maximum number of levels in a tree.}
   \item{qeName}{Name of qe-series predictive function.}
   \item{conv}{R list specifying the convolutional layers, if any.}
@@ -245,6 +246,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      response in a classification problem.}
   \item{params}{Tuning parameters for \code{xgboost}, e.g. 
      \code{params=list(eta=0.1,max_depth=8)}.
+  \item{boxPaletre}{Color palette..}
   }
   \item{pkgName}{Name of wrapped package.}
   \item{whereObtain}{Location.}
