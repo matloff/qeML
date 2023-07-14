@@ -3007,10 +3007,13 @@ qeRpart <- function(data,yName,minBucket=10,
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    requireNamespace('rpart')
+   rp <- rpart::rpart
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
-   cmd <- sprintf("rpart::rpart(%s ~.,data=data,control=list(minbucket=%d))",
-      yName,minBucket)
-   rpout <- evalr(cmd)
+   # cmd <- sprintf("rpart::rpart(%s ~.,data=data,control=list(minbucket=%d))",
+   #    yName,minBucket)
+   # rpout <- evalr(cmd)
+   frmla <- as.formula(paste0(yName,' ~ .'))
+   rpout <- rpart::rpart(frmla,data=data,control=list(minbucket=minBucket))
    rpout$classif <- classif
    rpout$trainRow1 <- getRow1(data,yName)
    if (!is.null(holdout)) {
