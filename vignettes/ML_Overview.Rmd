@@ -38,22 +38,28 @@ methods for language models and image analysis, are not covered.
 # Contents
 
 * [Example](#example)
-* [Regression and classification problems, mean functions](#regression-and-classification-problems,-regression-functions)
-* [k-Nearest Neighbors](#k-nearest-neighbors)
+* [A note on prediction](#a-note-on-prediction)
+* [k-nearest neighbors](#k-nearest-neighbors)
   * [K-NN edge bias](#k-nn-edge-bias)
 * [Random forests](#random-forests)
-  * [RF edge bias](#rf-edge-bias)
+  * [Decision trees](#decision-trees)
+  * [Random forests](#random-forests)
+  * [Tree and RF edge bias](#tree-and-rf-edge-bias)
 * [Boosting](#boosting)
 * [Linear model](#linear-model)
 * [Logistic model](#logistic-model)
 * [Polynomial-linear models](#polynomial-linear-models)
-* [Shrinkage methods for linear/generalized linear models](#shrinkage-methods-for-linear/generalized-linear-models)
+* [Shrinkage methods](#shrinkage-methods)
+  * [Overview](#overview)
+  * [LASSO for feature selection](#lasso-for-feature-selection)
 * [Support Vector Machines](#support-vector-machines)
 * [Neural networks](#neural-networks)
-* [Overfitting](#overfitting)
-* [Which ML method to use?](#which-ml-method-to-use?)
-
-
+  * [Structure](#structure)
+  * [Estimation, role of weights](#estimation,-role-of-weights)
+  * [Example](#example)
+  * [More on the estimation process; learning rate](#more-on-the-estimation-process;-learning-rate)
+  * [Summary](#summary)
+* [What the specialists say](#what-the-specialists-say)
 
 # Notation
 
@@ -674,7 +680,7 @@ with any ML method.  In particular, polynomial functions tend to grow
 rapidly near the edges of one's dataset, causing both bias and variance
 problems.
 
-## Shrinkage methods for linear/generalized linear models
+## Shrinkage methods
 
 ### Overview
 
