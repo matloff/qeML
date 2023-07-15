@@ -88,6 +88,8 @@ and data on n = 100 people.  Then for instance X<sub>23</sub> would be
 the vector of height and age for the 23rd person in our training data,
 and Y<sub>23</sub> would be that person's weight.
 
+*Indicator variables:*
+
 The vector X may include *indicator* variables, which have values only 1
 or 0.  We may for instance predict weight from height, age and gender,
 the latter being 1 for female, 0 for male.
@@ -96,8 +98,10 @@ If Y represents a binary variable, we represent it as an indicator
 variable.  In the famous Pima Diabetes dataset in the
 [UCI Machine Learning
 Repository](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database), 1 means diabetic,
-0 means not.  (The 0,1 form is statistical; often in ML circles the
-coding -1,1 is used.)
+0 means not. 
+
+> ~ The 0,1 form is statistical; often in ML circles the coding -1,1 is
+> used.
 
 If Y itself is categorical, we represent it by several indicator
 variables, one for each category.  In another disease-related UCI
@@ -176,6 +180,9 @@ using our random forests model created above, run
 
 Such a player would be predicted to weigh about 184 pounds.
 
+The return objects also give an indication of overall predictive power
+of our model.
+
 ``` r
 > rfout$testAcc  # mean absolute prediction error
 [1] 15.16911
@@ -190,7 +197,8 @@ the k-NN model?
 ```
 
 Seems to be better, though we should try other values of the
-*hyperparameters*.  (See below.)
+*hyperparameters*, and we should run the model multiple times.  (See
+below.)
 
 # Hyperparameters
 
@@ -222,12 +230,13 @@ settings*.  In the **mlb** dataset, for instance, prediction of player
 weight is a regression application, while predicting a player's position
 would be a classification application.
 
-Somewhat confusingly, both settings make use of the *regression function*,
-m(t) = E(Y | X = t), the mean value of Y in the subpopulation defined by
-X = t.  If say we are predicting weight in the **mlb** data, then for instance
-m(71,23) would denote the mean weight among all players of height 71 inches
-and 23 years old.  To predict the weight of a new player, say height 77
-and age 19, we use m(77,19).
+Somewhat confusingly, both settings make use of the *regression
+function*, m(t) = E(Y | X = t), the mean value of Y in the subpopulation
+defined by X = t.  If say we are predicting weight from height and age
+in the **mlb** data, then for instance m(71,23) would denote the mean
+weight among all players of height 71 inches and 23 years old.  To
+predict the weight of a new player, say height 77 and age 19, we use
+m(77,19).
 
 > ~ Readers who have seen **linear regression** models should note that
 > the term **regression** is much more general than that linear case.
@@ -252,20 +261,20 @@ Even though each ML method has its own special *tuning parameters* or
 *hyperparameters*, used to fine-tune performance, they all center around
 the regression function m(t).
 
-The **qe** series function sense whether the user is specifying a
+> ~ The **qe** series function sense whether the user is specifying a
 regression setting or a classification setting, by noting whether the Y
 variable is numeric or an R factor.
 
 # ML predictive methods
 
 We now present the "30,000 foot" view of the major statistical/machine
-learning methods.  But first, a point on the nature of prediction.
+learning methods.  But first, a point on the role of prediction.
 
 ## A note on prediction
 
 In most ML applications, our goal is prediction of an outcome variable
 Y, in contrast to statistics, in which most applications center on
-estimates effects of the features on Y.  Say we have data on diabetes.
+estimated effects of the features on Y.  Say we have data on diabetes.
 In ML, we will likely be interested in how to *diagnose* the disease,
 based on features such blood glucose, body mass index and family
 history.  In statistics, we would be typically interested in estimating,
@@ -273,10 +282,11 @@ for instance, the *effect* of BMI on the likelihood of developing
 diabetes.
 
 The significance of this distinction is that in predictive applications,
-issues of model validity, say homogeneous Y variance in the linear model
-setting, are not of much interest.  If our model predicts well, we are
-happy.  In an effect measurement setting, the assumptions may matter a
-lot, in terms of validity of confidence intervals and hypothesis tests.
+classical issues of model validity, say homogeneous Y variance in the
+linear model setting, are not of much interest.  If our model predicts
+well, we are happy.  In an effect measurement setting, the assumptions
+may matter a lot, in terms of validity of confidence intervals and
+hypothesis tests.
 
 ## k-nearest neighbors
 
@@ -295,10 +305,9 @@ hyperparameter, the user aims to set a "Goldilocks" level--not too big,
 not too small.  Setting k too small will result in our taking the
 average of just a few Y values, too small a sample.  On the other hand,
 too large a value for k will mean that some distant data points may be
-used that are not representative.
-
-To choose k, we could try various values, run **qeKNN** on each one,
-then use the value that produced the best (i.e. smallest) **testAcc**.
+used that are not representative.  To choose k, we could try various
+values, run **qeKNN** on each one, then use the value that produced the
+best (i.e. smallest) **testAcc**.
 
 Again, if Y is an indicator variable, its average works out to be the
 proportion of 1s.  This will then be the estimated probability that Y =
@@ -330,22 +339,21 @@ a standard error for the figure.  (1.96 times the standard error will be
 the radius of an approximate 95% confidence interval.) Changing k to 10
 reduced accuracy.
 
-The **qeML** function **qeFit** makes it easier to try various values of
-the hyperparameters.
-
 ### K-NN edge bias
 
 One potential problem is bias at the edge of our dataset  Say we are
-predicting weight from height, and a new case involving a very tall person.
-Most data points in the neighborhood of this particular height value
-will be for people who are shorter than the new case.  Those neighbors
-are thus likely to be lighter than the new case, making our predicted
-value for that case biased downward.
+predicting weight from height, and have a new case involving a very tall
+person.  Most data points in the neighborhood of this particular height
+value will be for people who are shorter than the new case.  Those
+neighbors are thus likely to be lighter than the new case, making our
+predicted value for that case biased downward.
 
 Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
 Setting the argument **smoothingFtn = loclin** removes a linear trend
 within the neighborhood, and may improve predictive accuracy for new
 cases that are located near the edge of the training set.
+
+> ~ See also the function **qeLinKNN**.
 
 ## Random forests
 
@@ -377,12 +385,14 @@ termed a *node*, and terminal nodes are called *leaves*.
 
 *Example:*
 
-Here is an illustration using a vertebrae dataset.  There are 6
+Here is an illustration using the vertebrae dataset.  Again, there are 6
 predictor variables, named V1 through V6, consisting of various bone
 measurements.  The variable to be predicted is disease status, a
 categorical variable with levels DH, NO, SL and VC.  NO designates a
-normal patient, no disease.  (This picture was generated using the
-**rpart.plot** package, via **qeRpart()**.)
+normal patient, no disease.  
+
+> ~ This picture was generated using the **rpart.plot** package, via
+> **qeRpart()**.
 
 ![alt text](RpartVert.png)
 
@@ -402,9 +412,12 @@ subdivision is judged by the algorithm to be fine enough to produce good
 accuracy.  
 
 In the above example, for instance, if V6 is at least 16, we do not check
-other variables, and the next node becomes a leaf.  
+other variables, and the next node, the green one oApparently n the far right,
+becomes a leaf.  Just knowing that V6 &ge; 16 is enough to
+reasonably guess that this case is in the SL class, with probability
+98%.
 
-We also might check a feature more than once, as seen above.
+We also might check a feature more than once, as seen above for V4.
 
 *Prediction:*
 
@@ -423,8 +436,8 @@ of the hyperparameters common in tree software indirectly controls the
 number of levels, as follows.
 
 One generally wants to avoid having leaves that don't have many data
-points.  This is like setting k to too small a value in k-NN.  This is
-often controlled by a hyperparameter in the form of a minimum number of
+points.  This is like setting k to too small a value in k-NN.  We often
+control this via a hyperparameter in the form of a minimum number of
 data points per node. If a split would violate that rule, then don't
 split.  A small minimum leaf size is analogous to a small k, and the
 same is true for large minimum leaf size and large k.  Again we need to
@@ -442,9 +455,6 @@ hyperparameter.  Each tree gives us a prediction for the unknown Y.  In
 a regression setting, those predictions are averaged to get our final
 prediction.  In a classification setting, we see which class was
 predicted most often among all those trees.
-
-The thresholds used at each node are determined through a complicated
-process, depending on which implementation of RF one uses.
 
 The **qeRF** function wraps the function of the same name in the
 **randomForests** package.  
@@ -483,8 +493,9 @@ The package also offers other implementations of boosting, including
 
 ## Linear model
 
-This of course is the classical linear regression model, invented
-200 years ago (!) and developed by statisticians.
+This of course is the classical linear regression model, invented 200
+years ago (!) and developed by statisticians.  It is mainly for
+regression settings. 
 
 For motivation, below is a graph of mean weight vs. height for the 
 **mlb** data.  (There are many players for each height level, and we
@@ -501,36 +512,31 @@ is a linear function.
 > prediction" above); and (b) these are sample means, subject to
 > sampling variation.
 
-For example, a model for mean weight, given height and age, would be
+For example, a linear model for mean weight, given height and age, would be
 
-m(height,age) = 
-&beta;<sub>0</sub> +
-&beta;<sub>1</sub> height + 
-&beta;<sub>2</sub> age
+> m(height,age) = 
+> &beta;<sub>0</sub> +
+> &beta;<sub>1</sub> height + 
+> &beta;<sub>2</sub> age
 
 for unknown population constants &beta;<sub>i</sub>, which are estimated
 from our training data using the classic *least-squares* approach.  Our
 estimates of the &beta;<sub>i</sub>, denoted b<sub>i</sub>, are
 calculated by minimizing
 
-&Sigma;<sub>i</sub> 
-[
-weight<sub>i</sub> - 
-(b<sub>0</sub>+b<sub>1</sub>height<sub>i</sub>+b<sub>2</sub>age<sub>i</sub>)
-]
-<sup>2</sup>
+> &Sigma;<sub>i</sub> 
+> [
+> weight<sub>i</sub> - 
+> (b<sub>0</sub>+b<sub>1</sub>height<sub>i</sub>+b<sub>2</sub>age<sub>i</sub>)
+> ]
+> <sup>2</sup>
 
 This is a simple calculus problem.  We find the partial derivatives of
 the sum of squares with respect to the b<sub>i</sub>, and set them to 0.
 This gives us 3 equations in 3 unknowns, and since these equations are
 linear, it is easy to solve them for the b<sub>i</sub>.
 
-There are no hyperparameters here.
-
-This model is mainly for regression settings, though some analysts use
-it in classification.  If used in conjunction with polynomials (see
-below), this may work as well or better than the logistic model (see
-below).
+> ~ There are no hyperparameters here.
 
 The function **qeLin** wraps the ordinary **lm**.  It mainly
 just calls the latter, but does some little fixes.
@@ -550,27 +556,26 @@ Here u will be a linear form in the features.
 So for instance, to predict whether a player is a catcher (Y = 1 if 
 yes, Y = 0 if no), we fit the model 
 
-probability of catcher given height, weight, age = 
-
-m(height,weight,age) = 
-
-1 / [1 + exp{-(&beta;<sub>0</sub> +
-&beta;<sub>1</sub> height + 
-&beta;<sub>2</sub> weight +
-&beta;<sub>3</sub> age)}]
+> probability of catcher given height, weight, age = 
+> 
+> m(height,weight,age) = 
+> 
+> 1 / [1 + exp{-(&beta;<sub>0</sub> +
+> &beta;<sub>1</sub> height + 
+> &beta;<sub>2</sub> weight +
+> &beta;<sub>3</sub> age)}]
 
 The &beta;<sub>i</sub> are estimated from the sample data, using a
 technique called *iteratively reweighted least squares*.
 
-The function **qeLogit** wraps the ordinary R function **glm**, but
-adds an important feature:  **glm** only handles the 2-class setting,
-e.g.  catcher vs. non-catcher.  The **qeLogit** handles the c-class
-situation via the *One vs. All* method (applicable to any ML algorithm):
-
-it calls **glm** one class at a time, generating c
-**glm** outputs.  When a new case is to be predicted, it is fed into
-each of the c **glm** outputs, yielding c probabilities.  It then
-predicts the new case as whichever class has the highest probability.
+The function **qeLogit** wraps the ordinary R function **glm**, but adds
+an important feature:  **glm** only handles the 2-class setting, e.g.
+catcher vs. non-catcher.  The **qeLogit** handles the c-class situation
+via the *One vs. All* method (applicable to any ML algorithm): It calls
+**glm** one class at a time, generating c **glm** outputs.  When a new
+case is to be predicted, it is fed into each of the c **glm** outputs,
+yielding c probabilities.  It then predicts the new case as whichever
+class has the highest probability.
 
 Here is an example using the UCI vertebrae data;
 
@@ -609,13 +614,14 @@ this latter figure come from?  Look at this tabulation:
 If we were to not use the body measurements V1 etc., we would always
 guess SL, the most prevalent class.  We would be wrong
 
-(60+100)/(60+100+150) = 0.51629
+> (60+100)/(60+100+150) = 0.51629
 
-of the time, similar to the 0.5053763 value found above.  (The
-discrepancy is due to the latter figure being based on a holdout set.)
-By making use of
-the measurement data, we can reduce the misclassification rate to about
-19%.
+of the time, similar to the 0.5053763 value found above.  
+
+> ~ The discrepancy is due to the latter figure being based on a holdout set.
+
+By making use of the measurement data, we can reduce the
+misclassification rate to about 19%.
 
 Let's try a prediction.  Consider someone like the first patient in the
 dataset but with V6 = 6.22.  What would our prediction be?
@@ -636,7 +642,7 @@ We would predict the DH class, as our estimated probability for the class
 is 0.74, the largest among the three classes.
 
 Some presentations describe the logistic model as "linearly modeling the
-logarithm of the odds of Y = 1 vs. Y = 0"  While this is
+logarithm of the odds of Y = 1 vs. Y = 0."  While this is
 correct, it is less informative, in our opinion.  Why would we care
 about a logarithm being linear?  The central issue is that the logistic
 function models a probability, just what we need.
@@ -648,18 +654,18 @@ model a tendency for people to gain weight in middle age but then lose
 weight as seniors, a nonlinear relation.  We could try a quadratic
 model:
 
-m(height,age) = 
-&beta;<sub>0</sub> +
-&beta;<sub>1</sub> height + 
-&beta;<sub>2</sub> age +
-&beta;<sub>3</sub> age<sup>2</sup>
+> m(height,age) = 
+> &beta;<sub>0</sub> +
+> &beta;<sub>1</sub> height + 
+> &beta;<sub>2</sub> age +
+> &beta;<sub>3</sub> age<sup>2</sup>
 
 where presumably &beta;<sub>3</sub> < 0.
 
-We may even include a height x age product term, allowing for interactions.
-Polynomials of degree 3 and so on could also be considered.  The choice
-of degree is a hyperparameter; in **qeSVM** it is named, of course,
-**degree**.
+We may even include a height x age product term, allowing for
+interactions.  Polynomials of degree 3 and so on could also be
+considered.  The choice of degree is a hyperparameter; in **qePolyLin**
+it is named **deg**.
 
 Such model for mean weight for given height and age
 would at first seem nonlinear, but that would be true only
@@ -1003,15 +1009,15 @@ settings (see below), and by an assumption that the user can and will do
 voluminous hyperparameter optimization, but their views are of course
 still worth considering.
 
-  * CMLSs tend to distinguish between "tabular" and "nontabular" data.
-    A disease diagnosis application may be considered tabular--rows of
-    patients, and columns of measurements such as blood glucose, body
-    temperature and so on.  On the other hand, CMLSs view  a facial
-    recognition application as nontabular, which is confusing, since it
-    too has the form of a table--one table row per row of the picture,
-    and one column per pixel position within a picture row.  
+CMLSs tend to distinguish between "tabular" and "nontabular" data.  A
+disease diagnosis application may be considered tabular--rows of
+patients, and columns of measurements such as blood glucose, body
+temperature and so on.  On the other hand, CMLSs view  a facial
+recognition application as nontabular, which is confusing, since it too
+has the form of a table--one table row per row of the picture, and one
+column per pixel position within a picture row.  
 
-    * The strategies currently in vogue among CMLSs is:
+The strategies currently in vogue among CMLSs is:
 
         * Use XGBoost for tabular applications.
 
@@ -1025,7 +1031,7 @@ still worth considering.
       in which elaborate hyperparameter optimization will not be done.  They
       would view k-NN and RFs similarly.
 
-* Here are some views (general, not CMLSs) to consider:
+##  Some views (general, not CMLSs) to consider
 
     * Many analysts find that SVM works well for them, in spite of
       disdain by the CMLSs.
