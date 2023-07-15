@@ -37,29 +37,29 @@ methods for language models and image analysis, are not covered.
 
 # Contents
 
-* [Example](#example)
-* [A note on prediction](#a-note-on-prediction)
-* [k-nearest neighbors](#k-nearest-neighbors)
-  * [K-NN edge bias](#k-nn-edge-bias)
-* [Random forests](#random-forests)
-  * [Decision trees](#decision-trees)
-  * [Random forests](#random-forests)
-  * [Tree and RF edge bias](#tree-and-rf-edge-bias)
-* [Boosting](#boosting)
-* [Linear model](#linear-model)
-* [Logistic model](#logistic-model)
-* [Polynomial-linear models](#polynomial-linear-models)
-* [Shrinkage methods](#shrinkage-methods)
-  * [Overview](#overview)
-  * [LASSO for feature selection](#lasso-for-feature-selection)
-* [Support Vector Machines](#support-vector-machines)
-* [Neural networks](#neural-networks)
-  * [Structure](#structure)
-  * [Estimation, role of weights](#estimation,-role-of-weights)
-  * [Example](#example)
-  * [More on the estimation process; learning rate](#more-on-the-estimation-process;-learning-rate)
-  * [Summary](#summary)
-* [What the specialists say](#what-the-specialists-say)
+- [Notation](#notation)
+- [Running example](#running-example)
+- [The qe-series functions](#the-qe-series-functions)
+  - [Example](#example)
+- [Hyperparameters](#hyperparameters)
+- [Mean functions](#mean-functions)
+- [ML predictive methods](#ml-predictive-methods)
+  - [A note on prediction](#a-note-on-prediction)
+  - [k-nearest neighbors](#k-nearest-neighbors)
+  - [Random forests](#random-forests)
+  - [Boosting](#boosting)
+  - [Linear model](#linear-model)
+  - [Logistic model](#logistic-model)
+  - [Polynomial-linear models](#polynomial-linear-models)
+  - [Shrinkage methods](#shrinkage-methods)
+  - [Support Vector Machines](#support-vector-machines)
+  - [Neural networks](#neural-networks)
+- [Learning rates](#learning-rates)
+- [Overfitting](#overfitting)
+- [Which ML method to use?](#which-ml-method-to-use)
+  - [What the specialists say](#what-the-specialists-say)
+  - [Also consider](#also-consider)
+  - [Well, then, what algorithm?](#well-then-what-algorithm)
 
 # Notation
 
@@ -132,7 +132,7 @@ Here is a glimpse of the data:
 6   Brian_Roberts  BAL Second_Baseman     69    176 29.39   Infielder
 ```
 
-# The qeML package's qe-series functions
+# The qe-series functions
 
 Here "qe" stands for **"quick and easy,"** and we really mean that!
 
@@ -221,7 +221,7 @@ The typical strategy regarding selection of the values of
 hyperparameters is to perform a *grid search*, trying all possible
 combinations.  This computation can be quite voluminous.
 
-# Regression and classification problems, mean functions
+# Mean functions
 
 Prediction applications in which Y is a continuous variable, or at least
 ordinal, are called *regression settings*.  Applications in which Y is
@@ -719,7 +719,7 @@ Why regularize?
   the features can make predictions numerically and statistically
   unstable.
 
-* The LASSO;s appealing property is that it can be used for feature
+* The LASSO's appealing property is that it can be used for feature
   selection; it tends to produce solutions in which some of the 
   b<sub>i</sub> are 0.  
 
@@ -767,9 +767,17 @@ variable for occupation 141, so it is the base, e.g. it is estimated
 that on average, holding other feature values constant, occupation 102
 pays about $3795 more than than does occupation 141.
 
-The LASSO gave coefficients of 0 for
-occupations 106 and 140, so we might decide not to use them, even if we
-utimately use some other ML algorithm.
+The LASSO gave coefficients of 0 for occupations 106 and 140, so we
+might decide not to use them, even if we utimately use some other ML
+algorithm.
+
+### Amount of shrinkage
+
+As mentioned, ridge and the LASSO shrink the estimated coefficients
+vector b by placing a limit on the size of that vector; the smaller the
+limit, the greater the amount of shrinkage.  So, what is the best value
+for that amount?  The **glmnet** packages handles that via
+cross-validation.
 
 ## Support Vector Machines
 
@@ -782,8 +790,10 @@ based on height and weight.  We might plot a scatter diagram, with
 height on the horizontal axis and weight on the vertical, using red dots
 for the catchers and blue dots for the non-catchers.  We might draw a
 line that best separates the red and blue dots, then predict new cases
-by observing which side of the line they fall on.  This is what SVM does
-(with more predictors, the line become a plane or hyperplane).
+by observing which side of the line they fall on.  This is what SVM
+does.
+
+> ~ With more predictors, the line become a plane or hyperplane.
 
 Here is an example, using the Iris dataset built in to R:
 
@@ -819,10 +829,12 @@ These were developed almost exclusively in the AI community.
 
 An NN consists of *layers*, each of which consists of a number of
 *neurons* (also called *units* or *nodes*).  Say for concreteness we
-have 10 neurons per layer.  The output of the first layer will be 10
-linear combinations of the predictor variables/features, essentially 10
-linear regression models.  Those will be fed into the second layer,
-yielding 10 "linear combinations of linear combinations," and so on.
+have 10 neurons per layer.  The values of the features for a given data
+point are fed into the first layer, the output of which will be 10
+different linear combinations of those values.  This is essentially 10
+different linear regression models.  Those outputs will be fed into the
+second layer, yielding 10 "linear combinations of linear combinations,"
+and so on.
 
 In regression settings, the outputs of the last layer will be averaged
 together to produce our estimated m(t).  In the classification case with
@@ -841,7 +853,13 @@ but a simple one to explain the issues).  The output of the first layer
 will be quadratic functions of our features.  Since we square again at
 the outputs of the second layer, the result will be 4th-degree
 polynomials in the features.  Then 8th-degree polynomials come out of
-the third layer, and so on.
+the third layer, and so on.  So, NNs are doing something akin to
+polynomial linear regression.  And the hyperparameter, Number of Layers,
+is analogous to the degree of the polynomial.
+
+> ~ Another hyperparameter is the number of neurons per layer.
+
+
 
 One common choice for A(t) is the logistic function l(u) we saw earlier.
 Another popular choice is ReLU, r(t) = max(0,t).  No matter what we
@@ -851,7 +869,11 @@ m(t).
 ### Estimation, role of weights
 
 At the training stage, the coefficients ("weights") of the linear
-combinations are computed by least squares, but in an iterative manner.
+combinations are computed by least squares. 
+
+> ~ Due to the activation function, this is now a nonlinear optimization
+> problem, so the computation is iterative.
+
 Then to predict Y<sub>new</sub> for a new case
 X<sub>new</sub>, we run the latter through the layers, taking linear
 combinations of inputs at each layer, using the coefficients found in
@@ -867,32 +889,16 @@ package (and there are further wraps involved after that).
 Here's an example, again with the vertebrae data:  The predictor
 variables V1, V2 etc. for a new case to be predicted enter on the left,
 and the predictions come out the right; whichever of the 3 outputs
-is largest, that will be our predicted class.
+is largest, that will be our predicted class.  Weights are shown on the
+edges.
 
 ![alt text](VertebraeNN.png)
 
-The first layer consists of V1 through V6.  The second layer, our
-only *hidden* layer here, has three neurons.  Entering on
-the left of each neuron is a linear combination of V1 through V6.  The
-outputs are fed into A(t) and then to the third layer. 
-
-Hyperparameters for NNs include the number of layers, the number of
-units per layer (which need not be the same in each layer), and the
-activation function.  Most NN software also includes various other
-hyperparameters.
-
-The linear combination coefficients are shown as numeric labels in the
-picture. 
-
-### More on the estimation process; learning rate
+### More on the estimation process
 
 Let n<sub>w</sub> denote the number of weights.  This can be quite
 large, even in the millions.  Moreover, the n<sub>w</sub>
 equations we get by setting the partial derivatives to 0 are not linear.
-
-Due to the nonlinearity of A(t), estimation of the weights is no longer
-a "simple" calculus problem.  Iterative methods must be used, and it can
-be extremely tricky to get them to converge.  Here's why:
 
 Though far more complex than in the linear case, we are still in the
 calculus realm.  We compute the partial derivatives of the sum of
@@ -900,19 +906,25 @@ squares with respect to the n<sub>w</sub> weights, and set the results
 to 0s.  So, we are finding roots of a very complicated function in
 n<sub>w</sub> dimensions, and we need to do so iteratively. 
 
-A simplified version of the iteration process is as follows.  Consider
-the function f graphed below:
+Typical NN methods also use *back propogation*, in which the accuracy
+found in one iteration is used to aid in making the next one better.
+
+# Learning rates
+
+Many ML algorithms, e.g. XGBoost and NNs, do some kind of iterative
+optimization, making use of a hyperparameter known as the *learning
+rate*.  A simplified version of the role of this quantity in the
+iteration process is as follows.  Consider the function f graphed below:
 
 ![alt text](ObjFtnPlusTangent.png)
 
 There is an overall minimum at approximately x = 2.2.  This is termed
-the *global minimum*.  But there is also a *local
-minimum*, at about x = 0.4; that term means that this is the minimum
-value of the function only for points near---"local to"--- 0.4.  Let's
-give the name x<sub>0</sub> to the value of x at the global minimum.
-
-Denote our guess for x<sub>0</sub> at iteration i by g<sub>i</sub>.
-Say our initial guess g<sub>0</sub> = 1.1.
+the *global minimum*.  But there is also a *local minimum*, at about x =
+0.4; that term means that this is the minimum value of the function only
+for points near -- "local to" -- 0.4.  Let's give the name x<sub>0</sub>
+to the value of x at the global minimum.  Denote our guess for
+x<sub>0</sub> at iteration i by g<sub>i</sub>.  Say our initial guess
+g<sub>0</sub> = 1.1.
 
 The tangent line is pointing upward to the right, i.e. has positive
 slope, so it tells us that by going to the left we will go to smaller
@@ -920,7 +932,7 @@ values of the function.  We do want smaller values, but in this case,
 the tangent is misleading us.  We should be going to the right, towards
 2.2, where the global minimum is.
 
-You can see that if our current guess were near 2.2, the tangent line
+If our current guess were near 2.2, the tangent line
 would guide us in the right direction.  But we see above that it can
 send us in the wrong direction.  One remedy (among several typically
 used in concert) is to not move very far in the direction the tangent
@@ -929,21 +941,9 @@ wrong direction, let's limit our loss.  The amount we move is called the
 *step size* in general math, but the preferred ML term is
 the *learning rate*.  And, this is yet another hyperparameter.
 
-Typical NN methods also use *back propogation*, in which the accuracy
-found in one iteration is used to aid in making the next one better.
-
-### Summary
-
-So, NNs are arguably the most complex of all the methods described here,
-and tend to use huge amounts of computing time, even weeks!
-
-Since any continuous activation function can be approximated by a
-polynomial, the outputs of the layers are approximately polynomials, of
-higher and higher degree with each layer.  Thus they are subject to the
-same issues on the edges of the dataset as were described for polynomial
-models above.  This is ameliorated by the boundedness of the popular
-activation functions.  Or one might transform the Y values to a bounded
-interval in the first place.
+So, to try to avoid settling on a local minimum, we should try different
+values of the learning rate, as well as different initial values for the
+weights.
 
 # Overfitting
 
@@ -957,11 +957,12 @@ over all possible samples--to the actual m(t), in principle.
 But the problem is that at the same time, the *variance* of a
 predicted Y<sub>new</sub> is increasing.  
 
-In other words, let M(t) denote our estimation of the true m(t),
-obtained from one of the methods covered here, or othes.  M(t) has a
-distribution over all possible samples.  For fixed n, the greater the
-complexity, the closer this distribution will be centered on m(t)--i.e.
-smaller bias--BUT the larger will be the variance of that distribution.
+Let M(X<sub>new</sub>) denote our estimate of the true
+m(X<sub>new</sub>), obtained from one of the methods covered here.
+M(X<sub>new</sub>) has a distribution over all possible samples.  For
+fixed n, the greater the complexity, the closer this distribution will
+be centered on m(X<sub>new</sub>)--i.e.  smaller bias--BUT the larger
+will be the variance of that distribution.
 
 Say again we are predicting human weight from height, with 
 polynomial models.  With a linear model, we use our training data to
@@ -978,7 +979,7 @@ predictive ability suffers.  We say we have *overfit*.
 
 So there is a "Goldilocks" level of complexity for any given n:
 an optimal polynomial degree, optimal number of nearest neighbors,
-optimal *network architecture* (configuration of layers and neurons),
+optimal NN *network architecture* (configuration of layers and neurons),
 and so on.  How do we find it?
 
 Alas, **there are no magic answers here**.  We will definitely try
@@ -992,7 +993,7 @@ cautious policy would be that if two combinations of hyperparameter
 values give similar predictive power, we choose the one with lesser
 complexity.
 
-See the 'Overfitting' vignette in this package for more on tbis topic,
+See the 'Overfitting' vignette in this package for more on this topic,
 including the intriguing phenonemon of *double descent*.
 
 # Which ML method to use?
@@ -1017,45 +1018,53 @@ recognition application as nontabular, which is confusing, since it too
 has the form of a table--one table row per row of the picture, and one
 column per pixel position within a picture row.  
 
-The strategies currently in vogue among CMLSs is:
+The strategies currently in vogue among CMLSs are:
 
-        * Use XGBoost for tabular applications.
+* Use XGBoost for tabular applications.
 
-        * Use deep NNs or other advanced, application-specific methods
-          in image and language settings.
+* Use deep NNs or other advanced, application-specific methods
+      in image and language settings.
 
-    * SVM is definitely not in vogue among CMLSs.  
-    
-    * CMLSs view linear and generalized linear models as valuable,
-      especially as initial analyses of a given dataset or in settings
-      in which elaborate hyperparameter optimization will not be done.  They
-      would view k-NN and RFs similarly.
+* SVM is definitely not in vogue among CMLSs.  
 
-##  Some views (general, not CMLSs) to consider
+* CMLSs view linear and generalized linear models as valuable,
+  especially as initial analyses of a given dataset or in settings
+  in which elaborate hyperparameter optimization will not be done.  They
+  would view k-NN and RFs similarly.
 
-    * Many analysts find that SVM works well for them, in spite of
-      disdain by the CMLSs.
+##  Also consider
 
-    * XGBoost is nice but in a typical application the default values
-      for the hyperparameters will not give impressive results.
-      Extensive, application-specific hyperparameter tuning will be
-      needed.
+* Many analysts find that SVM works well for them, in spite of
+  disdain by the CMLSs.
 
-    * A key question is whether there is a general monotonic
-      relationship between Y and the features.  In predicting diabetes,
-      say, the higher the glucose level, the more likely the patient is
-      diabetic.  Though monotonic relations may exist in image
-      classification, they maybe more localized.
+* XGBoost is nice but in a typical application the default values
+  for the hyperparameters will not give impressive results.
+  Extensive, application-specific hyperparameter tuning will be
+  needed.
 
-    * "Monotonic" applications may be best served by ML methods that
-      have either linear components or low-degree polynomials, such as
-      linear or generalized linear models, SVM and low-degree polynomial
-      versions of these.  For other applications, one might try k-NN,
-      RFs, NNs etc.
+* A key question is whether there is a general monotonic
+  relationship between Y and the features.  In predicting diabetes,
+  say, the higher the glucose level, the more likely the patient is
+  diabetic.  Though monotonic relations may exist in image
+  classification, they maybe more localized.
+
+* "Monotonic" applications may be best served by ML methods that
+  have either linear components or low-degree polynomials, such as
+  linear or generalized linear models, SVM and low-degree polynomial
+  versions of these.  For other applications, one might try k-NN,
+  RFs, NNs etc.
+
+## Well, then, what algorithm?
 
 As the saying goes, "Your mileage may vary," depending on your
-application and data.  Our recommended strategy would be to first try a
-linear or logistic model, possibly with a quadratic term.  If you then
-wish to go further, you'll need a grid search for each ML algorithm of
-interest.  The **qeFT** function can alleviate you of a lot of the work
-here.
+application and data.  Our recommended strategy for tabular data (image
+and language applications require extensive experience in those realms)
+would be to first try a linear or logistic model, possibly with a
+quadratic term.  If you then wish to go further, first try k-NN
+(in regression settings, also the "best of both worlds" algorithm,
+**qeLinKNN**), then heavy grid search with **qeXGBoost** or
+**qeNCVregCV**.  For feature selection, **qeLASSO** and **qeFOCI**.
+
+For grid search the **qeFT** function can alleviate you of a lot of the
+work.
+
