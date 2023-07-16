@@ -1,7 +1,8 @@
 
 ---
 title: "No P Values"
-output: tufte::tufte_html: default
+output: 
+  tufte::tufte_html: default
 vignette: >
   %\VignetteIndexEntry{No P Values}
   %\VignetteEngine{knitr::rmarkdown}
