@@ -402,7 +402,7 @@ This picture was generated using the **rpart.plot** package, via
 **qeRpart()**.
 ```
 
-![alt text](RpartVert.png)
+![](RpartVert.png)
 
 At the root, if the variable V6 in our new case to be predicted is < 16,
 we go left, otherwise right.  Say we go left.  Then if V4 < 28 in the
@@ -509,7 +509,7 @@ For motivation, below is a graph of mean weight vs. height for the
 **mlb** data.  (There are many players for each height level, and we
 find and plot the mean weight at each height.)
 
-![alt text](WtVsHt.png)
+![](WtVsHt.png)
 
 The means seem to lie near a straight line.  That suggests modeling m(t)
 is a linear function.
@@ -807,7 +807,7 @@ With more predictors, the line become a plane or hyperplane.
 
 Here is an example, using the Iris dataset built in to R:
 
-![alt text](SVM.png)
+![](SVM.png)
 
 There are 3 classes, but we are just predicting setosa species (shown by + 
 symbols) vs. non-setosa (shown by boxes) here.  Below the solid line,
@@ -900,7 +900,7 @@ and the predictions come out the right; whichever of the 3 outputs
 is largest, that will be our predicted class.  Weights are shown on the
 edges.
 
-![alt text](VertebraeNN.png)
+![](VertebraeNN.png)
 
 ### More on the estimation process
 
@@ -924,7 +924,7 @@ optimization, making use of a hyperparameter known as the *learning
 rate*.  A simplified version of the role of this quantity in the
 iteration process is as follows.  Consider the function f graphed below:
 
-![alt text](ObjFtnPlusTangent.png)
+![](ObjFtnPlusTangent.png)
 
 There is an overall minimum at approximately x = 2.2.  This is termed
 the *global minimum*.  But there is also a *local minimum*, at about x =
