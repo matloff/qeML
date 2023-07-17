@@ -24,6 +24,10 @@ its 177-year history.  It called into question one of core concepts in
 statistical methodology, *significance testing* (ST), colloqially known
 as *p-values*:
 
+```{marginfigure}
+![](ASAannounce.png)
+```
+
 > “The p-value was never intended to be a substitute for scientific
 > reasoning,” said Ron Wasserstein, the ASA’s executive director.
 > “Well-reasoned statistical arguments contain much more than the value
@@ -33,10 +37,12 @@ as *p-values*:
 
 To be sure, though "post p<0.05 era" sounds like a ban on ST,
 the position paper did not quite call for a ban.  It was, in many
-ways, the proverbial "camel created by a committee"; as some on the
+ways, the proverbial "camel created by a committee".  Since some on the
 committee still believe in ST, the paper stopped short of a ban.  Yet,
 the paper offered no use case in which ST *should* be used; their
 silence on that may be considered "significant" (pun intended).
+
+# What's all the fuss about?
 
 As the paper points out, these concerns about ST were not new.  They
 were, for instance, explained in 
