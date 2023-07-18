@@ -45,11 +45,11 @@ presented.
 
 ## Outline
 
-* What is the concern regarding imbalanced training data? Our ML
+* The main concern regarding imbalanced training data: Our ML
   algorithm may never predict very small classes, making the algorithm
   rather meaningless, especially in 2-class settings.
 
-* A popular solution is to artificially balance the data, e.g. CRAN
+* A popular solution is to artificially balance the data, e.g. via the CRAN
   package **smotefamily**.
 
 * This changes the class probabilities, with undesirable consequences.
