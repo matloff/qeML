@@ -29,7 +29,7 @@ Often one has an R factor in which one or more levels are rare in the
 data.  This could cause problems, say in performing cross-validation; a
 level in the test set might be "new," not having appeared in the
 training set.  Toward this end, \code{factorToTopLevels} will remove
-rare levels form a factor; \code{dataToTopLevels} applies this to an
+rare levels from a factor; \code{dataToTopLevels} applies this to an
 entire data frame.
 
 Toward this end, the function \code{levelCounts} simply applies
@@ -38,6 +38,15 @@ R list. (If more than 10 levels, it returns NA simply applies table() to
 each column of \code{data},
 
 }
+
+\examples{
+
+data(pef)
+levelCounts(pef)  # e.g. finds there are 15182 men, 4908 women
+
+
+}
+
 
 \author{
 Norm Matloff

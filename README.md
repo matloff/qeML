@@ -324,15 +324,17 @@ be overly optimistic.
 
 * utilities, exploratory tools
 
-    * **qeCompare()**:  compare the accuracy various ML methods on a 
-      given dataset
-
-    * **qeParallel()**:  apply "Software Alchemy" to parallelize
-      qe functions
+    * **factorToTopLevels()**::  removes rare levels from a factor
 
     * **levelCounts()**:  performs a census of levels for each R factor in
       the dataset
 
     * **plotPairedResids()**  plots model residuals against pairs of
+
+    * **qeCompare()**:  compare the accuracy various ML methods on a 
+      given dataset
+
+    * **qeParallel()**:  apply "Software Alchemy" to parallelize
+      qe functions
       features, useful e.g. for assessing model validity
 
