@@ -242,6 +242,8 @@ be overly optimistic.
 
     * **qeAdaBoost()**: Ada Boosting, wraps **Jousboost** pkg
 
+    * **qeDeepnet()**: wraps **deepnet** pkg
+
     * **qeDT()**: decision trees, wraps **party** pkg
 
     * **qeRpart()**: decision trees, wraps **Rpart** pkg; colorful tree plot
@@ -256,8 +258,10 @@ be overly optimistic.
 
     * **qeLightGBoost()**: gradient boosting, wraps **lightgbm** pkg
 
-    * **qeLin()**: wraps R's **lm()**; can be used for multiclass
-      classification, for speed
+    * **qeLin()**: wraps R's **lm()**
+
+    * **qeLinKNN()**: first fits **qeLin()**, followed by k-NN on the
+      residuals to correct deviations from linearity
 
     * **qeLogit()**: wraps R's **glm()**
 
@@ -287,6 +291,8 @@ be overly optimistic.
 
     * **qeSVMliquid()**: SVM, wraps **liquid SVM** pkg
 
+    * **qeXGBoost()** wraps the **xgboost** pkg
+
 * feature selection and model-fitting
 
     * **qeFOCI()**: fully nonparametric method for feature selection
@@ -309,9 +315,9 @@ be overly optimistic.
 
     * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
 
-    * **qeLeaveOut1Var**, **qeLASSO**, **qeFOCI**, **qeRFranger** and
-      **qeKNN**, all can be used for assessing or setting variable
-      importance
+    * **qeLeaveOut1Var**, **qeLASSO**, **qeFOCI**, **qeFOCIrand**,
+      **qeRFranger** and **qeKNN**, all can be used for assessing or
+      setting variable importance
 
 * application-specific functions (elementary)
     
@@ -324,7 +330,10 @@ be overly optimistic.
 
 * utilities, exploratory tools
 
-    * **factorToTopLevels()**::  removes rare levels from a factor
+    * **dataToTopLevels()**:  applies **factorToTopLevels()** to all
+      fadtors in the given data frame
+
+    * **factorToTopLevels()**:  removes rare levels from a factor
 
     * **levelCounts()**:  performs a census of levels for each R factor in
       the dataset
