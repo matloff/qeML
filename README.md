@@ -328,6 +328,11 @@ be overly optimistic.
     * *image classification*:  Our **imageClassR** package uses qe
       functions for this.  (Under construction.)
 
+* prediction with missing values
+
+    * **qeLinMV()**, **qeLogitMV()**, **qeKNNMV()**, associated
+    **predict()** generics for use with **toweranNA** pkg
+
 * utilities, exploratory tools
 
     * **dataToTopLevels()**:  applies **factorToTopLevels()** to all
