@@ -350,7 +350,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    if (!is.null(holdout)) {
       # splitData(holdout,newData); no, write separate code for qeKNN
       nHold <- holdout
-      cat('holdout set has ',nHold, 'rows\n')
+      # cat('holdout set has ',nHold, 'rows\n')
       holdIdxs <- sample(1:nrow(x),nHold)
 
       xTst <- x[holdIdxs,]

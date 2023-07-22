@@ -17,7 +17,7 @@
 splitData <- defmacro(holdout,data, 
    expr={
       nHold <- holdout;
-      cat('holdout set has ',nHold, 'rows\n');
+      # cat('holdout set has ',nHold, 'rows\n');
       idxs <- sample(1:nrow(data),nHold);
       tst <- data[idxs,,drop=FALSE];
       trn <- data[-idxs,,drop=FALSE];
