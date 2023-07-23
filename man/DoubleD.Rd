@@ -46,6 +46,14 @@ generic \code{plot.doubleD}.  Mean test (red) and training (blue) accuracy
 will be plotted against \code{xPts}.
 }
 
+\examples{
+   \dontrun{
+      data(mlb1)
+      hw <- mlb1[,2:3]
+      doubleD('qePolyLin(hw,"Weight",deg=xPts[i])',1:20,250)
+   }
+}
+
 \author{
 Norm Matloff
 }
