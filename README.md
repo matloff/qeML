@@ -295,6 +295,12 @@ be overly optimistic.
 
 * feature selection and model-fitting
 
+    * **plotClassesUMAP()**: plot first two UMAP components,
+      color-coding classes
+
+    * **plotPairedResiduals()**: plot residuals against pairs of
+      features
+
     * **qeFOCI()**: fully nonparametric method for feature selection
 
     * **qeLASSO()**:  for fit and/or feature selection
