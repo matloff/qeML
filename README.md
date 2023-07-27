@@ -21,9 +21,13 @@ learning (ML).
 
     * easy for learners, powerful/convenient for experts
 
-* Special Feature for ML Learners
+* Special Features for ML Learners/Instructors
 
-    * includes a **tutorial** on major ML methods
+    * includes **tutorials** on major ML predictive methods, and
+      on special topics such as feature selection and dealing with
+      missing values
+
+    * includes a large number of datasets
 
 * Special Features for Those Experienced in  ML 
 
@@ -246,8 +250,6 @@ be overly optimistic.
 
     * **qeDT()**: decision trees, wraps **party** pkg
 
-    * **qeRpart()**: decision trees, wraps **Rpart** pkg; colorful tree plot
-
     * **qeGBoost()**: gradient boosting, wraps **gbm** pkg
 
     * **qeKNN()**: k-Nearest Neighbors, wraps **regtools** pkg; includes
@@ -281,6 +283,8 @@ be overly optimistic.
     * **qeRFgrf**: random forests, wraps **grf** pkg; allows linear
       interpolation within a bin
 
+    * **qeRpart()**: decision trees, wraps **Rpart** pkg; colorful tree plot
+
     * **qeRFranger()**: random forests, wraps **ranger** pkg
 
     * **qeskRF()**: random forests, wraps Python **Scilearn** pkg
@@ -295,35 +299,38 @@ be overly optimistic.
 
 * feature selection and model-fitting
 
+    * **doubleD()**: computation and plotting for exploring Double Descent
+
     * **plotClassesUMAP()**: plot first two UMAP components,
       color-coding classes
 
     * **plotPairedResiduals()**: plot residuals against pairs of
       features
 
+    * **qeCompare()**:  compare the accuracy various ML methods on a 
+      given dataset
+
     * **qeFOCI()**: fully nonparametric method for feature selection
 
+    * **qeFT()**:  automated grid hyperparameter search, *with
+      Bonferroni-Dunn corrected standard errors*
+
     * **qeLASSO()**:  for fit and/or feature selection
+
+    * **qeLeaveOut1Var**, **qeLASSO**, **qeFOCI**, **qeFOCIrand**,
+      **qeRFranger** and **qeKNN**, all can be used for assessing or
+      setting variable importance
 
     * **qePCA()**:  find principal components, number specified by user,
       then fit the resulting model, according to **qe*** function
       specified by user
 
-    * **qeUMAP()**:  same as **qePCA()** but using UMAP
+    * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
 
-    * **qeFT()**:  automated grid hyperparameter search, *with
-    Bonferroni-Dunn corrected standard errors*
+    * **qeUMAP()**:  same as **qePCA()** but using UMAP
 
     * **replicMeans()**: (from **regtools**, included in **qeML**)
       averages output, e.g. **testAcc**, over many holdout sets
-
-    * **doubleD()**: computation and plotting for exploring Double Descent
-
-    * **qeROC()**:  ROC computation and plotting, wraps **pROC** pkg
-
-    * **qeLeaveOut1Var**, **qeLASSO**, **qeFOCI**, **qeFOCIrand**,
-      **qeRFranger** and **qeKNN**, all can be used for assessing or
-      setting variable importance
 
 * application-specific functions (elementary)
     
@@ -336,8 +343,8 @@ be overly optimistic.
 
 * prediction with missing values
 
-    * **qeLinMV()**, **qeLogitMV()**, **qeKNNMV()**, associated
-    **predict()** generics for use with **toweranNA** pkg
+    * **qeLinMV()**, **qeLogitMV()**, **qeKNNMV()**, 
+      associated **predict()** generics for use with **toweranNA** pkg
 
 * utilities, exploratory tools
 
@@ -348,11 +355,6 @@ be overly optimistic.
 
     * **levelCounts()**:  performs a census of levels for each R factor in
       the dataset
-
-    * **plotPairedResids()**  plots model residuals against pairs of
-
-    * **qeCompare()**:  compare the accuracy various ML methods on a 
-      given dataset
 
     * **qeParallel()**:  apply "Software Alchemy" to parallelize
       qe functions
