@@ -1,11 +1,12 @@
 
 ---
 title: "Feature_Selection"
-output: rmarkdown::html_vignette
+output: 
+   tufte::tufte_html: default
 vignette: >
   %\VignetteIndexEntry{Feature_Selection}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -15,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Clearing the Confusion: How (and Why) Should We Select Just a Few of Our (Possible Many) Features?
+# Why Should We Consider Using Just a Few of Our Features?  And How Can We Do This?
 
 In many applications we may have a larger number of features---dozens,
 hundreds or even more.  In machine learning contexts, where we are
@@ -25,14 +26,18 @@ the features, for a couple of reasons:
 * Avoiding overfitting.
 
     As we add more and more features to a model, bias is reduced but
-    variance increases.  At some point, variance overwhelms bias, and our
-    predictive ability declines.
+    variance of the estimated model parameters increases. 
+    ```{marginfigure}
+    The famous Variance-Bias Tradeoff.  
+    ```
+    At some point, variance overwhelms bias, and our predictive ability
+    declines.
 
 * Avoiding large computation time and/or memory usage.
 
     Depending on the solution method used, computation time for a linear
     model increases with the cube, or at least the square, of the number
-    of features.  Modern ML models can be even worse in terms of
+    of features.  And modern ML models can be even worse in terms of
     computational burden.  In addition, large models may result in lack
     of convergence or instability of the output.
 
@@ -42,10 +47,11 @@ Many, many methods for feature selection have been developed over the
 years, and you will often hear someone claim that their favorite is *the*
 one to use, The Best.  As you may guess, the fact that there are
 conflicting claims as to "best" reflects the fact that no such Best 
-method exists.  Indeed, much of the feature selection process is *ad hoc*.
+method exists.  Indeed, much of the feature selection process is *ad hoc*,
+and in any case, it will often boil down to the user's judgment.
 
 We will cover a few feature selection methods here, to explain their
-rationales and how to use them in qeML.  You may typically use two or
+rationales and how to use them in **qeML**.  You may typically use two or
 more of them in any given application.
 
 # How Many Is Too Many?
@@ -67,14 +73,12 @@ points in our dataset (i.e. number of rows) and the number of features
   conservative rule p < log(n).  Again, these are oversimplifications,
   but you may find them useful as guides to intuition.
 
-* The value of p depends on "expanded" versions of any categorical features.
+* It should be kept in mind that categorical features can greatly add to
+  the value of p.  See below.
 
-## Impact of categorical variables on p
+# Example:  NYC Taxi Data
 
-In many large-p datasets, the culprit is primarily categorical
-variables.  Let's see why. 
-
-Consider the dataset **nycdata** included in qeML, which is
+Consider the dataset **nycdata** included in **qeML**, which is
 derived from taxi trip data made publicly available by the New York City
 government.  Many public analyses have been made on various versions of
 the NYC taxi data, frequently with the goal of predicting trip time.
@@ -182,11 +186,17 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 Residual standard error: 327.2 on 8663 degrees of freedom
 Multiple R-squared:  0.7128,	Adjusted R-squared:  0.7017
 F-statistic:    64 on 336 and 8663 DF,  p-value: < 2.2e-16
-
 ```
 
 There were 266 pickup/dropoff locations.  That means 265 dummy-variable
-features each for pickup and dropoff.  Similarly, there 6 more dummies
+features were created each for pickup and dropoff.  For instance, there
+would be such a variable for pickup at location 168, equal to 1 if
+```{marginfigure}
+There is no dummy for the 266th location, as it is indicated by the
+other 265 dummies all being 0.
+```
+pickup was at that location, 0 otherwise.
+Similarly, there are 6 more dummies
 for day of the week.  R's **lm** function, which **qeLin** wraps,
 automatically converts factors to dummies.
 
@@ -194,14 +204,18 @@ So, p is not 5 after all; it's 5 + 530 + 6 = 541!
 
 We are assuming no interactions here.  But if some pickup/dropoff
 location combinations behave quite differently from others, we ought to
-consider interaction terms.  These will have their own dummy variables,
-hugely increasing p if we include them all.
+consider interaction terms.  These will have their own dummy variables
+(products of the original dummies), hugely increasing p if we include
+them all.
 
 Now, in those warning messages, the term "rank-deficient" is referring
 to multicollinearity in the data, i.e. strong relations among the
 features, producing a possibly unstable result.  Note that the model was
 so unstable that the coefficient for DOLocationID123 turned out to be
-NA.
+NA.  
+
+But even the other coefficients have rather large standard errors.  This
+is the "variance" aspect of the Variance-Bias Tradeoff.
 
 A more subtle problem is in the warning, "7 rows removed from test set,
 due to new factor levels."  By default, all **qeML** predictive
@@ -230,11 +244,12 @@ candidate models.
 
 A nethod should produce some kind of ordered list, for instance, best
 single predictor; best pair of predictors; best triplet etc.  We can
-evaluate each of the p feature sets via cross-validation, then choose
-the one that peforms best.  (A method may simply rank features according
-to importance, but we still would assess the performance of the first
-feature, the first two features together, the first three features
-together and so on.)
+evaluate each of the p feature sets via cross-validation--i.e. noting
+the **testAcc** component in the output of **qeML** functions--and then
+choosing the one that peforms best.  (A method may simply rank features
+according to importance, but we still would assess the performance of
+the first feature, the first two features together, the first three
+features together and so on.)
 
 In the *all possible subsets* (APS) approach, by contrast, one looks at all
 the 2<sup>p</sup> possible feature sets, a prohibitively large number
@@ -245,9 +260,7 @@ sets randomly, and usually the dataset itself is considered to be a
 random sample from some (real or conceptual) population.  Due to this
 randomness, it's possible that some combination of features will appear
 to perform well, just by accident.  The more feature sets we look at,
-the greater the chance of this occurring.  This consideration really
-makes APS infeasible, and even with a linear sequence of candidate
-feature sets, this can be problematic with large p.
+the greater the chance of this occurring.  
 
 Note that some of the methods discussed below do their own internal
 cross-validation, and ultimately give us the "best" feature set
@@ -279,22 +292,30 @@ One could generate an ordered sequence of feature sets in the above
 manner by first setting the threshold for a p-value very low, then
 progressively higher  This is similar to  *stepwise regression*:  In the
 *forward* version, one starts with no features, but adds them one at a
-time.  At each step, one tests for the &beta; coefficient being 0.  When
-no new feature is found to be "significant," the process stops, and we
-use whatever features managed to make it in to the model so far.  The
-*backward* version starts with a full model, and removes features one at
-a time.  Though this one may seem to be an improvement, in that it does
-take into account that a feature may be useful individually but not if
-similar features are already in the equation, it still suffers from the
+time.  At each step, one tests for the &beta; coefficient being 0, and
+then chooses the feature that is most "significant." When no new feature
+is found to be "significant," the process stops, and we use whatever
+features managed to make it in to the model so far.  The *backward*
+version starts with a full model, and removes features one at a time.
+Though this one may seem to be an improvement, in that it does take into
+account that a feature may be useful individually but not if similar
+features are already in the equation, it still suffers from the
 fundamental problems of p-values.
 
 ## The LASSO
 
 Here we fit a linear model, subject to the constraint that no estimated
-&beta;<sub>i</sub> is larger than &lambda;, a hyperparameter.  Starting
-at 0, we increase &lambda; to ever-larger values, having the effect that
-one estimated &beta;<sub>i</sub> becomes nonzero at a time.  This gives
-us an ordered sequence of candidate features, as desired.
+```{marginfigure}
+The LASSO's historical antecedent, *ridge regression* was developed
+specifically for dealing with the multicollinearity problem we saw
+above.  The LASSO has this property too, but in addition it aids in
+feature selection.
+```
+&beta;<sub>i</sub> is larger (in absolute value) than &lambda;, a
+hyperparameter.  Starting at 0, we increase &lambda; to ever-larger
+values, having the effect that one estimated &beta;<sub>i</sub> becomes
+nonzero at a time.  This gives us an ordered sequence of candidate
+features, as desired.
 
 This is similar to a forward stepwise method, but NOT based on p-values;
 instead, the decision of which feature to use next is based on
@@ -445,9 +466,9 @@ Rather than doing feature selection *per se*, we might transform the
 data to summary variables.  We could group the pickup/dropoff locations
 by ZIP Code, for instance.  
 
-Or, we could consider only the more frequently used locations.  The qeML
-function **factorToTopLevels** would help here.  We will use it to
-reduce pickup location to just a few places that appear a lot in our
+Or, we could consider only the more frequently used locations.  The
+**qeML** function **factorToTopLevels** would help here.  We will use it
+to reduce pickup location to just a few places that appear a lot in our
 data; all others will be lumped together as 'other'.
 
 We invoke the function as follows:
