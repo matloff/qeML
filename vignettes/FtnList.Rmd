@@ -1,89 +1,136 @@
 
 ---
-title: 
-   plain: "Categorized Function List"
-output: rmarkdown::html_vignette
+title: "Categorized Function List"
+output: 
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Categorized Function List}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
-The qeML package:  Categorized Function List
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
 
-# Predictive Methods
+# ML algorithms
 
-## Tree-based
+    * qeAdaBoost(): Ada Boosting, wraps Jousboost pkg
 
-* qeAdaBoost: AdaBoost
-* qeDT: one tree; has plot function
-* qeGBoost: gbm package
-* qeLightGBoost: LightGBoost; fast
-* qeRF: random forests; has plot function
-* qeRFgrf: random forests; bias correction
-* qeRFranger: random forests
-* qeskRF: sklearn, needs Python
-* qeXGBoost: XGBoost
+    * qeDeepnet(): wraps deepnet pkg
 
-## Nearest neighbors
+    * qeDT(): decision trees, wraps party pkg
 
-* qeKNN: k-NN; bias correction; can give different weights
-* qeLinKNN: linear model with kNN correction
-* qePolyLinKNN: polynomial linear model with kNN correction
+    * qeGBoost(): gradient boosting, wraps gbm pkg
 
-## Neural networks
+    * qeKNN(): k-Nearest Neighbors, wraps regtools pkg; includes
+      predictor importance settings; allows linear interpolation within
+      a bin
 
-* qeDeepnet: neural networks, basic, Python-free
-* qeNeural: neural networks, using Keras, CNN included, Python needed
+    * qeLASSO(): LASSO and ridge regression, wraps glmment pkg
 
-## Linear/generalized/regularized linear
+    * qeLightGBoost(): gradient boosting, wraps lightgbm pkg
 
-* qeLASSO: LASSO; has plot function
-* qeLin: wrapper for lm(), with additions
-* qeLogit: wrapper for glm(), logit case
-* qeNCVregCV: wrapper for ncvreg::cv.ncvreg(); has plot function
-* qePolyLASSO: polynomial terms added, then LASSO
-* qePolyLin: polynomial terms added, then linear model
-* qePolyLog: polynomial terms added, then logit
+    * qeLin(): wraps R's lm()
 
-## SVM
+    * qeLinKNN(): first fits qeLin(), followed by k-NN on the
+      residuals to correct deviations from linearity
 
-* qeSVM: e1071
-* qeliquidSVM: liquid SVM, fast
-* qeskSVM: sklearn, needs Python
+    * qeLogit(): wraps R's glm()
 
-## Specialized application areas 
+    * qeNeural(): wraps keras package, including CNN
 
-* qeText: text classification
-* qeTS: time series classification
+    * qePolyLASSO(): LASSO/ridge applied to polynomial regression;
+      wraps glmnet, polyreg pkgs
 
-# Model Fitting, parameter tuning, dimension reduction
+    * qePolyLin(): polynomial regression on linear models;
+      uses Moore-Penrose inverse if overfitting; wraps polyreg pkg
 
-* plotClassesUMAP: 2-D plot of UMAP applied to any dataset
-* plotPairedResids: for any qe-series output object, finds the
-   residuals in the holdout set, and plots them against pairs
-   of predictor variables
-* qeCompare: compare several qe-series functions on a dataset
-* qeFOCI:  advanced nonparametric feature selection
-* qeFOCIrand: multiple random runs of qeFOCI
-* qeFT: grid search, and qe-series function, including standard errors,
-   has plot function
-* qeLASSO: feature selection, including "importance" in the form
-   of whenEntered component in output
-* qeNCVregCV: feature selection similar to LASSO
-* qeParallel: parallel run of qe-series function, multiple holdout sets
-* qePCA: PCA, followed by qe-series function on result
-* qeUMAP: UMAP, followed by qe-series function on result
-* qeRFranger: variable.importance component of output
-* qeROC: ROC computed on output of qe-series function
+    * qePolyLog(): polynomial regression on logistic models;
+      wraps polyreg pkg
 
-# missing value methods
+    * qeRF(): random forests, wraps randomforest pkg
 
-* qeLinMV, qeLogitMV, qeKNNMV: nonimputational methods for predicting
-   new cases; both the training data AND the new cases may have NAs
+    * qeRFgrf: random forests, wraps grf pkg; allows linear
+      interpolation within a bin
 
-# Utilities
+    * qeRpart(): decision trees, wraps Rpart pkg; colorful tree plot
 
-* levelCounts, factorToTopLevels, dataToTopLevels: deletion of rare
-   factor levels
+    * qeRFranger(): random forests, wraps ranger pkg
+
+    * qeskRF(): random forests, wraps Python Scilearn pkg
+
+    * qeskSVM(): SVM, wraps Python Scilearn pkg
+
+    * qeSVM(): SVM, wraps e1071 pkg
+
+    * qeSVMliquid(): SVM, wraps liquid SVM pkg
+
+    * qeXGBoost() wraps the xgboost pkg
+
+# Feature selection and model-fitting
+
+    * doubleD(): computation and plotting for exploring Double Descent
+
+    * plotClassesUMAP(): plot first two UMAP components,
+      color-coding classes
+
+    * plotPairedResiduals(): plot residuals against pairs of
+      features
+
+    * qeCompare():  compare the accuracy of various ML methods on a
+      given dataset
+
+    * qeFOCI(): fully nonparametric method for feature selection,
+      wraps FOCI pkg
+
+    * qeFT():  automated grid hyperparameter search, with
+      Bonferroni-Dunn corrected standard errors
+
+    * qeLASSO():  for fit and/or feature selection
+
+    * qeLeaveOut1Var, qeLASSO, qeFOCI, qeFOCIrand,
+      qeRFranger and qeKNN, all can be used for assessing or
+      setting variable importance
+
+    * qePCA():  find principal components, number specified by user,
+      then fit the resulting model, according to qe* function
+      specified by user
+
+    * qeROC():  ROC computation and plotting, wraps pROC pkg
+
+    * qeUMAP():  same as qePCA() but using UMAP
+
+    * replicMeans(): (from regtools, included in qeML)
+      averages output, e.g. testAcc, over many holdout sets
+
+# Application-specific functions (elementary)
+
+    * qeText()  text classification
+
+    * qeTS():  time series
+
+    * *image classification*:  Our imageClassR package uses qe
+      functions for this.  (Under construction.)
+
+# Prediction with missing values
+
+    * qeLinMV(), qeLogitMV(), qeKNNMV(), associated predict() 
+      generics for use with toweranNA pkg
+
+# Utilities, exploratory tools
+
+    * dataToTopLevels():  applies factorToTopLevels() to all
+      factors in the given data frame
+
+    * factorToTopLevels():  removes rare levels from a factor
+
+    * levelCounts():  performs a census of levels for each R factor in
+      the dataset
+
+    * qeParallel():  apply "Software Alchemy" to parallelize
+      qe functions
 
