@@ -463,8 +463,8 @@ with best cross-validation performance.
 ## Direct dimension reduction for categorical data
 
 Rather than doing feature selection *per se*, we might transform the
-data to summary variables.  We could group the pickup/dropoff locations
-by ZIP Code, for instance.  
+data to summary variables, or *embeddings*.  We could group the
+pickup/dropoff locations by ZIP Code, for instance.  
 
 Or, we could consider only the more frequently used locations.  The
 **qeML** function **factorToTopLevels** would help here.  We will use it
