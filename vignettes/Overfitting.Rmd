@@ -1,7 +1,8 @@
 
 ---
 title: "Overfitting"
-output: rmarkdown::html_vignette
+output: 
+   tufte::tufte_html: default
 vignette: >
   %\VignetteIndexEntry{Overfitting}
   %\VignetteEngine{knitr::rmarkdown}
@@ -56,16 +57,21 @@ talking about** in discussing bias and variance.
 ## Required Background
 
 Very basic statistical concepts + patience (document is a bit long).
-Expected notation, E(), is used in a couple of places, but is explained
-intuitively in the given context, and is not vital to the exposition.
+Expected value notation, E(), is used in a couple of places, but is
+explained intuitively in the given context, and is not vital to the
+exposition.
 
 ## Setting
 
 Let Y denote our outcome variable, and X represent the vector of our
 predictors/features.  We are predicting Y from X.  For instance, Y might
 be human weight, with X being (height, age).  We include binary
-classification problems, with Y = 1 or 0.  (In multiclass problems, Y is
-a vector of 1s and 0s, with only one component being 1 at a time.)
+```{marginfigure}
+In multiclass settings with c classes, Y is
+a vector of c 1s and 0s, with only one component being 1 at a time.
+```
+classification problems, with Y = 1 or 0, coding the "yes" class and
+"no" class.  
 
 
 Overfitting is often described as arising when we go too far towards the
@@ -78,29 +84,33 @@ really mean in the prediction context?
 # The "true" relation between Y and X
 
 The *regression function of Y on X*, &rho;(t), is defined to be the mean
+```{marginfigure}
+Though some books use the term "regression" to mean a linear model, the
+actual definition is unrestricted; it applies just as much to, say,
+random forests as to linear models.
+```
 Y for the given X values t.  In the weight/height/age example,
 &rho;(68.2,32.9) is the mean weight of all people of height 68.2 and age
 32.9.   
 
-Though some books use the term "regression" to mean a
-linear model, the actual definition is unrestricted; it applies just as
-much to, say, random forests as to linear models.
-
 The &rho; function is the best (i.e. minimum MSPE) predictor of weight
 based on height and age, the ideal.  Note the phrase "based on," though.
 If we had a third predictor variable/feature available, say waist size,
-there would be another &rho; for that 3-predictor setting, better than
-the 2-predictor one.
+there would be another &rho; function for that 3-predictor setting,
+better than the 2-predictor one.
 
 Note too that the &rho; function is a population entity, which we estimate
 from our sample data.  Denote the estimated &rho;(t) by r(t).  Say we
 are studying diabetic people.  &rho;(t) gives us the relation of weight
 vs.  height and age in the entire population of diabetics; if our study
-involves 100 patients, that is considered a sample from the population,
+```{marginfigure}
+Note:  "Sample" will mean our entire dataset; we will say, "A sample of 100
+people," as in statistics courses, not "We have 100 samples," the
+machine learning term.
+```
+involves 100 patients, that is considered a sample from that population,
 and our estimate r(t) is based on that sample.
 
-(Note:  "Sample" will mean our entire dataset; we will say, "A sample of 100
-people," as in statistics courses, not "We have 100 samples.")
 
 The term *population* is used in the statistics community.  Those who
 come to ML from the computer science world tend to use terms like
