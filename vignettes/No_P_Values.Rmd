@@ -37,27 +37,28 @@ as *p-values*:
 
 To be sure, though "post p<0.05 era" sounds like a ban on ST,
 the position paper did not quite call for a ban.  It was, in many
-ways, the proverbial "camel created by a committee".  Since some on the
+ways, the proverbial "camel created by a committee."  Since some on the
 committee still believe in ST, the paper stopped short of a ban.  Yet,
 the paper offered no use case in which ST *should* be used; their
 silence on that may be considered "significant" (pun intended).
 
 # What's all the fuss about?
 
-As the paper points out, these concerns about ST were not new.  They
-were, for instance, explained in 
-[a popular elementary stat text](https://wwnorton.com/books/9780393929720) and 
-even 
-[entire books](https://www.press.umich.edu/186351/cult_of_statistical_significance).  (See also 
-[my paper](https://academic.oup.com/ee/article/20/5/1246/2480617).)
+As the paper points out, these concerns about ST were not new.  Anti-ST
+views have been presented, in varying degrees, in [a popular elementary
+statistic text](https://wwnorton.com/books/9780393929720) and even
+[entire
+books](https://www.press.umich.edu/186351/cult_of_statistical_significance).
+(See also [my
+paper](https://academic.oup.com/ee/article/20/5/1246/2480617).)
 
-Indeed, most statisticians had been aware of the flaws of ST, but had
-continued to use them and teach them.  Why did they proceed in spite of
-knowing the dangers of STs?  For some it was out of habit, for others it
-was an appreciation of the elegance of the mathematical theory.  In many
-cases, it was  just plain convenience: An ST will at least give the
-analyst "an answer," and the analyst may thus be willing to ignore the
-potential problems with that answer.
+Indeed, most statisticians have lon been aware of the flaws of ST,
+before the but used them and taught them anyway.  Why did they proceed
+in spite of knowing the dangers of STs?  For some it was out of habit,
+for others it was an appreciation of the elegance of the mathematical
+theory.  In many cases, it was  just plain convenience: An ST will at
+least give the analyst "an answer," and the analyst may thus be willing
+to ignore the potential problems with that answer.
 
 Then what changed?  Among other things, 
 [a paper by John Ionnidis](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124), 
@@ -71,7 +72,7 @@ community to take a long-overdue look at statistical practice.
 Say we have a sample mean, aimed at estimating a population mean.  Or,
 more generally, say we have an asymptotically normal estimator T of some
 population value &theta;, with standard error s.e.(T).  For a test of
-approximate Type I error &alpha; of H<sub>0</sub>:   &theta; =
+approximate Type I error sizwe &alpha; of H<sub>0</sub>:   &theta; =
 &theta;<sub>0</sub>, reject H<sub>0</sub> if 
 
 Z = |(T-&theta;<sub>0</sub></sub>) / s.e.(T)| &gt; q<sub>1-&alpha; / 2</sub>
@@ -158,9 +159,9 @@ normality; should we use it?  No!  We know *a priori* that the effects
 can't be exactly normal -- e.g.  no one is 20 feet tall nor has a
 negative height -- yet normality would imply both -- so again, the ST,
 by asking whether the distributions are exactly normal, is asking the
-wrong question.  We may wish to continue a Method of Moments approach to
-estimating the variance components, which would not assume normal
-distributions in our data..
+wrong question.  We may wish instead to take a Method of Moments
+approach to estimating the variance components, which would not assume
+normal distributions in our data.
 
 ## But what if we just want to know whether there is *some* difference, even if small?
 
@@ -213,7 +214,7 @@ information:
 2. The width of the CI gives us an idea as to how accurate the
    indication in (1) is above.
 
-### Example:  Opinion poll in an election
+## Example:  Opinion poll in an election
 
 Say you are the campaign manager for Candidate X, and conduct a poll of
 the electorate.  You form a CI for p, the population proportion of
@@ -236,10 +237,10 @@ give Candidate X cause for optimism, as opposed to simply telling X,
 most important, X sees from the large width of the CI that a much larger
 poll is needed to get accurate results.
 
-### Another advantage of CIs over ST
+## Another advantage of CIs over ST
 
 The opinion poll example illustrates the fact that, in addition to being
-more informative, another advantage of CIs is their Intuitive
+more informative, another advantage of CIs is their intuitive
 interpretability.  Every poll is reported with a *margin of error*.
 This is actually the radius of a 95% CI for the population proportion
 under discussiuon.  The general public is quite comfortable with margins
