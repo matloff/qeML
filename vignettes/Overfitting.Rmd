@@ -49,11 +49,9 @@ talking about** in discussing bias and variance.
 ## Required Background
 
 Only very basic statistical concepts are needed, plus patience (document
-is a bit long).  Expected value notation, E(), is used in a couple of
-places, but is explained intuitively in the given context, and is not
-vital to the exposition.
+is a bit long).  
 
-## Setting
+## Setting and Notation
 
 Let Y denote our outcome variable, and X represent the vector of our
 predictors/features.  We are predicting Y from X.  For instance, Y might
@@ -65,6 +63,8 @@ a vector of c 1s and 0s, with only one component being 1 at a time.
 classification problems, with Y = 1 or 0, coding the "yes" class and
 "no" class.  
 
+We denote by n and p the number of rows and columns in our training
+data.
 
 Overfitting is often described as arising when we go too far towards the
 low-bias end of the Bias-Variance Tradeoff.  Yes, but what does that
@@ -166,7 +166,7 @@ In other words,
 > in an expensive neighborhood, our prediction based only on Square Feet
 > will likely be too low.
 
-We can write this as
+We can write this as, for a specific case,
 
    average(actual value - predicted value from size alone, 
       given size=2125, location='Seaside') > 0 
@@ -210,7 +210,7 @@ Let's illustrate this with the **pef** dataset, included with the
 6 57.70413 zzzOther 100   1       0       0
 ```
 
-Let's start with a very simple model, predicting wage income number of
+Let's start with a very simple model, predicting wage income from number of
 weeks worked:
 
 ``` r
@@ -225,6 +225,12 @@ So, our predicted income of someone who works 45 weeks would be
    -2315.625 + 1387.481 x 45
 
 But again, this varies from one training dataset to another.  One can
+```{marginfigure}
+For readers who know the matrix view of linear models: Our predicted
+value is a linear function of the b<sub>i</sub>, whose variance is 
+equal to the indicated matrix expression involving the covariance matrix
+of the b vector.
+```
 show that its estimated variance is as follows:
 
 ``` r
@@ -251,13 +257,8 @@ The estimated variance of our prediction is now
 [1,] 237114.2
 ```
 
-In other words:
-
-> For fixed n, the number of rows in our data, a prediction using more
-> columns will have smaller bias but larger variance.  This is the
-> Bias-Variance Tradeoff.
-
-
+So, adding just one more feature led to a dramatic increase in variance.
+```{marginfigure}
 The relevance of sampling variance is difficult for many nonspecialists
 in statistics/machine learning to accept.  "But we only have one
 sample," some might object to the analysis in the preceding paragraphs.
@@ -268,9 +269,17 @@ winning.  If the winnings vary rather little from one play of the game
 to another, and if the expected value is positive, your risk is less.
 But with large variability from one play to another, you will likely
 feel uneasy about taking the chance.
-
 The same is true in data science, and that in turn means that
 sampling variance is key.
+```
+Again, note that this reflects the variance in the b<sub>i</sub> from
+one sample training set to another.
+
+Roughly speaking:
+
+> For a fixed number of rows in our data, a prediction
+> using more columns will have smaller bias but larger variance.  This
+> is the Bias-Variance Tradeoff.
 
 # A U-Shaped Curve
 
