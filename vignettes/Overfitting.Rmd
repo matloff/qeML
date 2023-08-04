@@ -161,10 +161,6 @@ statistics courses, that of the sample variance.  Say we have an i.i.d.
 sample X<sub>1</sub>,...,X<sub>n</sub> from some population in which the
 variance of X is an unknown quantity &sigma;<sup>2</sup>.  
 
-(Note again:  We use the word *sample* in the manner of the statistics
-community. A dataset of 100 rows is *a sample* (singular) of 100 cases, 
-not "100 samples" or "100 examples" is in the ML community..)
-
 How do we estimate &sigma;<sup>2</sup> from the X<sub>i</sub>?
 
 At first, one might take as our estimate
@@ -182,7 +178,13 @@ that
 E(S<sup>2</sup>) = ((n-1)/n) &sigma;<sup>2</sup>
 
 In other words, averaged over all possible samples from this population,
-S<sup>2</sup> comes out...a...little...too...small.  So, they declared
+S<sup>2</sup> comes out...a...little...too...small.   There is a *bias*
+here of
+
+&sigma;<sup>2</sup> - ((n-1)/n) &sigma;<sup>2</sup> =
+(1/n) &sigma;<sup>2</sup>
+
+So, they declared
 that the estimator for &sigma;<sup>2</sup> would be
 
 s<sup>2</sup> = (n/(n-1)) S<sup>2</sup>
