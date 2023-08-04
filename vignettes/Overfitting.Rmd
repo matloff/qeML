@@ -16,19 +16,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Clearing the Confusion:  a Closer Look at Overfitting
 
-# Clearing the Confusion:  A Closer Look at Overfitting
-
-* [Goals](#goals)
-* [Required Background](#required-background)
-* [Setting](#setting)
-* [The "True" Relation between Y and X](#the-"true"-relation-between-y-and-x)
-* [A starting example](#a-starting-example)
-* [Bias in prediction](#bias-in-prediction)
-* [Baffling behavior--drastic overfitting](#baffling-behavior--drastic-overfitting)
-* [How could it be possible?](#how-could-it-be-possible?)
-* [Baffling behavior--"double descent"](#baffling-behavior--"double-descent")
-* [How could it be possible?](#how-could-it-be-possible?)
+The concept of overfitting is often mentioned in prediction
+applications, but often in vague terms.  Let's see what is really
+occurring.
 
 # Preparation
 
@@ -56,10 +48,10 @@ talking about** in discussing bias and variance.
 
 ## Required Background
 
-Very basic statistical concepts + patience (document is a bit long).
-Expected value notation, E(), is used in a couple of places, but is
-explained intuitively in the given context, and is not vital to the
-exposition.
+Only very basic statistical concepts are needed, plus patience (document
+is a bit long).  Expected value notation, E(), is used in a couple of
+places, but is explained intuitively in the given context, and is not
+vital to the exposition.
 
 ## Setting
 
@@ -154,109 +146,46 @@ data points.  Of course, k is a hyperparameter, chosen by the analyst.
 
 # Bias and Variance of WHAT
 
-## A starting example: estimators of &sigma;<sup>2</sup>
-
-Let's first review a famous instance of bias taught in elementary
-statistics courses, that of the sample variance.  Say we have an i.i.d.
-sample X<sub>1</sub>,...,X<sub>n</sub> from some population in which the
-variance of X is an unknown quantity &sigma;<sup>2</sup>.  
-
-How do we estimate &sigma;<sup>2</sup> from the X<sub>i</sub>?
-
-At first, one might take as our estimate
-
-S<sup>2 = </sup>(1/n) &Sigma;<sup>n</sup><sub>i=1</sub>
-(X<sub>i</sub> - X<sub>bar</sub>)<sup>2</sup>, 
-
-where X<sub>bar</sub> is the sample mean
-
-(1/n) &Sigma;<sup>n</sup><sub>i=1</sub> X<sub>i</sub>
-
-But the pioneering statisticians didn't like this, because they found
-that 
-
-E(S<sup>2</sup>) = ((n-1)/n) &sigma;<sup>2</sup>
-
-In other words, averaged over all possible samples from this population,
-S<sup>2</sup> comes out...a...little...too...small.   There is a *bias*
-here of
-
-&sigma;<sup>2</sup> - ((n-1)/n) &sigma;<sup>2</sup> =
-(1/n) &sigma;<sup>2</sup>
-
-So, they declared
-that the estimator for &sigma;<sup>2</sup> would be
-
-s<sup>2</sup> = (n/(n-1)) S<sup>2</sup>
-
-to make things come out exactly right.
-
-However, most estimators are biased, and we must deal with that.  It's a
-major issue in prediction, as we now discuss.
-
 ## Bias in prediction
 
-### Parametric methods
+Though the reader may have seen the concept of statistical bias in terms
+```{marginfigure}
+Prediction methods are often used in real estate contexts, such as in
+assessing market value.
+```
+of simple estimators, our context here is different.  Let's take as
+our example prediction of house prices, say using the predictor
+variables Square Feet and Location.
 
-Parametric methods such as linear and logistic models have a bias, in
-the sense of the fundamental inaccuracy of the model itself.  
+Generally, the larger a home is, the greater its value.  But the
+same-sized home will have a higher value in some places than others.
+In other words,
 
-Though the true population relation may be somewhat linear, the linear
-model cannot be perfectly correct.  So, no matter how much data we have,
-our estimated r(t) will not converge to the true &rho;(t) as the sample
-size grows; r(t) WILL converge to something, but that something will be
-the best-fitting LINEAR function for the population &rho;(t), not the
-best-fitting FUNCTION.
+> If we predict the price of a house based only on size and decline to
+> use (or do not know) its location, we induce a bias.  If say the house is
+> in an expensive neighborhood, our prediction based only on Square Feet
+> will likely be too low.
 
-This is *model bias*.  Consider predicting the height of a person who is
-68.2 inches tall.  Our best prediction would be &rho;(68.2), which we
-estimate from our data via r(68.2).  Averaged over all possible samples,
-our prediction r(68.2) will NOT be equal to the true value, i.e.
+We can write this as
 
-Ei[r(68.2)] &ne; &rho;(68.2)
+   average(actual value - predicted value from size alone, 
+      given size=2125, location='Seaside') > 0 
 
-### Nonparametric (i.e. ML) methods
+That average discrepancy is called the *bias*.  Here the bias will be
+positive for the houses in expensive neighborhoods, and negative for
+those in inexpensive areas.
 
-For model-free, i.e. nonparametric, methods, the bias is subtler.
-Consider k-NN, again predicting weight from height.  To calculate, say,
-r(70.6) with k=12, we find the 12 points in our data closest to 70.6, then take as
-r(70.6) the average weight among those 12 people.  
-
-Bias arises as follows:  Say we wish to predict weight for a person of
-height 64.2, which is on the shorter end of the height range.  Then most
-of the neighboring people in our dataset are likely to be taller than
-64.2, and since our prediction will consist of the mean weight among the
-neighbors, this 64.2-inch tall person's weight will likely be
-overestimated, i.e.  
-
-E[r(64.2)] > &rho;(64.2)
-
-But there is an important difference between this and the parametric
-example:  The larger the sample size n is (keeping k fixed), the smaller
-the bias.  With a very large sample, the neighbors of the 64.2-inch tall
-person, for example, will tend to be pretty close to 64.2, producing a
-smaller bias.  This is in contrast to the example of the linear model,
-in which the bias persists even as the sample size grows.
-
-Note too that for fixed n, smaller k will result in smaller bias.
-Fewer neighbors means that the ones we have are close by.
-
-The bias described above is *pointwise*, meaning specific to a
-particular value of t, e.g. t = 64.2 (or say t = (64.2,28.0) if we are
-predicting from both height and age).)  By contrast, the MSPE is
-averaged over the distribution of X, i.e.
-
-MSPE = E[(Y - &rho;(X))<sup>2</sup>]
-
-So, a linear model has permanent bias, even for huge datasets, while for
-k-NN, random forests and so on the bias goes to 0 as the dataset grows.
-But on the other hand, a linear model will have a smaller variance, our
-next topic:
+Note that "average" here means the mean over all possible houses of the
+given size and place.  In some cases, we may not underpredict, but on
+average we will do so.  The mean is also over possible training
+datasets; in a linear model, for instance, different datasets will
+produce different values of the b<sub>i</sub>, and thus produce
+different predicted values.
 
 ## Variance in prediction
 
 This refers to sampling variance, which measures the degree of
-instability of one's estimated r(t) from one sample to another.
+instability of one's estimated r(t) from one training dataset to another.
 E.g. in the above linear model, there will the variation of the 
 b<sub>i</sub> from one sample to another, thus causing variation in 
 r(t) among samples.
