@@ -190,13 +190,73 @@ E.g. in the above linear model, there will the variation of the
 b<sub>i</sub> from one sample to another, thus causing variation in 
 r(t) among samples.
 
-The same holds for nonparametric models.  In the k-NN example above, say
-n = 1000 and k = 25.  Then we are essentially basing our r(64.2) on the
-average of 25 data points--whereas the linear model uses all 1000 data
-points.  So, k-NN will have a larger variance.  
+The key point is:
 
-Note too that since k-NN averages k values, then for fixed n, we will
-have that the larger k is, the smaller the variance.
+> The more complex our model, the higher the variance of its fit to the
+> data.
+
+Let's illustrate this with the **pef** dataset, included with the
+**qeML** package:
+
+``` r
+> data(pef)
+> head(pef)
+       age     educ occ sex wageinc wkswrkd
+1 50.30082 zzzOther 102   2   75000      52
+2 41.10139 zzzOther 101   1   12300      20
+3 24.67374 zzzOther 102   2   15400      52
+4 50.19951 zzzOther 100   1       0      52
+5 51.18112 zzzOther 100   2     160       1
+6 57.70413 zzzOther 100   1       0       0
+```
+
+Let's start with a very simple model, predicting wage income number of
+weeks worked:
+
+``` r
+> zWeeks <- lm(wageinc ~ wkswrkd,pef))
+> coef(zWeeks)
+(Intercept)     wkswrkd 
+  -2315.625    1387.481 
+```
+
+So, our predicted income of someone who works 45 weeks would be
+
+   -2315.625 + 1387.481 x 45
+
+But again, this varies from one training dataset to another.  One can
+show that its estimated variance is as follows:
+
+``` r
+> c(1,45) %*% vcov(zWeeks) %*% c(1,45)
+         [,1]
+[1,] 98016.11
+```
+
+Now let's fit a somewhat more complex model, including age:
+
+``` r
+zWeeksAge <- lm(wageinc ~ wkswrkd+age,pef)
+> coef(zWeeksAge)
+(Intercept)     wkswrkd         age 
+-22097.8721   1388.9398    498.5047 
+```
+
+Say we predict the income of a worker who worked 45 weeks and is age 26.
+The estimated variance of our prediction is now
+
+``` r
+> c(1,45,26) %*% vcov(zWeeksAge) %*% c(1,45,26)
+         [,1]
+[1,] 237114.2
+```
+
+In other words:
+
+> For fixed n, the number of rows in our data, a prediction using more
+> columns will have smaller bias but larger variance.  This is the
+> Bias-Variance Tradeoff.
+
 
 The relevance of sampling variance is difficult for many nonspecialists
 in statistics/machine learning to accept.  "But we only have one
