@@ -32,10 +32,14 @@ examples," which is a definition, not an explanation.  Or we hear that
 overfitting results from "fitting the training data too well" or that we
 are "fitting the noise," again rather unsatisfying.
 
-Somewhat better--but only somewhat-- are the explanations based on the
-famous Bias-Variance Tradeoff:
+Somewhat better--but only somewhat--are the explanations based on the
+famous Bias-Variance Tradeoff.  The latter is the mathematical
+relationship,
 
-> Mean squared prediction error (MSPE) is the sum of squared bias and variance.
+> mean squared prediction error (MSPE) = squared bias + variance
+
+The narrative is then:
+
 > Bias and variance are at odds with each other.  The lower the bias, the
 > more the variance.  As we move through a sequence of models of
 > increasing complexity, eventually the reduction in bias is overwhlemed
@@ -58,7 +62,7 @@ predictors/features.  We are predicting Y from X.  For instance, Y might
 be human weight, with X being (height, age).  We include binary
 ```{marginfigure}
 In multiclass settings with c classes, Y is
-a vector of c 1s and 0s, with only one component being 1 at a time.
+a vector of c 1s and 0s, with only one component being equal to 1 at a time.
 ```
 classification problems, with Y = 1 or 0, coding the "yes" class and
 "no" class.  
@@ -172,10 +176,17 @@ In other words,
 
 We can write this as, for a specific case,
 
-   average(actual value - predicted value from size alone, 
+````{verbatim} 
+   average(actual value - 
+      predicted value from size alone, 
       given size=2125, location='Seaside') > 0 
+````
 
 That average discrepancy is called the *bias*.  Here the bias will be
+```{marginfigure}
+Note that, negative or positive, the impact on MSPE is the same, since
+the latter involves *squared* bias.
+```
 positive for the houses in expensive neighborhoods, and negative for
 those in inexpensive areas.
 
