@@ -274,11 +274,12 @@ So, adding just one more feature led to a dramatic increase in variance.
 ```{marginfigure}
 This can be a conceptual challenge for some, who may ask, "Why does
 sampling variation matter?  We have only one sample." The point is that
-if sampling variance is low, then most samples produce b<sub>i</sub>
+if sampling variance is low, say, then most samples produce b<sub>i</sub>
 that are near the true &beta;<sub>i</sub>, giving us confidence that
-this particular sample is of that nature.  It's just like playing a game
+our particular sample is of that nature.  It's just like playing a game
 in a casino; we may play the game just once, but we will still want to know
-the probability of winning before deciding to gample.
+the probability of winning--i.e. the proportion of wins among many
+plays--before deciding to gamble.
 ```
 Again, note that this reflects the sampling variation in the b<sub>i</sub>
 from one dataset to another.
