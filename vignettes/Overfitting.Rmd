@@ -89,7 +89,7 @@ The &rho; function is the best (i.e. minimum MSPE) predictor of weight
 based on height and age, the ideal.  Note the phrase "based on," though.
 If we had a third predictor variable/feature available, say waist size,
 there would be another &rho; function for that 3-predictor setting,
-better than the 2-predictor one.
+possibly better than the 2-predictor one.
 
 Note too that the &rho; function is a population entity, which we estimate
 from our sample data.  Denote the estimated &rho;(t) by r(t).  Say we
@@ -103,9 +103,13 @@ machine learning term.
 involves 100 patients, that is considered a sample from that population,
 and our estimate r(t) is based on that sample.
 
-
 The term *population* is used in the statistics community.  Those who
 come to ML from the computer science world tend to use terms like
+```{marginfigure}
+For those with some background in probability theory:  We are modeling the
+conditional distribution of Y given X, so we can regard the X columns in
+our dataset as fixed but the Y column as random.
+```
 *probabilistic generating process*.  Either way, it is crucial to keep
 in mind that we treat our data as randomly generated.  If our data
 consists of 100 diabetes patients, we treat them as being randomly drawn
@@ -177,10 +181,7 @@ those in inexpensive areas.
 
 Note that "average" here means the mean over all possible houses of the
 given size and place.  In some cases, we may not underpredict, but on
-average we will do so.  The mean is also over possible training
-datasets; in a linear model, for instance, different datasets will
-produce different values of the b<sub>i</sub>, and thus produce
-different predicted values.
+average we will do so.  
 
 ## Variance in prediction
 
@@ -224,7 +225,8 @@ So, our predicted income of someone who works 45 weeks would be
 
    -2315.625 + 1387.481 x 45
 
-But again, this varies from one training dataset to another.  One can
+But again, the predicted value varies from one training 
+dataset to another.  One can
 ```{marginfigure}
 For readers who know the matrix view of linear models: Our predicted
 value is a linear function of the b<sub>i</sub>, whose variance is 
@@ -259,21 +261,16 @@ The estimated variance of our prediction is now
 
 So, adding just one more feature led to a dramatic increase in variance.
 ```{marginfigure}
-The relevance of sampling variance is difficult for many nonspecialists
-in statistics/machine learning to accept.  "But we only have one
-sample," some might object to the analysis in the preceding paragraphs.
-True, but we are interested in the probability that that our sample is
-representative of the population.  In a gambling casino, you may play a
-game just once, but you still would like to know the probability of
-winning.  If the winnings vary rather little from one play of the game
-to another, and if the expected value is positive, your risk is less.
-But with large variability from one play to another, you will likely
-feel uneasy about taking the chance.
-The same is true in data science, and that in turn means that
-sampling variance is key.
+This can be a conceptual challenge for some, who may ask, "Why does
+sampling variation matter?  We have only one sample." The point is that
+if sampling variance is low, then most samples produce b<sub>i</sub>
+that are near the true &beta;<sub>i</sub>, giving us confidence that
+this particular sample is of that nature.  It's just like playing a game
+in a casino; we may play the game just once, but we will still want to know
+the probability of winning before deciding to gample.
 ```
-Again, note that this reflects the variance in the b<sub>i</sub> from
-one sample training set to another.
+Again, note that this reflects the sampling variation in the b<sub>i</sub>
+from one dataset to another.
 
 Roughly speaking:
 
