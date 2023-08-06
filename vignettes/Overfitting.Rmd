@@ -148,11 +148,18 @@ classic k-Nearest Neighbors approach.  To estimate &rho;(t), we find the
 k closest rows in our dataset to t, and average the Y values of those
 data points.  Of course, k is a hyperparameter, chosen by the analyst.
 
+Other machine learning methods, such as random forests, SVM and neural
+nets, have similar problems to what we discuss below, so k-NN will be
+our main nonparametric example.
 
 </br>
 </br>
 
 # Bias and Variance of WHAT
+
+It's very easy to drop terms like "Bias-Variance Tradeoff" into a
+discussion, but what does it really mean?  We'll explain here, mainly
+with linear model examples, but bring in k-NN later.
 
 ## Bias in prediction
 
@@ -290,7 +297,39 @@ Roughly speaking:
 > using more columns will have smaller bias but larger variance.  This
 > is the Bias-Variance Tradeoff.
 
-# A U-Shaped Curve
+## What about k-NN?
+
+Opposing effects on bias and variance definitely arise here (and in any
+other ML method):
+
+* **Bias:** Say Y = weight, X = height, and k is rather large.  Suppose
+  we need to predict the weight of a very tall person.  A problem arises
+  in that most of the training data points in the k-neighborhood of this
+  tall person will be shorter than him/her--thus lighter.  So, when we
+  average the weights of the neighborhs to get our predicted weight for
+  the new person, we are likely to be too low, a positive bias.  A
+  negative basis can occur analogously.  Smaller k values are thus
+  desirable.
+
+* **Variance:** As we know from statistics, the variance of a sample
+  mean is the population variance divided by the number of terms being
+  averaged.  In other words, variance will be proportional to 1/k.
+  Larger k values are thus desirable.
+
+
+# Where Is the "Goldilocks" Level of Complexity
+
+For any dataset and predictive algorithm, there is some optimal level of
+complexity--optimal feature set, optimal k etc.--which achieves minimum MSPE.
+Let's take a look.
+
+## Dependency on n
+
+Important principle:
+
+> The larger n is, the higher level of complexity is optimal
+
+## A U-Shaped Curve
 
 We stated above that a linear model cannot be exactly correct, even with
 an unlimited amount of data.  So, why not a quadratic model?  
@@ -301,12 +340,8 @@ This includes the linear model as a special case (&beta;<sub>2</sub> =
 0), but also is more general.  In the population, the best-fitting
 quadratic model will be more accurate than the best-fitting linear one.
 How about one of degree 3?  With higher and higher degree polynomials,
-we can reduce the bias to smaller and smaller amounts.
-
-But in finite samples, the higher the degree of the polynomial, the
-larger the variance.  (We have more parameters to estimate, and I like
-to think in terms of them "sharing" the data, less data available to
-each one.) 
+we can reduce the bias to smaller and smaller amounts.  But the higher
+the degree of the polynomial, the larger the variance.  
 
 So, we have a battle between bias and variance!  As we increase the
 degree, first 1, then 2, then 3 and so on, the bias initially shrinks a
@@ -321,14 +356,19 @@ Result:
 > but eventually variance overpowers bias.  Once we pass the low point
 > of the curve, **we are overfitting**.
 
-The same is true for k-NN, plotting prediction error against k.  As
-noted, we can achieve smaller bias with smaller k.  The latter situation
-means smaller neighborhoods, making the problem of "using tall people to
-predict a short person's weight" less likely.  But smaller k means we
-are taking an average over a small set of people, which will vary a lot
-from one sample to another, i.e. larger variance.  If we try a range of
-k values, the bias-variance tradeoff will typically result in a U-shaped
-curve.
+The same is true for k-NN, plotting prediction error against k.  Say for
+convenience our horizontal axis has large values of k on the left,
+smaller ones on the right, with MSPE on the vertical axis.  Starting on
+the left, with a very large value of k, as we move to the right with
+smaller and smaller values of k, what will occur?
+
+As noted, we can achieve smaller bias with smaller k.  The latter
+situation means smaller neighborhoods, making the problem of "using tall
+people to predict a short person's weight" less likely.  But smaller k
+means we are taking an average over a small set of people, which will
+vary a lot from one sample to another, i.e. larger variance.  If we try
+a range of k values, the bias-variance tradeoff will typically result in
+a U-shaped curve.
 
 Again, MSPE is a population quantity, but we can estimate it via
 cross-validation.  For instance, for each value of k in a range, we can
