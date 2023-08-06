@@ -77,7 +77,7 @@ really mean in the prediction context?
 </br>
 </br>
 
-# The "true" relation between Y and X
+# The "True" Relation between Y and X
 
 The *regression function of Y on X*, &rho;(t), is defined to be the mean
 ```{marginfigure}
@@ -300,7 +300,8 @@ Roughly speaking:
 ## What about k-NN?
 
 Opposing effects on bias and variance definitely arise here (and in any
-other ML method):
+other ML method).  The above analysis involving the number of predictors
+has a similar effect here, but let's look at the effect of k instead:
 
 * **Bias:** Say Y = weight, X = height, and k is rather large.  Suppose
   we need to predict the weight of a very tall person.  A problem arises
@@ -316,143 +317,58 @@ other ML method):
   averaged.  In other words, variance will be proportional to 1/k.
   Larger k values are thus desirable.
 
+So, again, we see bias and variance at odds with each other.
 
-# Where Is the "Goldilocks" Level of Complexity
+<br> 
+<br> 
+
+# Where Is the "Goldilocks" Level of Complexity?
 
 For any dataset and predictive algorithm, there is some optimal level of
+```{marginfigure}
+Other measures than MSPE might be used.  An analog of the neat
+bias<sup>2</sup>+variance formulation would not exist, but the 
+same general principles would hold.
+```
 complexity--optimal feature set, optimal k etc.--which achieves minimum MSPE.
-Let's take a look.
+Let's take a look.  First, a very important principle.
 
 ## Dependency on n
 
-Important principle:
-
 > The larger n is, the higher level of complexity is optimal
 
-## A U-Shaped Curve
-
-We stated above that a linear model cannot be exactly correct, even with
-an unlimited amount of data.  So, why not a quadratic model?  
-
-&rho;(weight) = mean weight = &beta;<sub>0</sub> + &beta;<sub>1</sub> height + &beta;<sub>2</sub> height<sup>2</sup>
-
-This includes the linear model as a special case (&beta;<sub>2</sub> =
-0), but also is more general.  In the population, the best-fitting
-quadratic model will be more accurate than the best-fitting linear one.
-How about one of degree 3?  With higher and higher degree polynomials,
-we can reduce the bias to smaller and smaller amounts.  But the higher
-the degree of the polynomial, the larger the variance.  
-
-So, we have a battle between bias and variance!  As we increase the
-degree, first 1, then 2, then 3 and so on, the bias initially shrinks a
-lot while the variance grows only a little.  But eventually, inceasing
-the degree by 1 will reduce bias only a little, while variance increases
-a lot.
-
-Result:
-
-> If we plot MSPE vs. degree, we typically will get a
-> U-shaped curve.  Bias reduction dominates variance increase initially,
-> but eventually variance overpowers bias.  Once we pass the low point
-> of the curve, **we are overfitting**.
-
-The same is true for k-NN, plotting prediction error against k.  Say for
-convenience our horizontal axis has large values of k on the left,
-smaller ones on the right, with MSPE on the vertical axis.  Starting on
-the left, with a very large value of k, as we move to the right with
-smaller and smaller values of k, what will occur?
-
-As noted, we can achieve smaller bias with smaller k.  The latter
-situation means smaller neighborhoods, making the problem of "using tall
-people to predict a short person's weight" less likely.  But smaller k
-means we are taking an average over a small set of people, which will
-vary a lot from one sample to another, i.e. larger variance.  If we try
-a range of k values, the bias-variance tradeoff will typically result in
-a U-shaped curve.
-
-Again, MSPE is a population quantity, but we can estimate it via
-cross-validation.  For instance, for each value of k in a range, we can
-fit k-NN on our training data and the estimate the corresponding
-MSPE value by predicting our test set.
+## A U-shaped curve
 
 Mean squared error is the sum of a decreasing quantity, squared bias,
 and an increasing quantity, variance.  This typically produces a
 U-shape, but there is no inherent reason that it must come out this way.
 A double-U can occur (see below), or for that matter, multiple-U. 
 
+## Cross-validation
+
+Again, MSPE is a population quantity, but we can estimate it via
+cross-validation.  For instance, for each value of k in a range, we can
+fit k-NN on our training data and the estimate the corresponding
+MSPE value by predicting our test set.
+
 </br>
 </br>
-
-# Empirical Illustration
-
-I used the [Million Song
-Dataset](https://archive.ics.uci.edu/ml/datasets/yearpredictionmsd).  It
-consists of 90 audio measurements on about 500,000 songs.  To reduce the
-amount of computation, I used only a random subset of 10,000 songs, and
-only two audio variables, fitting polynomial models in the two
-predictors, with increasing polynomial degree.  (The package includes the dataset
-**oneksongs**, a random subset of 1,000 songs.)
-
-As noted, mean squared prediction error is a sum of bias squared and
-variance.  I calculated mean absolute prediction error (MAPE), but the
-principle is the same; it still combines bias and variance.  
-
-My goal was to show that:
-
-1.  As degree increases, MAPE at first falls but later rises, confirming the
-    "U-shape" discussed above.
-
-2.  But as degree increases, variance *always* increases.
-
-Combining these two points, we can observe the battle between bias and
-variance in their impact on MAPE.  At first the reduction in bias
-dominates the increase in variance, but for larger degrees, the
-opposite it true.
-
-As a useful measure of variance, I took the first song in the dataset,
-and let t = the vector of audio characterstics of that particular song.
-I then found the variance of r(t) (a matrix quadratic form of t with the
-estimated covariance matrix of the vector of coefficients of the
-polynomial).
-
-I fit degrees 1 through 12.  (Again, to save on computation, I used
-interaction terms only of degree 2.)  For cross-validated MAPE values, I
-used 20 random holdout sets of size 1000.  Here is the output, with
-variance and MAPE in the top and bottom rows, respectively:
-
-```text
-           [,1]       [,2]       [,3]       [,4]       [,5]       [,6]
-[1,] 0.02440784 0.02718803 0.03184419 0.04229401 0.04945168 0.05450264
-[2,] 7.86296820 7.74149419 7.74222432 7.66320622 7.70638321 7.69907202
-           [,7]       [,8]     [,9]        [,10]    [,11]    [,12]
-[1,] 0.06572677 0.07980077 0.114887 -0.008906266       NA       NA
-[2,] 7.73367546 7.70928618 7.733230  7.793813681 9.980302 17.36951
-```
-
-Starting with degree 10, there are serious numerical issues, arising
-from exact or nearly exact collinearity among the various terms in the
-polynomial.  Thus variance is not reported for degrees 11 and 12, and
-even is negative (due to roundoff error) for degree 10.
-
-In the top row, one can see variance steadily increasing through 
-degree 9.  MAPE shows a general "U" trend, albeit a
-shallow one.  
 
 # Overfitting with Impunity--and Even Gain?
 
 Research in machine learning has, among other things, produced two major
-mysteries, which we address now.
+mysteries, which we discuss now.
 
 ## Baffling behavior--drastic overfitting
 
 In many ML applications, especially those in which neural networks are
-used, there may be far more hyperparameters than data points, i.e. p >>
-n.  Yet excellent prediction accuracy on new data has often been
+used, there may be far more hyperparameters than data points.
+Yet excellent prediction accuracy on new data has often been
 reported in spite of such extreme overfitting.
 
 ## How could it be possible?
 
-Much speculation has been made as to why these phenomena can occur.  My
+Much speculation has been made as to why this phenomenon can occur.  My
 own speculation is as follows.
 
 * **These phenomena occur in classification problems in which there is a
@@ -474,13 +390,13 @@ very low error rate, 1 or 2% or even under 1%.**
 Here is an example, using a famous image recognition dataset
 (generated by code available [here](https://jlmelville.github.io/uwot/metric-learning.html):
 
-![alt text](UMAPFMNIST.png)
+![UMAP plot](UMAPFMNIST.png)
 
 There are 10 classes, each shown in a different color.  Here the UMAP
 method (think of it as a nonlinear PCA) was applied for dimension
-reduction, down to dimension 2 here.  There are some isolated points here and
+reduction, shown to dimension 2 here.  There are some isolated points here and
 there, but almost all the data is separated into 10 "islands."  Between
-any 2 islands, there are tons of high-dimensonal curves, say high-degree
+any two islands, there are tons of high-dimensonal curves, say high-degree
 polynomials, that one can fit to separate them.  So we see that
 overfitting is just not an issue, even with high-degree polynomials.
 
@@ -492,14 +408,8 @@ familiar graph of test set accuracy vs. model complexity consists of
 *two* U shapes rather than one.  The most intriguing cases are those in
 which the first U ends at a point where the model fully interpolates the
 training data, i.e. 0 training error--and yet *even further* complexity
-actually reduces test set error.
-
-Below is an example again with the song data, but with a linear model
-rather than a polynomial one.  The horizontal axis is p, the number of
-predictors.  We see the double-U, though not with improvement in the
-second U over the first.
-
-![alt text](https://matloff.files.wordpress.com/2020/11/overfit.png)
+actually reduces test set error, with the minimum of the second U being
+smaller than the first..
 
 ## How could it be possible?
 
