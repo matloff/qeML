@@ -279,7 +279,7 @@ The estimated variance of our prediction is now
 
 So, adding just one more feature led to a dramatic increase in variance.
 ```{marginfigure}
-This can be a conceptual challenge for some, who may ask, "Why does
+This may be difficult to accept for some, who may ask, "Why does
 sampling variation matter?  We have only one sample." The point is that
 if sampling variance is low, say, then most samples produce b<sub>i</sub>
 that are near the true &beta;<sub>i</sub>, giving us confidence that
