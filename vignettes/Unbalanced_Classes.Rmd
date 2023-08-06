@@ -1,49 +1,32 @@
 
+
 ---
-title: "Unbalanced Class Data"
-output: rmarkdown::html_vignette
+output:
+   tufte::tufte_html: default
 vignette: >
-  %\VignetteIndexEntry{Unbalanced Class Data}
+  %\VignetteIndexEntry{Overfitting}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
 #  Clearing the Confusion: A Closer Look at the Issue of Unbalanced Training Data 
 
 Many resources on machine learning (ML) classification problems
-recommend that if one's dataset has unbalanced class sizes, one
-should modify the data to have equal class counts.  Yet it is shown here
-that this is both unnecessary and often harmful.  Alternatives are
-presented.
+recommend that if one's dataset has unbalanced class sizes, one should
+modify the data to have equal class counts.  Yet it is explained here
+that this is typically both unnecessary and possibly harmful.
+Alternatives are presented.
 
-
-* [Outline](#outline)
-* [Overview](#overview)
-* [Motivating examples](#motivating-examples)
-  * [Credit card fraud data](#credit-card-fraud-data)
-  * [Missed appointments data](#missed-appointments-data)
-  * [Optical letter recognition data](#optical-letter-recognition-data)
-  * [Mt. Sinai Hospital X-ray study](#mt.-sinai-hospital-x-ray-study)
-  * [Cell phone fraud](#cell-phone-fraud)
-* [Terminology](#terminology)
-* [Notation](#notation)
-* [Key issue:  How were the data generated?](#key-issue:-how-were-the-data-generated?)
-* [Optimal classification rules](#optimal-classification-rules)
-* [What your ML algorithm is thinking](#what-your-ml-algorithm-is-thinking)
-* [Artificial balance will not achieve our goals](#artificial-balance-will-not-achieve-our-goals)
-* [So, what SHOULD be done?](#so,-what-should-be-done?)
-  * [Approach 1: use the ROC curve](#approach-1:-use-the-roc-curve)
-  * [Approach 2:  informal, nonmechanical consideration of the r<sub>i</sub> (favored choice)](#approach-2:-informal,-nonmechanical-consideration-of-the-r<sub>i</sub>-(favored-choice))
-* [Obtaining the r<sub>i</sub>](#obtaining-the-r<sub>i</sub>)
-  * [Example: Missed Apppointments Data](#example:-missed-apppointments-data)
-* [Adjusting the p<sub>i</sub>](#adjusting-the-p<sub>i</sub>)
-  * [The adjustment formula](#the-adjustment-formula)
-* [Summary](#summary)
-* [Appendix A: derivation of the unequal-loss rule](#appendix-a:-derivation-of-the-unequal-loss-rule)
-* [Appendix B: derivation of the adjustment formula](#appendix-b:-derivation-of-the-adjustment-formula)
-* [Appendix C:  What is really happening if you use equal class probabilities?](#appendix-c:-what-is-really-happening-if-you-use-equal-class-probabilities?)
-
-## Outline
+# Outline
 
 * The main concern regarding imbalanced training data: Our ML
   algorithm may never predict very small classes, making the algorithm
@@ -52,7 +35,7 @@ presented.
 * A popular solution is to artificially balance the data, e.g. via the CRAN
   package **smotefamily**.
 
-* This changes the class probabilities, with undesirable consequences.
+* This changes the class probabilities, with possibly undesirable consequences.
 Since class probabilities do factor into our prediction, changing them
 distorts our analysis.
 
@@ -68,13 +51,13 @@ probabilities may change.
 
 * Solutions:
 
-    - Regarding imbalance, we first consider ROC, but argue
+    - Regarding imbalance, we first consider ROC approaches, but argue
       that simple, informal use of conditional probabilities is best.
 
     - Regarding incorrect class probabilities, we develop an adjustment
       formula.
 
-## Overview
+## Introduction
 
 Illustrations of the (perceived) problems and
 offered remedies appear in numerous parts of the ML literature, ranging
@@ -129,9 +112,6 @@ Quoting from the Kaggle site,
 > (frauds) account for 0.172% of all transactions.
 
 Note the phrase, "highly unbalanced."
-
-Due to privacy concerns, PCA has been used to replace most of the
-features,  though two original features have been retained.
 
 ### Missed appointments data
 
@@ -193,8 +173,7 @@ blood test value on some measure is 2.39, the latter is the condition.
 Among all patients with that blood test value, what proportion of them have
 the disease?
 
-The overall class probabilities, e.g. the 0.000172 value above, are
-*unconditional class probabilities*.
+The overall class probabilities are *unconditional class probabilities*.
 
 The conditional and unconditional class probabilities are often referred
 to as the *posterior* and *prior* probabilities.  This sounds Bayesian,
@@ -216,7 +195,9 @@ estimate from our training data.
 * f<sub>i</sub>: (conditional) density of X within class i
 
 2-class case (Y = 0,1):
+
 * p: P(Y = 1) (probability of class 1)
+
 * r<sub>i</sub>: estimated q<sub>1</sub>(X<sub>i</sub>)    
 
 Note that for a given case, i.e. a given value of the feature vector X,
