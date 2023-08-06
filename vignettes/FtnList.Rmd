@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ML algorithms
+## ML algorithms
 
     * qeAdaBoost(): Ada Boosting, wraps Jousboost pkg
 
@@ -71,7 +71,7 @@ knitr::opts_chunk$set(
 
     * qeXGBoost() wraps the xgboost pkg
 
-# Feature selection and model-fitting
+## Feature selection and model-fitting
 
     * doubleD(): computation and plotting for exploring Double Descent
 
@@ -107,7 +107,7 @@ knitr::opts_chunk$set(
     * replicMeans(): (from regtools, included in qeML)
       averages output, e.g. testAcc, over many holdout sets
 
-# Application-specific functions (elementary)
+## Application-specific functions (elementary)
 
     * qeText()  text classification
 
@@ -116,12 +116,12 @@ knitr::opts_chunk$set(
     * *image classification*:  Our imageClassR package uses qe
       functions for this.  (Under construction.)
 
-# Prediction with missing values
+## Prediction with missing values
 
     * qeLinMV(), qeLogitMV(), qeKNNMV(), associated predict() 
       generics for use with toweranNA pkg
 
-# Utilities, exploratory tools
+## Utilities, exploratory tools
 
     * dataToTopLevels():  applies factorToTopLevels() to all
       factors in the given data frame
