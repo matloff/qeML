@@ -1,14 +1,20 @@
 
 ---
-title: "Quick Start"
-output: rmarkdown::html_vignette
+output:
+   tufte::tufte_html: default
 vignette: >
-  %\VignetteIndexEntry{Quick Start}
+  %\VignetteIndexEntry{Overfitting}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-# <img src="Forest500UMAP.png" alt="drawing" width="400"/>
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
 
 # The qeML Package: "Quick and Easy" Machine Learning
 
@@ -35,7 +41,7 @@ statistical computing, [bio](https://heather.cs.ucdavis.edu/matloff.html).
 
 * <span style="color:purple">Ideal for teaching!</span>
 
-    * numerous built-in real datasetss.
+    * numerous built-in real datasets.
 
     * includes **tutorials** on major ML methods
 
@@ -47,7 +53,7 @@ statistical computing, [bio](https://heather.cs.ucdavis.edu/matloff.html).
 
     * advanced plotting utilities
 
-## Model fit
+## Easy model fit--first examples
 
 (Also see categorized function list, by calling
 **vignette('FtnList')**.)
@@ -79,13 +85,13 @@ Here is what the data looks like:
 6 Second_Baseman     69    176 29.39
 ```
 
-The qe-series function calls are of the vewry simple form
+The qe-series function calls are of the very simple form
 
 ``` r
 qe_function_name(dataset,variable_to_predict)
 ```
 
-Say we wish to predict weight of a player.  For the random forests ML
+Say we wish to predict player weights.  For the random forests ML
 algorithm, we would make the simple call
 
 ``` r
@@ -112,19 +118,23 @@ qeRF(mlb1,'Weight',nTree=200)
 Each qe-series function is paired with a **predict** method, e.g.
 to predict player weight:
 
+::: {.fullwidth}
 ``` r
 > z <- qeGBoost(mlb1,'Weight')
-> predict(z,data.frame(Position='Catcher',Height=73,Age=28))
+> x <- data.frame(Position='Catcher',Height=73,Age=28)
+> predict(z,x)
 [1] 204.2406
 ```
+:::
 
 A catcher of height 73 and age 28 would be predicted to have weight
-about 204.
+about 204.  
 
 Categorical variables can be predicted too.  Where possible,
 class probabilities are computed in addition to class.  Let's predict
 player position from the physical characteristics:
 
+::: {.fullwidth}
 ``` r
 > w <- qeGBoost(mlb1,'Position')
 > predict(w,data.frame(Height=73,Weight=185,Age=28))
@@ -138,16 +148,19 @@ $probs
 [1,] 0.0592867        0.1824601    0.04046717
 
 ```
+::: 
 
-A player of height 73, weight 185 and age 28
-would be predicted to be a
-relief pitcher, with probability 0.28.
+A player of height 73, weight 185 and age 28 would be predicted to be a
+relief pitcher, with probability 0.28.  The second most-likely position
+would be outfielder, and so on.
 
 ## Holdout sets
 
 By default, the qe functions reserve a *holdout set* on which to assess
+```{marginfigure}
+To specify no holdout, set holdout=NULL in the call.
+```
 accuracy.  The remaining data form the *training set*.
-
 After a model is fit to the training set, we use it to predict the
 holdout data.
 
@@ -163,16 +176,13 @@ holdout set has  101 rows
 The mean absolute prediction error (MAPE) on the holdout data was about
 14.5 pounds.  On the other hand, if we had simply predicted every player
 using the overall mean weight, the MAPE would be about 17.2.  So, using
-height, age and player position for our prediction did improve things a
-lot.
-
-One can skip holdout by setting the **holdout** argument to NULL.
+height, age and player position for our prediction did improve things.
 
 Of course, since the holdout set is random, the same is true for the
-accuracy numbers.  To gauge the predictedive power of a model over many
-holdout sets, one can use **replicMeans()**, which is
-available in qeML by automatic loading of the **regtools**
-package.  Say for 100 holdout sets:
+above accuracy numbers.  To gauge the predictedive power of a model over
+many holdout sets, one can use **replicMeans()**, which is available in
+qeML via automatic loading of the **regtools** package.  Say for 100
+holdout sets:
 
 ``` r
 > replicMeans(100,"qeRF(mlb1,'Weight')$testAcc")
@@ -194,7 +204,8 @@ topics.  A few examples (showing how they are invoked):
 * **vignette('ML_Overview')**; for those with no prior ML background
 
 * **vignette('Overfitting')**; plugging "overfitting" into Google
-  yielded 49,400,000 results!--but what is overfitting REALLY about?
+  yielded 49,400,000 results!--but what is overfitting REALLY about?;
+  read here!
 
 * **vignette('Feature_Selection')**; we often need to pare down our set
   of predictor variables, both to save computation and prevent
