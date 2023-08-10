@@ -531,7 +531,6 @@ rowMatch <- function(d1,d2)
 
 cartesianFactor <- function(dataName,factorNames,fNameSep='.')
 {
-browser()
    dta <- get(dataName)
    # form list of levels of each factor{
    theLevels <- lapply(factorNames,
@@ -543,6 +542,7 @@ browser()
    # form cartesian product of the levels, with one row for each
    # combination of levels, i.e. n1 * n2 rows as in the comment above
    superLevels <- expand.grid(theLevels)
+   # don't mistake 1 for '1'
    for (i in 1:ncol(superLevels))
       superLevels[,i] <- as.character(superLevels[,i])
    subData <- dta[,factorNames]
@@ -554,4 +554,25 @@ browser()
 
 }
 
+# after fitting a qeML model on a data frame dta, saving the result in
+# z, say we now want to predict the Y value of a new case x; x must be
+# of the same R modes as rows of dta, e.g. numeric, character and R
+# factor variables; this information must be retrieved from dta, which
+# is the goal of this function here
 
+# x is specified as an R list of column name/value pairs, one for each
+# column of dta
+
+newDFRow <- function(dta,yName,x) 
+{
+   # remove yName column
+   ycol <- which(names(dta) == yName)
+   dtaX <- dta[,-ycol]
+   # use row 1 as a skeleton having the right R modes
+   tmp <- dtaX[1,]  # eventually will be our output
+   # now replace
+   for (i in 1:ncol(dtaX)) {
+      tmp[,i] <- x[[names(dtaX)[i]]]
+   }
+   tmp
+}
