@@ -529,16 +529,27 @@ rowMatch <- function(d1,d2)
 # f2 have n1 and n2 levels, the output is a new factor with n1 * n2
 # levels
 
-cartFactor <- function(data,factorNames)
+cartesianFactor <- function(dataName,factorNames,fNameSep='.')
 {
+browser()
+   dta <- get(dataName)
    # form list of levels of each factor{
-   theLevels <- lapply(factorNames,function(fName) levels(get(fName)))
+   theLevels <- lapply(factorNames,
+      function(fName) {
+         cmd <- paste0("levels(dta[['",fName,"']])")
+         evalr(cmd)
+      }
+   )
    # form cartesian product of the levels, with one row for each
    # combination of levels, i.e. n1 * n2 rows as in the comment above
    superLevels <- expand.grid(theLevels)
-   subData <- data[,factorNames]
+   subData <- dta[,factorNames]
    subDataLevels <- rowMatch(subData,superLevels)
-   
+   combNames <- function(nms) paste0(nms,collapse='.')
+   newvec <- 
+      sapply(subDataLevels,function(sdl) combNames(superLevels[sdl,]))
+   as.factor(newvec)
+
 }
 
 
