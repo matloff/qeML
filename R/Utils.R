@@ -531,7 +531,6 @@ rowMatch <- function(d1,d2)
 
 cartesianFactor <- function(dataName,factorNames,fNameSep='.')
 {
-browser()
    dta <- get(dataName)
    # form list of levels of each factor{
    theLevels <- lapply(factorNames,
