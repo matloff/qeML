@@ -334,10 +334,10 @@ notably t-SNE and UMAP.  Let's take a very brief look at the latter.
 
 ``` r
 library(umap)
-my <- umap.defaults
-my$n_components <- 6
+mypars <- umap.defaults
+mypars$n_components <- 6
 umOut <- umap(fiftyksongs[,-1],
-   config=my)
+   config=mypars)
 ```
 
 

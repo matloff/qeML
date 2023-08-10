@@ -505,3 +505,40 @@ plot.tuner <- function (x, ...)
     cdparcoord::discparcoord(outdf, k = nr, differentiate = TRUE)
 }
 
+# forms a list of the rows of a data frame
+
+# returns an R list of the rows of 'data'
+
+getRows <- function(data) split(data,1:nrow(data))
+
+# finds the matches, in terms of row numbers, of rows in d1 in rows of
+# d2; assumes each of the former has exactly one match in the latter
+
+# warning: uses character representations; conceivably two R factor
+# types could map to the same character representations
+
+rowMatch <- function(d1,d2) 
+{
+   charD1 <- apply(d1,1,function(rw) paste(rw,collapse=' '))
+   charD2 <- apply(d2,1,function(rw) paste(rw,collapse=' '))
+   g <- function(x) match(x,charD2)
+   g(charD1)
+}
+
+# generates a "superfactor" from individual ones; e.g. if factors f1 and
+# f2 have n1 and n2 levels, the output is a new factor with n1 * n2
+# levels
+
+cartFactor <- function(data,factorNames)
+{
+   # form list of levels of each factor{
+   theLevels <- lapply(factorNames,function(fName) levels(get(fName)))
+   # form cartesian product of the levels, with one row for each
+   # combination of levels, i.e. n1 * n2 rows as in the comment above
+   superLevels <- expand.grid(theLevels)
+   subData <- data[,factorNames]
+   subDataLevels <- rowMatch(subData,superLevels)
+   
+}
+
+
