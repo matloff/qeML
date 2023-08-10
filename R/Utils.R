@@ -531,6 +531,7 @@ rowMatch <- function(d1,d2)
 
 cartesianFactor <- function(dataName,factorNames,fNameSep='.')
 {
+browser()
    dta <- get(dataName)
    # form list of levels of each factor{
    theLevels <- lapply(factorNames,
@@ -542,6 +543,8 @@ cartesianFactor <- function(dataName,factorNames,fNameSep='.')
    # form cartesian product of the levels, with one row for each
    # combination of levels, i.e. n1 * n2 rows as in the comment above
    superLevels <- expand.grid(theLevels)
+   for (i in 1:ncol(superLevels))
+      superLevels[,i] <- as.character(superLevels[,i])
    subData <- dta[,factorNames]
    subDataLevels <- rowMatch(subData,superLevels)
    combNames <- function(nms) paste0(nms,collapse='.')
