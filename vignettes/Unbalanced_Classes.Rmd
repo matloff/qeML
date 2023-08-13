@@ -177,7 +177,7 @@ The overall class probabilities are *unconditional class probabilities*.
 
 The conditional and unconditional class probabilities are often referred
 to as the *posterior* and *prior* probabilities.  This sounds Bayesian,
-and indeed we do use Bayes' Rule, but there is no subjectivity involved;
+and Bayes' Rule, but there is no subjectivity involved;
 these are real probabilities.  E.g. in a disease classification
 application, there is a certain proportion of people in the population
 who have the disease.  This is a prior probability, which we will
@@ -194,14 +194,13 @@ estimate from our training data.
 * (X<sub>i</sub>,Y<sub>i</sub>), i=1,2,...,n: training data
 * f<sub>i</sub>: (conditional) density of X within class i
 
+* l<sub>ij</sub>: loss incurred by guessing class i when the true class is j
+
 2-class case (Y = 0,1):
 
 * p: P(Y = 1) (probability of class 1)
 
 * r<sub>i</sub>: estimated q<sub>1</sub>(X<sub>i</sub>)    
-
-Note that for a given case, i.e. a given value of the feature vector X,
-the r<sub>i</sub> will sum to 1, as i ranges across all our classess.
 
 ## Key issue:  How were the data generated?
 
@@ -238,7 +237,9 @@ with quite different frequencies:
 <br>
 >   Z           0.07
 
-One can obtain these numbers in `regtools`:
+One can obtain these numbers in the `regtools` package, included by
+'qeML'.
+:
 
 ``` r
 > data(ltrfreqs)
@@ -254,6 +255,11 @@ One can obtain these numbers in `regtools`:
 ## What your ML algorithm is thinking
 
 ML algorithms take your data literally.  Say you have a two-class
+```{marginfigure}
+The term *population* is sometimes only conceptual, but in all cases we
+believe our data are generated randomly in some manner, and the term
+refers to the associated distribution.
+```
 setting, for Classes 0 and 1.  If about 1/2 your data is Class 1, then
 the algorithm, whether directly or indirectly, operates under the
 assumption that the true population class probabilities are each about 0.5.
@@ -265,8 +271,10 @@ use will then assume the true probabilities of the letters are about
 illustrates.
 
 So, if your sampling scheme artificially creates balanced data, as in
-the LetterRecognition data, or if you do resampling to make your data balanced, as
-is commonly recommended, you are fooling your ML algorithm.  
+the LetterRecognition data, or if you do resampling to make your data
+balanced, as is commonly recommended, you are fooling your ML algorithm.  
+
+In the following, let's focus on the 2-class case for simplicity.
 
 ## Artificial balance will not achieve our goals
 
