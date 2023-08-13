@@ -563,16 +563,30 @@ cartesianFactor <- function(dataName,factorNames,fNameSep='.')
 # x is specified as an R list of column name/value pairs, one for each
 # column of dta
 
-newDFRow <- function(dta,yName,x) 
+# to save typing in specifying x, the user can say, "Give me a row like
+# that of dta[dtaRowNum,] but with some elements changed according to
+# what I specify in x
+
+newDFRow <- function(dta,yName,x,dtaRowNum=1) 
 {
    # remove yName column
    ycol <- which(names(dta) == yName)
    dtaX <- dta[,-ycol]
    # use row 1 as a skeleton having the right R modes
-   tmp <- dtaX[1,]  # eventually will be our output
+   tmp <- dtaX[dtaRowNum,]  # eventually will be our output
    # now replace
-   for (i in 1:ncol(dtaX)) {
-      tmp[,i] <- x[[names(dtaX)[i]]]
+###    for (i in 1:ncol(dtaX)) {
+###       tmp[,i] <- x[[names(dtaX)[i]]]
+###   }
+   for (nm in names(x)) {
+      dtaCol <- dta[[nm]]
+      fX <- is.factor(dtaCol)
+      if (!fX) tmp[[nm]] <- x[[nm]]
+      else {
+         newDtaVal <- x[[nm]]
+         newDtaVal <- factor(newDtaVal,levels(dta[[nm]]))
+         tmp$nm <- newDtaVal
+      }
    }
    tmp
 }
