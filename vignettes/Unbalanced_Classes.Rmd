@@ -320,15 +320,18 @@ to sampling variability, and (b) not all qe-series functions are capable
 of calculating the r values.
 
 Clearly, one's course of action should center around the value of
+```{marginfigure}
+Both approaches will be informal.  The reader is urged to avoid
+"automatic" solutions, as proper action is highly dependent on the
+specific application.
+```
 r<sub>new</sub>.  Specifically, how should we use it?  We will discuss
 two approaches:
 
 1. Use of the ROC curve, which is derived from the
    r<sub>i</sub> values.
 
-2. Informal, nonmechanical consideration of the r<sub>new</sub> value.
-
-Our recommendation will be Approach 2 above.
+2. Direct consideration of the r<sub>new</sub> value.
 
 ### Approach 1: use the ROC curve
 
@@ -357,12 +360,7 @@ the code and result:
 > qeROC(MissedAppts,z,'Yes')
 ```
 
-![alt text](MissedApptsROCYes.png)
-
-So for instance, if we were to set h = 0.24, then FPR and TPR would be
-about 0.2 and 0.4, respectively.  While this may be interesting, it is
-not advising us how setting h = 0.24 is directly relevant to the issue
-at hand--how do we identify possible no-shows?
+![Missed Appts ROC](MissedApptsROCYes.png)
 
 Often a 45-degree line is superimposed on the ROC graph for comparison.
 To see why, say we are classifying patients as having a certain disease
@@ -371,6 +369,17 @@ with a point on the line, diseased and disease-free patients would have
 the same probability of testing positive, indicating that the test has
 no discriminatory value.  Thus, the further above the 45-line our ROC
 curve is, the better our predictive power.
+
+This can be used as an aid for the analyst to try to find a "happy
+medium" point for deciding whether to take action on a suspicion that
+the client will not show up. 
+
+For instance, if we were to set h = 0.24, then FPR and TPR would be
+about 0.2 and 0.4, respectively.   Is this an acceptable tradeoff?  The
+answer depends on the severity of trouble that a missed appointment
+brings the business and many other factors.  Taking all aspects of the
+situation into account, the analyst can choose a value of h to use in
+all future such decisions.
 
 *A note on AUC:*  AUC is the total area under the ROC curve.  As such,
 it is a measure of the general predictive ability of your algorithm on
@@ -382,15 +391,12 @@ the artificially balanced data are not comparable.
 
 ### Approach 2:  informal, nonmechanical consideration of r (favored choice)
 
-The key points are:
+Here, our approach is even less mechanical, not even setting a fixed h
+as above.  We simply look at r<sub>new</sub> **and special aspects of
+this particular case** and use our judgment to decide.  Some cases may
+have additional information not in our training set, thus justifying a
+more flexible case-by-case approach.
 
-* ROC involves macro-level quantities, TPR and FPR. In highly
-  unbalanced settings, we are concerned with the micro-level, rare
-events where the much smaller class occurs.
-
-* Mechanical rules are too constraining for many applications.
-
-This latter point is especially relevant.
 Often the required decision is too critical to be left up to a machine.
 For instance, relevant to our fraud example, in
 [Fraud: a Guide to Its Prevention, Detection and Investigation](https://www.pwc.com.au/consulting/assets/risk-controls/fraud-control-jul08.pdf) 
@@ -402,67 +408,14 @@ by Price Waterhouse Coopers, it is pointed out that
 Use of a machine learning algorithm to make a mechanical decision would
 not provide this needed flexibility.
 
-Instead, a practical, *effective* approach would be to simply look at
-the r value for the new case directly.  In other words, we have the
-algorithm only take the first step, after which we work "by hand" rather
-than by computer.  We would still set a threshold h, yes, but would use
-it only as first-stage screening, with the second stage being done by
-humans.  
-
-At that point, the (human) fraud auditor would take  into account both
-that estimated probability as well as such factors as the amount of the
-charge, special characteristics not measured in the available features,
-and so on.  The auditor may not give priority, for instance, to a case
-for which the probability is above h but the monetary value of the
-transaction is small.  On the other hand, if the probability is far
-above h, the auditor may give this transaction a closer look even if the
-monetary value is small.
-
-A related issue is that of ranking.  In the credit card fraud example,
-for instance, we may have sufficient audit funding to investigate 100
-transactions per month.  Thus we would rank the r<sub>i</sub>, and cull
-out the top 100 cases, and set h = r<sub>100</sub>.  Any future r value
-above that hwill be given extra scrutiny.
-
-## Extracting the r<sub>i</sub> values
-
-The qe-series functions include a component **holdoutPreds**, which give
-us the predictions for the holdout cases.  That component in turn shows
-predicted classes and the r<sub>i</sub>.
-
-``` r
-> names(z)
- [1] "handle"         "raw"            "niter"          "evaluation_log"
- [5] "call"           "params"         "callbacks"      "feature_names" 
- [9] "nfeatures"      "classif"        "factorsInfo"    "yLevels"       
-[13] "holdoutPreds"   "testAcc"        "holdIdxs"      
-> names(z$holdoutPreds)
-[1] "predClasses" "probs"      
-```
-
-The **probs** component in this case has No and Yes columns (no, the
-person was not a no-show):
-
-``` r
-> head(z$holdoutPreds$probs)
-            No       Yes
-[1,] 0.8597212 0.1402789
-[2,] 0.8391342 0.1608659
-[3,] 0.8112034 0.1887966
-[4,] 0.7932751 0.2067250
-[5,] 0.8362259 0.1637741
-[6,] 0.8776399 0.1223601
-```
-
-So, here is a histogram of the Yes r<sub>i</sub> in the Missed Appointments
-dataset, to give us an idea of how often various r values will arise in
-the future:
-
-``` r
-hist(z$holdoutPreds$probs[,2])
-```
-
-![alt text](MissedApptsXBGYes.png)
+In the credit card fraud example, for instance, the (human) fraud
+auditor would take  into account both that estimated probability as well
+as such factors as the amount of the charge, special characteristics not
+measured in the available features, and so on.  The auditor may not give
+priority, for instance, to a case for which the probability is above h
+but the monetary value of the transaction is small.  On the other hand,
+if the probability is far above h, the auditor may give this transaction
+a closer look even if the monetary value is small.
 
 ## Adjusting for incorrect/changed p<sub>i</sub>
 
