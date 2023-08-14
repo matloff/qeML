@@ -347,13 +347,14 @@ out the ROC curve.  Some R packages, such as ROCR, colorize the curve,
 with the color showing the value of h.  The qeML function **qeROC**
 (which wraps the **ROCR** package) does this.
 
-For instance, let's look at the Missed Appointments Dataset.  Here re
+For instance, let's look at the Missed Appointments Dataset.  Here are
 the code and result:
 
 ``` r
 
+> data(MissedAppts) 
 > z <- qeXGBoost(MissedAppts,'No.show')
-> qeROC(MissedAppts,z,'No.show','Yes')
+> qeROC(MissedAppts,z,'Yes')
 ```
 
 ![alt text](MissedApptsROCYes.png)
