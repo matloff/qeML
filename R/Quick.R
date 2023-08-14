@@ -2536,6 +2536,7 @@ qeXGBoost <- function(data,yName,nRounds=250,params=list(),
    xgbOut$classif <- classif
    xgbOut$factorsInfo <- factorsInfo
    xgbOut$yLevels <- yLevels
+   xgbOut$yName <- yName
 
    if (!is.null(holdout)) {
       tst[,ycol] <- tst[,ycol] + 1
