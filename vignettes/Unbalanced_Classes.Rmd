@@ -278,11 +278,11 @@ In the following, let's focus on the 2-class case for simplicity.
 
 ## Artificial balance will not achieve our goals
 
-In fooling your algorithm, it will generate the wrong conditional class
-probabilities r<sub>i</sub> in our notation above.  And whether we wish
-to minimize the overall probability of misclassification, or expected
-loss, or any other criterion, the algorithm will (again, directly or
-indirectly) rely on the values of r<sub>i</sub>.  
+In fooling your algorithm, it will generate the wrong conditional
+class-1 probabilities r<sub>i</sub> in our notation above.  And whether
+we wish to minimize the overall probability of misclassification, or
+expected loss, or any other criterion, the algorithm will (again,
+directly or indirectly) rely on the values of r<sub>i</sub>.  
 
 Consider the fraud example, in which the data are highly imbalanced but
 in which wrongly guessing the large class carries heavy penalties for
@@ -311,15 +311,16 @@ Frank Harrell
 ## So, what SHOULD be done?
 
 We will focus here on the 2-class class.  Let r<sub>new</sub> denote the
-conditional class probability P(Y<sub>new</sub> = 1 | X<sub>new</sub> =
-r<sub>new</sub>) for a new case to be classified.
+estimated conditional class probability q<sub>new</sub> =
+P(Y<sub>new</sub> = 1 | X<sub>new</sub>) 
+for a new case to be classified.
 
 Note that (a) as always, the r values are only sample estimates, subject
 to sampling variability, and (b) not all qe-series functions are capable
 of calculating the r values.
 
 Clearly, one's course of action should center around the value of
-r<sub>new</sub>.  specifically, how should we use it?  We will discuss
+r<sub>new</sub>.  Specifically, how should we use it?  We will discuss
 two approaches:
 
 1. Use of the ROC curve, which is derived from the
@@ -332,8 +333,8 @@ Our recommendation will be Approach 2 above.
 ### Approach 1: use the ROC curve
 
 Here one considers various threshhold values h, where we guess class 1
-if r > h, 0 otherwise.  The value one chooses for h will determine the
-True Positive Rate and False Positive Rate:
+if r<sub>new</sub> > h, 0 otherwise.  The value one chooses for h will
+determine the True Positive Rate and False Positive Rate:
 
 TPR(h) = P(Y<sub>pred</sub> = 1 | Y = 1) 
 = &int;<sub>t > h</sub> f<sub>1</sub>(t) dt
