@@ -260,12 +260,17 @@ be overly optimistic.
 
     * **qeLightGBoost()**: gradient boosting, wraps **lightgbm** pkg
 
+    * **qeliquidSVM**: wraps liquidSVM pkg
+
     * **qeLin()**: wraps R's **lm()**
 
     * **qeLinKNN()**: first fits **qeLin()**, followed by k-NN on the
       residuals to correct deviations from linearity
 
     * **qeLogit()**: wraps R's **glm()**
+
+    * **qeNCVregCV**: wraps **ncvreg** package, regularized linar
+      gen. linear regression
 
     * **qeNeural()**: wraps **keras** package, including CNN
 
@@ -297,7 +302,9 @@ be overly optimistic.
 
     * **qeXGBoost()** wraps the **xgboost** pkg
 
-* feature selection and model-fitting
+* feature selection 
+
+* model development
 
     * **doubleD()**: computation and plotting for exploring Double Descent
 
