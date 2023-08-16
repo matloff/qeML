@@ -582,7 +582,7 @@ newDFRow <- function(dta,yName,x,dtaRowNum=1)
       else {
          newDtaVal <- x[[nm]]
          newDtaVal <- factor(newDtaVal,levels(dta[[nm]]))
-         tmp$nm <- newDtaVal
+         tmp[[nm]] <- newDtaVal
       }
    }
    tmp
