@@ -209,6 +209,10 @@ topics.  A few examples (showing how they are invoked):
   practical look at Principal Components Analysis, then gives an
   overview of UMAP, a relatively new nonlinear alternative to PCA
 
+# Full function list, by category
+
+Type **vignette('Function_list')**.
+
 # Norm Matloff, UC Davis
 
 Professor of computer science, and former professor of
