@@ -1,9 +1,10 @@
 
 ---
+title: "Quick Start"
 output:
-   tufte::tufte_html: default
+   rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overfitting}
+  %\VignetteIndexEntry{Quick Start}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -48,9 +49,6 @@ knitr::opts_chunk$set(
     * advanced plotting utilities
 
 ## Easy model fit--first examples
-
-(Also see categorized function list, by calling
-**vignette('FtnList')**.)
 
 The letters 'qe' in the package title stand for "quick and easy,"
 alluding to the convenience goal of the package.  We bring together a
@@ -151,12 +149,9 @@ would be outfielder, and so on.
 ## Holdout sets
 
 By default, the qe functions reserve a *holdout set* on which to assess
-```{marginfigure}
-To specify no holdout, set holdout=NULL in the call.
-```
-accuracy.  The remaining data form the *training set*.
-After a model is fit to the training set, we use it to predict the
-holdout data.
+accuracy.  The remaining data form the *training set*.  After a model is
+fit to the training set, we use it to predict the holdout data.  To
+specify no holdout, set holdout=NULL in the call.
 
 ``` r
 > z <- qeRF(mlb1,'Weight')
@@ -221,4 +216,4 @@ statistics; 2017 Ziegal Award for book,
 from Linear Models to Machine Learning*; 
 Distinguished Teaching Award and Outstanding
 Public Service Award, UC Davis;
-[bio](https://heather.cs.ucdavis.edu/matloff.html).
+[bio here](https://heather.cs.ucdavis.edu/matloff.html).

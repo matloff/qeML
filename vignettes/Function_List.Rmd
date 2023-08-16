@@ -1,10 +1,11 @@
 
 
 ---
+title: "Function List"
 output:
    rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overfitting}
+  %\VignetteIndexEntry{Function List}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
