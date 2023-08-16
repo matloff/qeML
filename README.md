@@ -269,8 +269,8 @@ be overly optimistic.
 
     * **qeLogit()**: wraps R's **glm()**
 
-    * **qeNCVregCV**: wraps **ncvreg** package, regularized linar
-      gen. linear regression
+    * **qeNCVregCV**: wraps **ncvreg** package, linear
+      gen. linear regression regularized via SCAD etc.
 
     * **qeNeural()**: wraps **keras** package, including CNN
 
@@ -302,7 +302,18 @@ be overly optimistic.
 
     * **qeXGBoost()** wraps the **xgboost** pkg
 
-* feature selection 
+* feature importance/selection 
+
+    * **qeFOCI(), qeFOCIrand()**: fully nonparametric method for feature
+      selection
+
+    * **qeLASSO()**:  for feature importance, apply **coef()** to return value
+
+    * **qeLeaveOut1Var**:  fits full model, then with all features but
+      1, for each feature, reporting difference in predictive power; use
+      with any **qeML** predictive function
+
+     * **qeRFranger**:  **variable.importance** component of return value
 
 * model development
 
@@ -317,16 +328,8 @@ be overly optimistic.
     * **qeCompare()**:  compare the accuracy various ML methods on a 
       given dataset
 
-    * **qeFOCI()**: fully nonparametric method for feature selection
-
     * **qeFT()**:  automated grid hyperparameter search, *with
       Bonferroni-Dunn corrected standard errors*
-
-    * **qeLASSO()**:  for fit and/or feature selection
-
-    * **qeLeaveOut1Var**, **qeLASSO**, **qeFOCI**, **qeFOCIrand**,
-      **qeRFranger** and **qeKNN**, all can be used for assessing or
-      setting variable importance
 
     * **qePCA()**:  find principal components, number specified by user,
       then fit the resulting model, according to **qe*** function
