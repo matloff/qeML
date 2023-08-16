@@ -2491,7 +2491,8 @@ qeROC <- function(dataIn,qeOut,yLevelName)
 #     params: R list of tuning parameters; see documentation fo
 #        xgboost::xgboost()
  
-qeXGBoost <- function(data,yName,nRounds=250,params=list(),
+qeXGBoost <- function(data,yName,nRounds=250,
+   params=list(eta=0.3,max_depth=6,alpha=0),
    holdout=floor(min(1000,0.1*nrow(data))))
 {
    checkForNonDF(data)

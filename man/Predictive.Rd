@@ -126,7 +126,8 @@ qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
 qePolyLASSO(data,yName,deg=2,maxInteractDeg=deg,alpha=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeROC(dataIn,qeOut,yLevelName)
-qeXGBoost(data,yName,nRounds=250,params=list(),
+qeXGBoost(data,yName,nRounds=250,
+   params=list(eta=0.3,max_depth=6,alpha=0),
    holdout=floor(min(1000,0.1*nrow(data))))
 qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
    learningrate=0.8,momentum=0.5,learningrate_scale=1,

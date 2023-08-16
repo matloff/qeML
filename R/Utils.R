@@ -575,9 +575,6 @@ newDFRow <- function(dta,yName,x,dtaRowNum=1)
    # use row 1 as a skeleton having the right R modes
    tmp <- dtaX[dtaRowNum,]  # eventually will be our output
    # now replace
-###    for (i in 1:ncol(dtaX)) {
-###       tmp[,i] <- x[[names(dtaX)[i]]]
-###   }
    for (nm in names(x)) {
       dtaCol <- dta[[nm]]
       fX <- is.factor(dtaCol)
