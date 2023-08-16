@@ -150,8 +150,9 @@ would be outfielder, and so on.
 
 By default, the qe functions reserve a *holdout set* on which to assess
 accuracy.  The remaining data form the *training set*.  After a model is
-fit to the training set, we use it to predict the holdout data.  To
-specify no holdout, set holdout=NULL in the call.
+fit to the training set, we use it to predict the holdout data, so as to
+assess the predictive power of our model.  To specify no holdout, set
+holdout=NULL in the call.
 
 ``` r
 > z <- qeRF(mlb1,'Weight')
