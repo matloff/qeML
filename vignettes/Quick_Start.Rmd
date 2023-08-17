@@ -42,9 +42,9 @@ knitr::opts_chunk$set(
 
 * Special features for those experienced in  ML 
 
-    * variety of functions for feature selection and model development
+    * advanced functions for feature selection and model development
 
-    * large variety of ML algorithms, including some novel/unusual ones
+    * advanced ML algorithms, including some novel/unusual ones
 
     * advanced plotting utilities
 
