@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 ```
 
 
-* ML algorithms
+* *ML algorithms*
 
     * **qeAdaBoost()**: Ada Boosting, wraps **Jousboost** pkg
 
@@ -78,7 +78,7 @@ knitr::opts_chunk$set(
 
     * **qeXGBoost()** wraps the **xgboost** pkg
 
-* feature importance/selection 
+* *feature importance/selection* 
 
     * **qeFOCI(), qeFOCIrand()**: fully nonparametric method for feature
       selection
@@ -91,7 +91,7 @@ knitr::opts_chunk$set(
 
      * **qeRFranger**:  **variable.importance** component of return value
 
-* model development
+* *model development*
 
     * **doubleD()**: computation and plotting for exploring Double Descent
 
@@ -118,7 +118,7 @@ knitr::opts_chunk$set(
     * **replicMeans()**: (from **regtools**, included in **qeML**)
       averages output, e.g. **testAcc**, over many holdout sets
 
-* application-specific functions (elementary)
+* *application-specific functions (elementary)*
     
     * **qeText()**  text classification
 
@@ -127,12 +127,15 @@ knitr::opts_chunk$set(
     * *image classification*:  Our **imageClassR** package uses qe
       functions for this.  (Under construction.)
 
-* prediction with missing values
+* *prediction with missing values*
 
     * **qeLinMV()**, **qeLogitMV()**, **qeKNNMV()**, 
       associated **predict()** generics for use with **toweranNA** pkg
 
-* utilities, exploratory tools
+* *utilities, exploratory tools*
+
+    * **cartesianFactor()**:  with inputs of R factors of n1, n2...
+      levels, creates a combined "superfactor" of n1*n2*... levels
 
     * **dataToTopLevels()**:  applies **factorToTopLevels()** to all
       fadtors in the given data frame
@@ -142,7 +145,8 @@ knitr::opts_chunk$set(
     * **levelCounts()**:  performs a census of levels for each R factor in
       the dataset
 
+    * **newDFRow()**:  creates a new case to input to **predict()**
+
     * **qeParallel()**:  apply "Software Alchemy" to parallelize
-      qe functions
-      features, useful e.g. for assessing model validity
+      **qe** functions
 

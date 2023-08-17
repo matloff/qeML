@@ -358,6 +358,9 @@ be overly optimistic.
 
 * utilities, exploratory tools
 
+    * **cartesianFactor()**:  with inputs of R factors of n1, n2...
+      levels, creates a combined "superfactor" of n1*n2*... levels
+
     * **dataToTopLevels()**:  applies **factorToTopLevels()** to all
       fadtors in the given data frame
 
@@ -366,7 +369,8 @@ be overly optimistic.
     * **levelCounts()**:  performs a census of levels for each R factor in
       the dataset
 
+    * **newDFRow()**:  creates a new case to input to **predict()**
+
     * **qeParallel()**:  apply "Software Alchemy" to parallelize
-      qe functions
-      features, useful e.g. for assessing model validity
+      **qe functions
 
