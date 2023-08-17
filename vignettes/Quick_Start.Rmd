@@ -83,7 +83,7 @@ The qe-series function calls are of the very simple form
 qe_function_name(dataset,variable_to_predict)
 ```
 
-Say we wish to predict player weights.  For the random forests ML
+For instance, say we wish to predict player weights.  For the random forests ML
 algorithm, we would make the simple call
 
 ``` r
@@ -96,7 +96,8 @@ For gradient boosting, the call would be similar,
 qeGBoost(mlb1,'Weight')
 ```
 
-and so on.  **IT COULDN'T BE EASIER**!
+and so on.  **IT COULDN'T BE EASIER**!  No setup, predefinitions etc.;
+just make a simple call.
 
 Default values are used on the above calls, but nondefaults can be
 specified, e.g.
@@ -149,10 +150,10 @@ would be outfielder, and so on.
 ## Holdout sets
 
 By default, the qe functions reserve a *holdout set* on which to assess
-accuracy.  The remaining data form the *training set*.  After a model is
+model accuracy.  The remaining data form the *training set*.  After a model is
 fit to the training set, we use it to predict the holdout data, so as to
-assess the predictive power of our model.  To specify no holdout, set
-holdout=NULL in the call.
+assess the predictive power of our model.  (To specify no holdout, set
+holdout=NULL in the call.)
 
 ``` r
 > z <- qeRF(mlb1,'Weight')
@@ -169,7 +170,7 @@ using the overall mean weight, the MAPE would be about 17.2.  So, using
 height, age and player position for our prediction did improve things.
 
 Of course, since the holdout set is random, the same is true for the
-above accuracy numbers.  To gauge the predictedive power of a model over
+above accuracy numbers.  To gauge the predictive power of a model over
 many holdout sets, one can use **replicMeans()**, which is available in
 qeML via automatic loading of the **regtools** package.  Say for 100
 holdout sets:
@@ -209,7 +210,7 @@ topics.  A few examples (showing how they are invoked):
 
 Type **vignette('Function_list')**.
 
-# Norm Matloff, UC Davis
+# Package author: Norm Matloff, UC Davis
 
 Professor of computer science, and former professor of
 statistics; 2017 Ziegal Award for book,
