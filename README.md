@@ -313,7 +313,10 @@ be overly optimistic.
       1, for each feature, reporting difference in predictive power; use
       with any **qeML** predictive function
 
-     * **qeRFranger**:  **variable.importance** component of return value
+    * **qeRareLevels()**:  investigates whether rare levels of a feature
+      that is an R factor should be included
+
+    * **qeRFranger**:  **variable.importance** component of return value
 
 * model development
 
@@ -348,9 +351,6 @@ be overly optimistic.
 
     * **qeTS():**  time series
     
-    * *image classification*:  Our **imageClassR** package uses qe
-      functions for this.  (Under construction.)
-
 * prediction with missing values
 
     * **qeLinMV()**, **qeLogitMV()**, **qeKNNMV()**, 
