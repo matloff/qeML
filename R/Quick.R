@@ -2406,26 +2406,32 @@ qeCompare <- function(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 
 # builds a string for a qe*() call, with options
 
-buildQEcall <- function(qeFtnName,dataName,yName,opts=NULL,holdout=NULL) 
+buildQEcall <- function(qeFtnName,dataName,yName=NULL,opts=NULL,holdout=NULL,
+   holdoutArg=TRUE) 
 {
    ho <- if (is.null(holdout)) 'NULL' else as.character(holdout)
-   qeCmd <- paste0(
-       qeFtnName,'(',
-       'data = ',dataName, 
-       ',yName = ','"',yName,'"',
-       ',holdout = ',ho)
+   cmd <- paste0( qeFtnName,'(','data = ',dataName) 
+   if (!is.null(yName)) {
+      cmd <- paste0(cmd,',yName=','"',yName,'"')
+   }
+   if (holdoutArg) {
+      ho <- if (is.null(holdout)) 'NULL' else as.character(holdout)
+      cmd <- paste0(cmd,',holdout = ',ho)
+   }
+
    if (!is.null(opts)) {  # more args?
       nms <- names(opts)
       for (i in 1:length(nms)) {
-         qeCmd <- paste0(qeCmd,',')
+         cmd <- paste0(cmd,',')
          argval <- opts[[nms[i]]]
          arg <- paste0(nms[i],'=',argval)
-         if (i == length(nms)) qeCmd <- paste0(qeCmd,arg,')')
+         if (i == length(nms)) cmd <- paste0(cmd,arg,')')
       }
-   } else qeCmd <- paste0(qeCmd,')')
-   qeCmd
+   } else cmd <- paste0(cmd,')')
+   cmd
 
 }
+
 
 ######################  qeROC()  #############################
 
