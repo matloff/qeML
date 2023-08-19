@@ -1,13 +1,15 @@
 
-qeFreqParcoord <- function(dataName,k,grpName=NULL) 
+qeFreqParcoord <- function(dataName,k=25,opts=NULL) 
 {
-   # cmd <- paste0('discparcord(',dataName,',k=k')
-   # if (!is.null(grpName)) {
-   #    cmd <- paste0(cmd,',grpcategory=',"'",grpName,"'")
-   # }
-   # qeOut <- eval(parse(text=cmd))
 
-   cmd <- buildQEcall('discparcoord','pef',holdoutArg=FALSE)
+   if (!is.character(dataName)) stop("dataName must be quoted")
+   checkPkgLoaded('cdparcoord')
+
+   # if (!is.null(grpName)) opts[['grpcategory']] <- grpName
+   if (!is.null(opts[['grpcategory']])) 
+      stop('grpcategory not currently implemented')
+
+   cmd <- buildQEcall('discparcoord',dataName,opts=opts,holdoutArg=FALSE)
    evalr(cmd)
 
 }
