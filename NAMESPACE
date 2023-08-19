@@ -66,4 +66,5 @@ export(
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
    levelCounts,dataToTopLevels,checkPkgLoaded,
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,
-   cartesianFactor,newDFRow,qeRareLevels)
+   cartesianFactor,newDFRow,qeRareLevels,
+   qeFreqParcoord,buildQEcall)
