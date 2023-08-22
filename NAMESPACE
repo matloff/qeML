@@ -67,4 +67,4 @@ export(
    levelCounts,dataToTopLevels,checkPkgLoaded,
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,
    cartesianFactor,newDFRow,qeRareLevels,
-   qeFreqParcoord,buildQEcall)
+   qeFreqParcoord,buildQEcall,evalr)
