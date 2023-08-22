@@ -319,7 +319,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
             yesYVal <- yLevels[1]
          whichYes <- which(yLevels == yesYVal)
          noYVal <- yLevels[3 - whichYes]
-         y <- as.integer(y == yesYVal)
+         ### y <- as.integer(y == yesYVal)
       } else noYVal <- NULL
    } else {
       noYVal <- NULL
