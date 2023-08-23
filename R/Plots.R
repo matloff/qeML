@@ -52,10 +52,11 @@ plotPairedResids <- function(data,qeOut)
    }
 }
 
-# run R call from string
-evalr <- function(toexec) {
-   eval(parse(text=toexec),parent.frame())
-}
+# in Utils.R
+### # run R call from string
+### evalr <- function(toexec) {
+###    eval(parse(text=toexec),parent.frame())
+### }
 
 # extract args from ...
 

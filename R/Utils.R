@@ -157,7 +157,8 @@ predictHoldoutKNN <- defmacro(res,
          }
       }
 
-      if (!classif2 &&classif) {
+      # multiclass Y
+      if (!classif2 && classif) {
          predClasses <- preds$predClasses
          probs <- preds$probs
          preds <- list(predClasses=predClasses,probs=probs)
@@ -169,7 +170,8 @@ predictHoldoutKNN <- defmacro(res,
 
       if (classif2) {
          predClasses <- preds$predClasses 
-         res$testAcc <- mean(predClasses != tsty,na.rm=TRUE)
+         tstyClasses <- ifelse(tsty,yesYVal,noYVal)
+         res$testAcc <- mean(predClasses != tstyClasses,na.rm=TRUE)
          res$baseAcc <- 1 - max(table(tst[,ycol])) / nrow(tst)
       } 
       
