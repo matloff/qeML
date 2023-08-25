@@ -653,7 +653,7 @@ qeRF <- function(data,yName,nTree=500,minNodeSize=10,
    xyc <- getXY(data,yName,xMustNumeric=FALSE,classif=classif)
    frml <- stats::as.formula(paste(yName,'~ .'))
    rfout <- randomForest::randomForest(frml,data=data,
-      ntree=nTree,nodesize=minNodeSize,mtry=mtry)
+      importance=TRUE,ntree=nTree,nodesize=minNodeSize,mtry=mtry)
    rfout$classNames <- xyc$classNames
    rfout$classif <- classif
    rfout$trainRow1 <- getRow1(data,yName)
