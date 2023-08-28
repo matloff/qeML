@@ -180,8 +180,8 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{maxdepth}{Maximum number of levels in a tree.}
   \item{qeName}{Name of qe-series predictive function.}
   \item{conv}{R list specifying the convolutional layers, if any.}
-  \item{deweightPars}{Values for de-emphasizing variables in a split,
-     e.g. 'list(age=0.2,gender=0.5)'.}
+  \item{deweightPars}{Values for de-emphasizing variables in a 
+     tree node split, e.g. 'list(age=0.2,gender=0.5)'.}
   \item{allDefaults}{Use all default values of the wrapped function.}
   \item{expandVars}{Columns to be emphasized.}
   \item{expandVals}{Emphasis values; a value less than 1 means de-emphasis.}
