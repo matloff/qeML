@@ -17,7 +17,7 @@
 
 qeRareLevels <- function(x,yName,yesYVal=NULL) 
 {
-   qeML:::checkForNonDF(x)
+   checkForNonDF(x)
 
    yCol <- which(names(x) == yName)
    y <- x[,yCol]
