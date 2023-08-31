@@ -13,6 +13,7 @@ Utilities to manipulate R factors, extending the ones in \code{regtools.}
 levelCounts(data)
 dataToTopLevels(data,lowCountThresholds)
 factorToTopLevels(f,lowCountThresh=0)
+cartesianFactor(dataName,factorNames,fNameSep = ".")
 }
 
 \arguments{
@@ -21,7 +22,11 @@ factorToTopLevels(f,lowCountThresh=0)
   \item{lowCountThresh}{Factor levels will counts below this value will
      not be used for this factor.}
   \item{lowCountThresholds}{An R list of column names and their
-  corresponding values of \code{lowCountThresh}.}
+     corresponding values of \code{lowCountThresh}.}
+  \item{dataName}{A quoted name of a data frame or equivalent.}
+  \item{factorNames}{A vector of R factor names.}
+  \item{fNameSep}{A character to be used as a delimiter in the names of
+  the levels of the output factor.}
 }
 
 \details{
@@ -32,18 +37,26 @@ training set.  Toward this end, \code{factorToTopLevels} will remove
 rare levels from a factor; \code{dataToTopLevels} applies this to an
 entire data frame.
 
-Toward this end, the function \code{levelCounts} simply applies
+Also toward this end, the function \code{levelCounts} simply applies
 \code{table()} to each column of \code{data}, returning the result as an
-R list. (If more than 10 levels, it returns NA simply applies table() to
-each column of \code{data},
+R list. (If more than 10 levels, it returns NA.
+
+The function \code{cartesianFactor} generates a "superfactor" from
+individual ones; e.g. if factors f1 and f2 have n1 and n2 levels, the
+output is a new factor with n1 * n2 levels.
 
 }
 
 \examples{
 
-data(pef)
-levelCounts(pef)  # e.g. finds there are 15182 men, 4908 women
-
+data(svcensus)
+levelCounts(svcensus)  # e.g. finds there are 15182 men, 4908 women
+f1 <- svcensus$gender  # 2 levels
+f2 <- svcensus$occ  # 6 levels
+z <- cartesianFactor('svcensus',c('gender','occ'))
+head(z)
+# [1] female.102 male.101   female.102 male.100   female.100 male.100  
+# 12 Levels: female.100 female.101 female.102 female.106 ... male.141
 
 }
 
