@@ -44,16 +44,16 @@ checkBuildQECall <- function()
    z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='"linear"'),
       pcaProp=0.5) 
 
-   require(dsld)
-
-   dsldML('svcensus','wageinc','gender',qeMLftnName='qeKNN')
-   dsldML('svcensus',quote(wageinc),'gender',qeMLftnName='qeKNN')
-
-   z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='linear'),
-      pcaProp=0.5) 
-   z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='"linear"'),
-      pcaProp=0.5) 
-   print(z$testAcc)
+###    require(dsld)
+### 
+###    dsldML('svcensus','wageinc','gender',qeMLftnName='qeKNN')
+###    dsldML('svcensus',quote(wageinc),'gender',qeMLftnName='qeKNN')
+### 
+###    z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='linear'),
+###       pcaProp=0.5) 
+###    z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='"linear"'),
+###       pcaProp=0.5) 
+###    print(z$testAcc)
 
 }
 
