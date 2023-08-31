@@ -1,12 +1,14 @@
 \name{prgeng}
 \alias{prgeng}
 \alias{pef}
+\alias{svcensus}
 
 \title{
 Silicon Valley programmers and engineers data
 }
 \usage{
 data(prgeng)
+data(svcensus)
 }
 
 \description{
@@ -25,7 +27,11 @@ There are three versions:
     \item{\code{pef}, same as \code{peFactors}, but having only columns
     for age, education, occupation, gender, wage income and weeks
     worked.  The education column has been collapsed to Master's degree,
-    PhD and other.}
+    PhD and other, coded 'z14', 'z16' and 'zzzOther'.  Most cases are in
+    the latter category.}
+
+    \item{\code{svcensus}}, same as {\code{pef}, but with the column
+    name 'sex' replaced by 'gender'.
 
     }
 
