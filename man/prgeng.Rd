@@ -30,8 +30,8 @@ There are three versions:
     PhD and other, coded 'z14', 'z16' and 'zzzOther'.  Most cases are in
     the latter category.}
 
-    \item{\code{svcensus}, same as {\code{pef}, but with the column
-    name 'sex' replaced by 'gender'.
+    \item{\code{svcensus}, same as \code{pef}, but with the column
+    name 'sex' replaced by 'gender'.}
 
     }
 
