@@ -139,10 +139,9 @@ Again, we must not take small p-values literally.
 
 # What Is the Underlying Problem, and Its Implications?
 
-::: {.callout-note}
-### The basic problem with significance testing
+# The basic problem with significance testing
 
-This central issue in the above examples, and essentially in any other
+The central issue in the above examples, and essentially in any other
 testing situation, is that *a significance test is not answering the
 question of interest to us.*  
 
@@ -164,6 +163,4 @@ enough to be considered important.  Analysts should not be misled by
 words like "significant." [Modern statistical
 practice](https://tinyurl.com/2s7x6h2v) places reduced value, or in the
 view of many, no value at all, on significance testing.
-
-:::
 
