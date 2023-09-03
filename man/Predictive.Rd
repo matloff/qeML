@@ -23,6 +23,7 @@
 \alias{qeDT}
 \alias{qeFOCI}
 \alias{qeFOCIrand}
+\alias{qeFOCImult}
 \alias{qeLinKNN}
 \alias{qePolyLASSO}
 \alias{qeROC}
@@ -120,6 +121,9 @@ qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
 qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
    yesYLevel=NULL)
 qeFOCIrand(data,yName,xSetSize,nXSets)
+qeFOCIrand(data,yName,xSetSize,nXSets)
+qeFOCImult(data,yName,numCores=parallel::detectCores(),
+   parPlat="none",coalesce='union')
 qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
    expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
@@ -383,8 +387,14 @@ Some notes on specific functions:
    \code{qePCA} and \code{qeUMAP}.  For instance, the former will first
    extract the specified number of principal components, then fit the
    user's desired ML model, say k-NN (\code{qeKNN}) or gradient boosting
-   (\code{qeGBoost}).  The \code{qeFOCI} function does feature selection
-   in a basically assumption-free manner.
+   (\code{qeGBoost}).  
+
+   \item The \code{qeFOCI} function does feature selection
+   in a basically assumption-free manner.  It handles numeric and binary
+   Y (the latter coded 1,0).  For categorical Y, use \code{qeFOCImult}.
+   The function \code{qeFOCIrand} applies FOCI to many subsets of the
+   input dataset, eventually returning the union of the outputs; this is
+   useful if the dataset has many NA values.
 
    \item Neural network models are implemented by \code{qeNeural}
    and \code{qeDeepnet}, based on \pkg{keras} and \pkg{deepnet}.
