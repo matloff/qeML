@@ -1,6 +1,7 @@
 \name{Utilities}
 \alias{buildQEcall}
 \alias{evalr}
+\alias{newDFRow}
 
 \title{Utilities}
 
@@ -12,7 +13,7 @@ possible use externally.}
 buildQEcall(qeFtnName,dataName,yName=NULL,opts=NULL,holdout=NULL,
     holdoutArg=TRUE) 
 evalr(toexec) 
-
+newDFRow(dta,yName,x,dtaRowNum=1)
 }
 
 \arguments{
@@ -25,6 +26,10 @@ evalr(toexec)
   \item{holdoutArg}{A value TRUE means the function specified in 
      \code{qeFtnName} has an argument 'holdout'.}
   \item{toexec}{Quoted string containing an R function call.}
+  \item{dta}{A data frame.}
+  \item{yName}{Name of response variable.}
+  \item{x}{An R list specifying fields to be set.}
+  \item{dtaRowNum}{Row number in 'dta' to be used as a basis.}
 }
 
 \details{
@@ -33,6 +38,10 @@ The function \code{qeFtnName} does what its name implies:  It assembles
 a string consisting of a \pkg{qeML} function call.  Typically the latter
 is then executed via \link{evalr}.  See for instance the source code of
 \code{qeLeaveOut1Var}.
+
+R's generic \code{predict} function generally required that the input
+rows match the original training data in name and class.  The
+\code{newDFRow} function can be used to construct such a row.
 
 }
 
