@@ -2,6 +2,7 @@
 \alias{levelCounts}
 \alias{dataToTopLevels}
 \alias{factorToTopLevels}
+\alias{cartesianFactor}
 
 \title{R Factor Utilities}
 
