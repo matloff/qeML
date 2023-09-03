@@ -7,8 +7,8 @@
 Silicon Valley programmers and engineers data
 }
 \usage{
-data(prgeng)
-data(svcensus)
+prgeng
+svcensus
 }
 
 \description{

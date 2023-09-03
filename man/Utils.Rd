@@ -1,5 +1,6 @@
 \name{Utilities}
 \alias{buildQEcall}
+\alias{evalr}
 
 \title{Utilities}
 
