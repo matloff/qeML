@@ -243,6 +243,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      'locThreads' (local cores).}
   \item{xSetSize}{Size of subsets of the predictor variables.}
   \item{nXSets}{Number of subsets of the predictor variables.}
+  \item{coalesce}{Method for combining variable sets.}
   \item{deg}{Degree of a polynomial.}
   \item{maxInteractDeg}{Maximul degree of interaction terms in
      a polynomial.}
