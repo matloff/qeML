@@ -3,6 +3,7 @@
 \alias{dataToTopLevels}
 \alias{factorToTopLevels}
 \alias{cartesianFactor}
+\alias{qeRareLevels}
 
 \title{R Factor Utilities}
 
@@ -15,6 +16,7 @@ levelCounts(data)
 dataToTopLevels(data,lowCountThresholds)
 factorToTopLevels(f,lowCountThresh=0)
 cartesianFactor(dataName,factorNames,fNameSep = ".")
+qeRareLevels(x, yName, yesYVal = NULL)
 }
 
 \arguments{
@@ -27,7 +29,11 @@ cartesianFactor(dataName,factorNames,fNameSep = ".")
   \item{dataName}{A quoted name of a data frame or equivalent.}
   \item{factorNames}{A vector of R factor names.}
   \item{fNameSep}{A character to be used as a delimiter in the names of
-  the levels of the output factor.}
+     the levels of the output factor.}
+  \item{x}{A data frame.}
+  \item{yName}{Quoted name of the response variable.}
+  \item{yesYVal}{In the case of binary Y, the factor level to 
+     be considered positive.}
 }
 
 \details{
@@ -45,6 +51,9 @@ R list. (If more than 10 levels, it returns NA.
 The function \code{cartesianFactor} generates a "superfactor" from
 individual ones; e.g. if factors f1 and f2 have n1 and n2 levels, the
 output is a new factor with n1 * n2 levels.
+
+The function \code{qeRareLevels} checks all columns in a data frame in
+terms of being an R factor with rare levels.
 
 }
 
