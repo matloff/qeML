@@ -27,7 +27,6 @@ newDFRow(dta,yName,x,dtaRowNum=1)
      \code{qeFtnName} has an argument 'holdout'.}
   \item{toexec}{Quoted string containing an R function call.}
   \item{dta}{A data frame.}
-  \item{yName}{Name of response variable.}
   \item{x}{An R list specifying fields to be set.}
   \item{dtaRowNum}{Row number in 'dta' to be used as a basis.}
 }
