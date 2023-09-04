@@ -4,7 +4,7 @@ title: "Problems with P-values"
 subtitle: A case study
 author: 
   - Norman Matloff
-date: "9/2/2023"
+date: "9/4/2023"
 crossref:
    labels: roman i
    subref-labels: roman i
@@ -33,9 +33,9 @@ library(qeML)
 
 In 2016, the American Statistical Association released its first-ever
 position paper, to warn of the problems of significance testing and
-"p-values."  Though the issues had been well known for years, it was
-"significant" that the ASA finally took a stand.  Let's use the law
-school data to illustrate.
+"p-values."  Though the issues had been well known for many years, it was
+"significant" that the ASA finally took a stand.  Let's use the **lsa**
+data to illustrate.
 
 # Law School Admissions Data
 
@@ -56,8 +56,10 @@ names(lsa)
 ```
 
 Most of the names are self-explanatory, but we'll note that:  The two
-[The 'age' variable is apparently birth year, with e.g. 67 meaning
-1967.]{.column-margin}
+```{marginfigure}
+The 'age' variable is apparently birth year, with e.g. 67 meaning
+1967.
+```
 decile scores are class standing in the first and third years of law
 school, and 'cluster' refers to the reputed quality of the law school.
 Two variables of particular interest might be the student's score on the
@@ -86,12 +88,15 @@ output above.  But actually, the impact of family income is not very
 large.  Here's why:
 
 Family income in this dataset is measured by quintiles.  So
-[Mathematically, testing for a 0 effect is equivalent to checking
+```{marginfigure}
+Mathematically, testing for a 0 effect is equivalent to checking
 whether the CI contains 0.  But this is missing the point of the CI,
 which is to (a) give us an idea of the effect *size*, and (b) to
 indicate how accurate our estimate is of that size.  Aspect (a) is given
 by the location of the center of the interval, while (b) is seen from
-the CI's radius.]{.column-margin} this estimated coefficient says that,
+the CI's radius.
+```
+this estimated coefficient says that,
 for example, if we compare people who grew up in the bottom 20% of
 income with those who were raised in the next 20%, the mean LSAT score
 rises by only about 1/3 of 1 point--on a test where scores are typically
@@ -121,7 +126,7 @@ summary(w1)
 Indeed, the Black and white interaction terms with undergraduate GPA are
 "very highly significant."  But that does mean we should use the more
 complex model?  Let's check the actual impact of including the
-interaction terms, by doing predictions of both models on a particle X
+interaction terms, by doing predictions of both models on an example X
 value:
 
 ```{r}
@@ -130,28 +135,34 @@ predict(w,typx)  # no-interaction model
 predict(w1,typx)  # with-interaction model
 ```
 
-We see here that adding in term interaction term changed the
+We see here that adding the interaction term changed the
 predictions--and the estimated value of the regession function--by only
-about 0.02 out of a 40.23 baseline.  So, we may well prefer the simpler,
+about 0.02 out of a 40.23 baseline.  So, while the test has validated
+our with-interaction model, we may well prefer the simpler,
 no-interaction model.
 
 Again, we must not take small p-values literally.
 
 # What Is the Underlying Problem, and Its Implications?
 
-# The basic problem with significance testing
-
 The central issue in the above examples, and essentially in any other
 testing situation, is that *a significance test is not answering the
 question of interest to us.*  
 
 We wish to know whether family income plays a substantial role in the
-LSAT, not whether they is any relation at all, no matter how
+LSAT, not whether there is any relation at all, no matter how
 meaningless.  Similarly, we wish to know whether the interaction between
 race and GPA is substantial enough to include it in our model, not
 whether there is any interaction at all, no matter how tiny.
 
 The question at hand in research studies is rarely, if ever, whether a
+```{marginfigure}
+The same concerns, e.g. bias in our data collection methods, also
+applies to settings in which we "just want to see whether the effect is
+positive or negative."  A "significant" but minuscule difference in one
+direction could be due to such inaccuracies,  So here too, it's
+important to restrict attention to substantial differences.
+```
 quantity is 0.000... to infinitely many decimal places.  Indeed, in most
 cases our measuring instrument is not this accurate in the first place;
 there will always be systemic bias or missingness, unobserved variables
