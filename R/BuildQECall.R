@@ -26,24 +26,24 @@ buildQEcall <- function(qeFtnName,dataName,yName=NULL,opts=NULL,holdout=NULL,
 
 }
 
-checkBuildQECall <- function() 
-{
-   data(svcensus)
-
-   qeFreqParcoord(svcensus)
-   qeFreqParcoord('svcensus')
-
-   z <- qePCA(svcensus,'wageinc','qeKNN',pcaProp=0.5)
-   print(z$testAcc)
-
-   z <- qePCA(svcensus,'wageinc','qeKNN',opts=list(k=100),pcaProp=0.5)
-   print(z$testAcc)
-
-   z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='linear'),
-      pcaProp=0.5) 
-   z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='"linear"'),
-      pcaProp=0.5) 
-
+### checkBuildQECall <- function() 
+### {
+###    data(svcensus)
+### 
+###    qeFreqParcoord(svcensus)
+###    qeFreqParcoord('svcensus')
+### 
+###    z <- qePCA(svcensus,'wageinc','qeKNN',pcaProp=0.5)
+###    print(z$testAcc)
+### 
+###    z <- qePCA(svcensus,'wageinc','qeKNN',opts=list(k=100),pcaProp=0.5)
+###    print(z$testAcc)
+### 
+###    z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='linear'),
+###       pcaProp=0.5) 
+###    z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='"linear"'),
+###       pcaProp=0.5) 
+### 
 ###    require(dsld)
 ### 
 ###    dsldML('svcensus','wageinc','gender',qeMLftnName='qeKNN')
@@ -54,6 +54,6 @@ checkBuildQECall <- function()
 ###    z <- qePCA(svcensus,'gender','qeSVM',opts=list(kernel='"linear"'),
 ###       pcaProp=0.5) 
 ###    print(z$testAcc)
-
-}
+### 
+### }
 
