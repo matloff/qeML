@@ -20,9 +20,10 @@ dichotRegFtns <- c(
 'qePolyLASSO',
 '# qePolyLin',
 '# qePolyLog',
-'qeSVM',
-'qeliquidSVM'
+'qeSVM'
 )
 
 source('CheckAll.R')
+
+checkAll(dichotRegFtns,'svc1000','gender',pause=TRUE) 
 

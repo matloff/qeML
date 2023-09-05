@@ -1,25 +1,26 @@
 
 require(qeML)
-data(prgeng)
+data(svcensus)
 set.seed(9999)
-pe1000 <- prgeng[sample(1:nrow(prgeng),1000),]
+svc1000 <- svcensus[sample(1:nrow(svcensus),1000),]
+dataName <- 'svc1000'
 
 evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
 }
 
-checkAll <- function(regFtns,data,yName,pause=TRUE) 
+checkAll <- function(regFtns,dataName,yName,pause=TRUE) 
 {
 
    errMsgs <- NULL
-   for (qeFtn in regFtns) {
-      if (substr(qeFtn,1,1) == '#') {
-         warning(paste0('skipping ',qeFtn))
+   for (qeFtnName in regFtns) {
+      if (substr(qeFtnName,1,1) == '#') {
+         warning(paste0('skipping ',qeFtnName))
          next
       }
-      qeCmd <- sprintf('qeOut <- %s(%s,"%s")$testAcc',qeFtn,data,yName)
+      qeCmd <- sprintf('qeOut <- %s(%s,"%s")$testAcc',qeFtnName,dataName,yName)
       res <- try(evalr(qeCmd))
-      print(qeFtn)
+      print(qeFtnName)
       if (!inherits(res,'try-error')) print(qeOut)
       else errMsgs <- c(errMsgs,res)
       if (pause) ans <- readline('next')

@@ -20,8 +20,7 @@ NumericRegFtns <- c(
 'qePolyLASSO',
 'qePolyLin',
 '# qePolyLog',
-'# qeSVM',
-'# qeliquidSVM'
+'# qeSVM'
 )
    
 source('CheckAll.R')
