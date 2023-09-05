@@ -24,5 +24,8 @@ multiclassRegFtns <- c(
 )
    
 source('CheckAll.R')
+
+checkAll(multiclassRegFtns,'svc1000','occ',pause=TRUE) 
+
       
 
