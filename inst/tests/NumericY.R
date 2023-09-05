@@ -25,3 +25,6 @@ NumericRegFtns <- c(
    
 source('CheckAll.R')
 
+checkAll(NumericRegFtns,'svc1000','wageinc',pause=TRUE) 
+
+
