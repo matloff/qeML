@@ -20,9 +20,7 @@ S3method(predict,qeKNN)
 S3method(predict,qeRF)
 S3method(predict,qeRFranger)
 S3method(predict,qeRFgrf)
-S3method(predict,qeskRF)
 S3method(predict,qeSVM)
-S3method(predict,qeskSVM)
 S3method(predict,qeGBoost)
 S3method(predict,qeAdaBoost)
 S3method(predict,qeNeural)
@@ -50,18 +48,17 @@ S3method(predict,qeLightGBoost)
 S3method(predict,qeLinKNN)
 S3method(predict,qePolyLinKNN)
 S3method(predict,qeXGBoost)
-S3method(predict,qeliquidSVM)
 S3method(predict,qeNCVregCV)
 S3method(predict,qeLinMV)
 S3method(predict,qeLogitMV)
 S3method(predict,qeKNNMV)
 
 export(
-   qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeskRF,qeDT,
+   qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeDT,
    qeLogit,qeLin,qeKNN,qeSVM,qeGBoost,qeAdaBoost,
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,qeNCVregCV,
-   qePolyLin,qePolyLog,qePolyLASSO,qeskSVM,qePolyLinKNN,
-   qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,qeliquidSVM,
+   qePolyLin,qePolyLog,qePolyLASSO,qePolyLinKNN,
+   qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,
    doubleD,qeFOCI,qeFOCIrand,qeLinKNN,qeDeepnet,
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
    levelCounts,dataToTopLevels,checkPkgLoaded,

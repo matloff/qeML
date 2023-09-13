@@ -66,10 +66,6 @@ knitr::opts_chunk$set(
 
     * **qeRFranger()**: random forests, wraps **ranger** pkg
 
-    * **qeskRF()**: random forests, wraps Python **Scilearn** pkg
-
-    * **qeskSVM()**: SVM, wraps Python **Scilearn** pkg
-
     * **qeSVM()**: SVM, wraps **e1071** pkg
 
     * **qeXGBoost()** wraps the **xgboost** pkg

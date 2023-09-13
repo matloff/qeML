@@ -17,8 +17,6 @@
 \alias{qeIso}
 \alias{qePCA}
 \alias{qeUMAP}
-\alias{qeskRF}
-\alias{qeskSVM}
 \alias{qeParallel}
 \alias{qeDT}
 \alias{qeFOCI}
@@ -51,8 +49,6 @@
 \alias{predict.qeIso}
 \alias{predict.qePCA}
 \alias{predict.qeUMAP}
-\alias{predict.qeskRF}
-\alias{predict.qeskSVM}
 \alias{predict.qeDeepnet}
 \alias{predict.qeParallel}
 \alias{predict.qeNCVregCV}
@@ -88,12 +84,8 @@ qeRFranger(data,yName,nTree=500,minNodeSize=10,
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
    holdout=floor(min(1000,0.1*nrow(data))))
-qeskRF(data,yName,nTree=500,minNodeSize=10,
-   holdout=floor(min(1000,0.1*nrow(data))))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
    allDefaults=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
-qeskSVM(data,yName,gamma=1.0,cost=1.0,kernel='rbf',degree=2,
-   holdout=floor(min(1000,0.1*nrow(data))))
 qeGBoost(data,yName,nTree=100,minNodeSize=10,learnRate=0.1,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeAdaBoost(data, yName, treeDepth = 3, nRounds = 100, rpartControl = NULL, 
@@ -361,19 +353,13 @@ Some notes on specific functions:
    regression version is \code{qePolyLog}, and there is a LASSO version,
    \code{qePolyLASSO}.
    
-   \item Several SVM implementations are offered:  \code{qeSVM} wraps
-   the SVM algorithm in the \pkg{e1071} package; \code{qeskSVM} wraps
-   \code{svm.SVC} in the Python \pkg{sklearn}.  (Both \code{qeSVM} and
-   \code{qeskSVM} use the \code{libsvm} C library.)  
-
    \item Several random forests implementations are offered:
    \code{qeRF} wraps \code{randomForest} in the package of the same name; 
    \code{qeRFranger} wraps \code{ranger} in the package of the same name; 
    \code{qeRFgrf} wraps \code{regression_forest} and 
    \code{ll_regression_forest} in \pkg{grf} (the latter does local
-   linear smoothing); \code{qeskRF} wraps \code{ensemble.RandomForestRegressor}
-   and \code{RandomForestClassifier} in the Python \pkg{sklearn}.  There
-   is also \code{qeDT}, using the \pkg{party} package.
+   linear smoothing).  There is also \code{qeDT}, using 
+   the \pkg{party} package.
 
    \item Several implementations of gradient boosting are offered,
    including \code{qeGBoost} using the \pkg{gbm} package, 
