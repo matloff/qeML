@@ -31,7 +31,6 @@
 \alias{qeDeepnet}
 \alias{qeNCVregCV}
 \alias{qePolyLinKNN}
-\alias{qeliquidSVM}
 \alias{qeRpart}
 \alias{checkPkgLoaded}
 
@@ -58,7 +57,6 @@
 \alias{predict.qeParallel}
 \alias{predict.qeNCVregCV}
 \alias{predict.qePolyLinKNN}
-\alias{predict.qeliquidSVM}
 \alias{predict.qePoly}
 \alias{predict.qeRpart}
 \alias{plot.qePoly}
@@ -366,8 +364,7 @@ Some notes on specific functions:
    \item Several SVM implementations are offered:  \code{qeSVM} wraps
    the SVM algorithm in the \pkg{e1071} package; \code{qeskSVM} wraps
    \code{svm.SVC} in the Python \pkg{sklearn}.  (Both \code{qeSVM} and
-   \code{qeskSVM} use the \code{libsvm} C library.)  There is also
-   \code{qeliquidSVM}, wrapping the package \pkg{liquidSVM}.
+   \code{qeskSVM} use the \code{libsvm} C library.)  
 
    \item Several random forests implementations are offered:
    \code{qeRF} wraps \code{randomForest} in the package of the same name; 
