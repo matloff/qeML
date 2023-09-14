@@ -4,7 +4,7 @@
 output:
    tufte::tufte_html: default
 vignette: >
-  %\VignetteIndexEntry{Overfitting}
+  %\VignetteIndexEntry{Unbalanced Classes}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
