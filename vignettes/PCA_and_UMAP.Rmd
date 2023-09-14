@@ -3,7 +3,7 @@
 output:
    tufte::tufte_html: default
 vignette: >
-  %\VignetteIndexEntry{Overfitting}
+  %\VignetteIndexEntry{PCA and UMAP}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
