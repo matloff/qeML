@@ -1278,6 +1278,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
    acts=rep("relu",length(hidden)),learnRate=0.001,conv=NULL,xShape=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   checkPkgLoaded('keras')
    yNameSave <- yName
    checkForNonDF(data)
    # for use with qeRT(), hidden could be a string
