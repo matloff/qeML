@@ -6,10 +6,6 @@
 \title{
 Silicon Valley programmers and engineers data
 }
-\usage{
-prgeng
-svcensus
-}
 
 \description{
 This data set is adapted from the 2000 Census (5\% sample, person
