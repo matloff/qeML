@@ -1,7 +1,7 @@
 ---
 title: "Machine Learning Overview"
 output: 
-  rmarkdown::html_vignette
+  tufte::tufte_html: default
 vignette: >
   %\VignetteIndexEntry{Machine Learning Overview}
   %\VignetteEngine{knitr::rmarkdown}
@@ -9,6 +9,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
+library(tufte)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -77,11 +78,12 @@ We develop our prediction rule from available
 Y<sub>n</sub>).  We wish to predict new cases
 (X<sub>new</sub>,Y<sub>new</sub>) in the future, in which X<sub>new</sub>
 is known but Y<sub>new</sub> needs to be predicted.
-
+```{marginfigure}
 If our data is in the form of an R data frame, then we will have n
 rows.  The number of columns, other than our Y column, is generally
 denoted by p.  Both n and p could be very large in some applications,
 say in the millions for n and the hundreds for p.
+```
 
 So, we may wish to predict human weight Y from height X, or from height
 and age in a two-component vector X.  Say we have the latter situation,
@@ -100,16 +102,21 @@ variable.  In the famous Pima Diabetes dataset in the [UCI Machine
 Learning
 Repository](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database),
 1 means diabetic, 0 means not. 
+```{marginfigure}
 The 0,1 form is statistical; often in ML circles the coding -1,1 is
+used.
+```
 
 If Y itself is categorical, we represent it by several indicator
 variables, one for each category.  In another disease-related UCI
 dataset, Y is status of a person's vertebrae condition; there are three
 classes: normal (NO), disk hernia (DH), or spondilolysthesis (SP).  Y =
 (1,0,0) for a normal person, for instance.  Thus Y can be a vector too.
+```{marginfigure}
 If we have data on an indicator variable, note that its mean is the
 proportion of 1s in the data.  On the population level, this becomes the
 probability of a 1.
+```
 
 # Running example
 
@@ -235,13 +242,13 @@ in the **mlb** data, then for instance m(71,23) would denote the mean
 weight among all players of height 71 inches and 23 years old.  To
 predict the weight of a new player, say height 77 and age 19, we use
 m(77,19).
-
+```{marginfigure}
 Readers who have seen **linear regression** models should note that
 the term **regression** is much more general than that linear case.
 In the general context, the regression function is simply the mean
 function, expressing the mean of one variable in terms of the values
 of other variables.
-
+```
 
 In classification problems, Y is converted to a set of indicator
 variables.  For the position 'pitcher' in the **mlb** data, we would have
@@ -259,11 +266,11 @@ presented below in an order that shows connection between them.
 Even though each ML method has its own special *tuning parameters* or
 *hyperparameters*, used to fine-tune performance, they all center around
 the regression function m(t).
-
+```{marginfigure}
 The **qe** series function sense whether the user is specifying a
 regression setting or a classification setting, by noting whether the Y
 variable is numeric or an R factor.
-
+```
 
 # ML predictive methods
 
@@ -352,8 +359,9 @@ Rare for k-NN implementations, **qeKNN** has a remedy for this bias.
 Setting the argument **smoothingFtn = loclin** removes a linear trend
 within the neighborhood, and may improve predictive accuracy for new
 cases that are located near the edge of the training set.
+```{marginfigure}
 See also the function **qeLinKNN**.
-
+```
 
 ## Random forests
 
@@ -390,8 +398,10 @@ predictor variables, named V1 through V6, consisting of various bone
 measurements.  The variable to be predicted is disease status, a
 categorical variable with levels DH, NO, SL and VC.  NO designates a
 normal patient, no disease.  
+```{marginfigure}
 This picture was generated using the **rpart.plot** package, via
 **qeRpart()**.
+```
 
 ![](RpartVert.png)
 
@@ -504,11 +514,13 @@ find and plot the mean weight at each height.)
 
 The means seem to lie near a straight line.  That suggests modeling m(t)
 is a linear function.
+```{marginfigure}
 The points don't **exactly** lie on a straight line.  It's important
 to keep in mind:  (a) We are merely setting up an approximate model,
 one that is close enough to reality to be useful (see "A note on
 prediction" above); and (b) these are sample means, subject to
 sampling variation.
+```
 
 For example, a linear model for mean weight, given height and age, would be
 
@@ -533,7 +545,9 @@ This is a simple calculus problem.  We find the partial derivatives of
 the sum of squares with respect to the b<sub>i</sub>, and set them to 0.
 This gives us 3 equations in 3 unknowns, and since these equations are
 linear, it is easy to solve them for the b<sub>i</sub>.
+```{marginfigure}
 There are no hyperparameters in the linear model.
+```
 
 The function **qeLin** wraps the ordinary **lm**.  It mainly
 just calls the latter, but does some little fixes.
@@ -724,9 +738,11 @@ Why regularize?
 Here is an example using **pef**, a dataset from the US Census, included
 with **qeML**.  The features consist of age, education, occupation and
 gender.  Those last three are categorical variables, which are
-automatically converted by most qe-series functions to indicator variables.  
+```{marginfigure}
 The function **regtools::factorsToDummies** can be used to do this
 conversion manually.
+```
+automatically converted by most qe-series functions to indicator variables.  
 
 Let's predict wage income.
 
@@ -786,7 +802,9 @@ for the catchers and blue dots for the non-catchers.  We might draw a
 line that best separates the red and blue dots, then predict new cases
 by observing which side of the line they fall on.  This is what SVM
 does.
+```{marginfigure}
 With more predictors, the line become a plane or hyperplane.
+```
 
 Here is an example, using the Iris dataset built in to R:
 
@@ -849,7 +867,9 @@ polynomials in the features.  Then 8th-degree polynomials come out of
 the third layer, and so on.  So, NNs are doing something akin to
 polynomial linear regression.  And the hyperparameter, Number of Layers,
 is analogous to the degree of the polynomial.
+```{marginfigure}
 Another hyperparameter is the number of neurons per layer.
+```
 
 One common choice for A(t) is the logistic function l(u) we saw earlier.
 Another popular choice is ReLU, r(t) = max(0,t).  No matter what we
