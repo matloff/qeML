@@ -2,7 +2,7 @@
 ---
 title: "Overfitting"
 output: 
-   tufte::tufte_html: default
+   rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Overfitting}
   %\VignetteEngine{knitr::rmarkdown}
@@ -60,12 +60,10 @@ is a bit long).
 Let Y denote our outcome variable, and X represent the vector of our
 predictors/features.  We are predicting Y from X.  For instance, Y might
 be human weight, with X being (height, age).  We include binary
-```{marginfigure}
-In multiclass settings with c classes, Y is
-a vector of c 1s and 0s, with only one component being equal to 1 at a time.
-```
 classification problems, with Y = 1 or 0, coding the "yes" class and
 "no" class.  
+In multiclass settings with c classes, Y is
+a vector of c 1s and 0s, with only one component being equal to 1 at a time.
 
 We denote by n and p the number of rows and columns in our training
 data.
@@ -80,14 +78,12 @@ really mean in the prediction context?
 # The "True" Relation between Y and X
 
 The *regression function of Y on X*, &rho;(t), is defined to be the mean
-```{marginfigure}
-Though some books use the term "regression" to mean a linear model, the
-actual definition is unrestricted; it applies just as much to, say,
-random forests as to linear models.
-```
 Y for the given X values t.  In the weight/height/age example,
 &rho;(68.2,32.9) is the mean weight of all people of height 68.2 and age
 32.9.   
+Though some books use the term "regression" to mean a linear model, the
+actual definition is unrestricted; it applies just as much to, say,
+random forests as to linear models.
 
 The &rho; function is the best (i.e. minimum MSPE) predictor of weight
 based on height and age, the ideal.  Note the phrase "based on," though.
@@ -99,25 +95,22 @@ Note too that the &rho; function is a population entity, which we estimate
 from our sample data.  Denote the estimated &rho;(t) by r(t).  Say we
 are studying diabetic people.  &rho;(t) gives us the relation of weight
 vs.  height and age in the entire population of diabetics; if our study
-```{marginfigure}
+involves 100 patients, that is considered a sample from that population,
+and our estimate r(t) is based on that sample.
 Note:  "Sample" will mean our entire dataset; we will say, "A sample of 100
 people," as in statistics courses, not "We have 100 samples," the
 machine learning term.
-```
-involves 100 patients, that is considered a sample from that population,
-and our estimate r(t) is based on that sample.
 
 The term *population* is used in the statistics community.  Those who
 come to ML from the computer science world tend to use terms like
-```{marginfigure}
-For those with some background in probability theory:  We are modeling the
-conditional distribution of Y given X, so we can regard the X columns in
-our dataset as fixed but the Y column as random.
-```
 *probabilistic generating process*.  Either way, it is crucial to keep
 in mind that we treat our data as randomly generated.  If our data
 consists of 100 diabetes patients, we treat them as being randomly drawn
 from the conceptual population of all diabetics.
+
+For those with some background in probability theory:  We are modeling the
+conditional distribution of Y given X, so we can regard the X columns in
+our dataset as fixed but the Y column as random.
 
 In a binary classification problem, the regression function reduces to the
 probability of class 1, since the mean of a 0,1 variable is the
@@ -164,13 +157,11 @@ with linear model examples, but bring in k-NN later.
 ## Bias in prediction
 
 Though the reader may have seen the concept of statistical bias in terms
-```{marginfigure}
-Prediction methods are often used in real estate contexts, such as in
-assessing market value.
-```
 of simple estimators, our context here is different.  Let's take as
 our example prediction of house prices, say using the predictor
 variables Square Feet and Location.
+Prediction methods are often used in real estate contexts, such as in
+assessing market value.
 
 Generally, the larger a home is, the greater its value.  But the
 same-sized home will have a higher value in some places than others.
@@ -190,12 +181,10 @@ We can write this as, for a specific case,
 ````
 
 That average discrepancy is called the *bias*.  Here the bias will be
-```{marginfigure}
-Note that, negative or positive, the impact on MSPE is the same, since
-the latter involves *squared* bias.
-```
 positive for the houses in expensive neighborhoods, and negative for
 those in inexpensive areas.
+Note that, negative or positive, the impact on MSPE is the same, since
+the latter involves *squared* bias.
 
 Note that "average" here means the mean over all possible houses of the
 given size and place.  In some cases, we may not underpredict, but on
@@ -245,12 +234,6 @@ So, our predicted income of someone who works 45 weeks would be
 
 But again, the predicted value varies from one training 
 dataset to another.  One can
-```{marginfigure}
-For readers who know the matrix view of linear models: Our predicted
-value is a linear function of the b<sub>i</sub>, whose variance is 
-equal to the indicated matrix expression involving the covariance matrix
-of the b vector.
-```
 show that its estimated variance is as follows:
 
 ``` r
@@ -278,7 +261,9 @@ The estimated variance of our prediction is now
 ```
 
 So, adding just one more feature led to a dramatic increase in variance.
-```{marginfigure}
+Again, note that this reflects the sampling variation in the b<sub>i</sub>
+from one dataset to another.
+
 This may be difficult to accept for some, who may ask, "Why does
 sampling variation matter?  We have only one sample." The point is that
 if sampling variance is low, say, then most samples produce b<sub>i</sub>
@@ -287,9 +272,6 @@ our particular sample is of that nature.  It's just like playing a game
 in a casino; we may play the game just once, but we will still want to know
 the probability of winning--i.e. the proportion of wins among many
 plays--before deciding to gamble.
-```
-Again, note that this reflects the sampling variation in the b<sub>i</sub>
-from one dataset to another.
 
 Roughly speaking:
 
@@ -325,13 +307,12 @@ So, again, we see bias and variance at odds with each other.
 # Where Is the "Goldilocks" Level of Complexity?
 
 For any dataset and predictive algorithm, there is some optimal level of
-```{marginfigure}
+complexity--optimal feature set, optimal k etc.--which achieves minimum MSPE.
+Let's take a look.  First, a very important principle.
+
 Other measures than MSPE might be used.  An analog of the neat
 bias<sup>2</sup>+variance formulation would not exist, but the 
 same general principles would hold.
-```
-complexity--optimal feature set, optimal k etc.--which achieves minimum MSPE.
-Let's take a look.  First, a very important principle.
 
 ## Dependency on n
 

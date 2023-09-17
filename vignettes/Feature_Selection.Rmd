@@ -306,11 +306,6 @@ values, having the effect that one estimated &beta;<sub>i</sub> becomes
 nonzero at a time.  This gives us an ordered sequence of candidate
 features, as desired.
 
-The LASSO's historical antecedent, *ridge regression* was developed
-specifically for dealing with the multicollinearity problem we saw
-above.  The LASSO has this property too, but in addition it aids in
-feature selection.
-
 This is similar to a forward stepwise method, but NOT based on p-values;
 instead, the decision of which feature to use next is based on
 cross-validated mean squared prediction error.  

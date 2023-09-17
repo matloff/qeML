@@ -1,9 +1,9 @@
 
 ---
 output:
-   tufte::tufte_html: default
+   rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{PCA and UMAP}
+  %\VignetteIndexEntry{Overfitting}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -265,12 +265,11 @@ One hopes to substantially reduce the number of predictors from 90.  But
 how many should we retain?  And which ones?
 
 There are 2<sup>90</sup> possible sets of predictors to use.  It of
-```{marginfigure}
+course would be out of the question to check them all.  
 And given the randomness and the huge number of sets, the odds are high
 that the "best"-predicting set is just an accident, not the actual best
 and maybe not even close to the best.
-```
-course would be out of the question to check them all.  So, we might
+So, we might
 consider the below predictor sets, say following the order of the
 features (which are named **V2**, **V3**, **V4**,...)
 
@@ -284,13 +283,11 @@ Now we have only 90 predictor sets to check--a lot, but far better than
 2<sup>90</sup>.  Yet there are two problems that would arise:
 
 * Presumably the **Vi** are not arranged in order of importance as
-```{marginfigure}
-While the set **V12**, **V13**,..., **V88** would include these three
-variables, we may risk overfitting, masking the value of these three..
-```
 predictors.  What if, say, **V12**, **V28** and **V88** make for an
 especially powerful predictor set?  The scheme considered here would
 never pick that up.
+While the set **V12**, **V13**,..., **V88** would include these three
+variables, we may risk overfitting, masking the value of these three..
 
 * Possibility of substantial duplication:  What if, say, **V2** and
   **V3** are very highly correlated?  Then once **V2** is in our

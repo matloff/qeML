@@ -36,6 +36,8 @@ knitr::opts_chunk$set(
 
     * **qeLightGBoost()**: gradient boosting, wraps **lightgbm** pkg
 
+    * **qeliquidSVM**: wraps liquidSVM pkg
+
     * **qeLin()**: wraps R's **lm()**
 
     * **qeLinKNN()**: first fits **qeLin()**, followed by k-NN on the
@@ -66,7 +68,13 @@ knitr::opts_chunk$set(
 
     * **qeRFranger()**: random forests, wraps **ranger** pkg
 
+    * **qeskRF()**: random forests, wraps Python **Scilearn** pkg
+
+    * **qeskSVM()**: SVM, wraps Python **Scilearn** pkg
+
     * **qeSVM()**: SVM, wraps **e1071** pkg
+
+    * **qeSVMliquid()**: SVM, wraps **liquid SVM** pkg
 
     * **qeXGBoost()** wraps the **xgboost** pkg
 
@@ -142,7 +150,3 @@ knitr::opts_chunk$set(
     * **qeParallel()**:  apply "Software Alchemy" to parallelize
       **qe** functions
 
-* *useful utilities imported from **regtools** package
-
-    * **factorsToDummies** and other factor conversions, **replicMeans*,
-      **TStoX**, **prToFile** etc.
