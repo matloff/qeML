@@ -4,7 +4,7 @@
 output:
    rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overfitting}
+  %\VignetteIndexEntry{Unbalanced}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
