@@ -2,7 +2,7 @@
 
 ---
 output:
-   rmarkdown::html_vignette
+   tufte::tufte_html: default
 vignette: >
   %\VignetteIndexEntry{Unbalanced}
   %\VignetteEngine{knitr::rmarkdown}
@@ -255,12 +255,14 @@ One can obtain these numbers in the `regtools` package, included by
 ## What your ML algorithm is thinking
 
 ML algorithms take your data literally.  Say you have a two-class
-setting, for Classes 0 and 1.  If about 1/2 your data is Class 1, then
-the algorithm, whether directly or indirectly, operates under the
-assumption that the true population class probabilities are each about 0.5.
+```{marginfigure}
 The term *population* is sometimes only conceptual, but in all cases we
 believe our data are generated randomly in some manner, and the term
 refers to the associated distribution.
+```
+setting, for Classes 0 and 1.  If about 1/2 your data is Class 1, then
+the algorithm, whether directly or indirectly, operates under the
+assumption that the true population class probabilities are each about 0.5.
 
 In the LetterRecognition data, since the sampling was actually *designed* to have
 about the same number of instances for each letter, the algorithm you
@@ -318,6 +320,11 @@ to sampling variability, and (b) not all qe-series functions are capable
 of calculating the r values.
 
 Clearly, one's course of action should center around the value of
+```{marginfigure}
+Both approaches will be informal.  The reader is urged to avoid
+"automatic" solutions, as proper action is highly dependent on the
+specific application.
+```
 r<sub>new</sub>.  Specifically, how should we use it?  We will discuss
 two approaches:
 
