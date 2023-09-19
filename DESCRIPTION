@@ -4,7 +4,7 @@ Title: Quick and Easy Machine Learning Tools
 Authors@R: c(person("Norm", "Matloff", email = "nsmatloff@ucdavis.edu",
    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")))
 Maintainer: Norm Matloff <nsmatloff@ucdavis.edu>
-Depends: R (>= 3.5.0),regtools (>= 0.8.0),partools,FOCI,gtools,rmarkdown
+Depends: R (>= 3.5.0),regtools (>= 0.8.0),partools,FOCI,gtools,rmarkdown,tufte
 Imports: grf,gbm,toweranNA,tm,rpart,rpart.plot
 Suggests: knitr,partykit,randomForest,ranger,e1071,JOUSBoost,lightgbm,
    keras,neuralnet,polyreg,glmnet,umap,reticulate,party,pROC,xgboost,ROCR,
