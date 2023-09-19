@@ -61,21 +61,20 @@ consisting of data on professional baseball players.  As usual in R, we
 load the data:
 
 ``` r
-library(qeML)
-data(mlb1)
+> data(mlb1)
 ```
 
 Here is what the data looks like:
 
-``` r 
-head(mlb1)
-#         Position Height Weight   Age
-# 1        Catcher     74    180 22.99
-# 2        Catcher     74    215 34.69
-# 3        Catcher     72    210 30.78
-# 4  First_Baseman     72    210 35.43
-# 5  First_Baseman     73    188 35.71
-# 6 Second_Baseman     69    176 29.39
+``` r
+> head(mlb1)
+        Position Height Weight   Age
+1        Catcher     74    180 22.99
+2        Catcher     74    215 34.69
+3        Catcher     72    210 30.78
+4  First_Baseman     72    210 35.43
+5  First_Baseman     73    188 35.71
+6 Second_Baseman     69    176 29.39
 ```
 
 The qe-series function calls are of the very simple form
