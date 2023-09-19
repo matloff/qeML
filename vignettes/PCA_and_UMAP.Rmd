@@ -1,5 +1,6 @@
 
 ---
+title: "PCA and UMAP"
 output:
    tufte::tufte_html: default
 vignette: >

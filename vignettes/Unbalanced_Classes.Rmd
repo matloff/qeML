@@ -1,6 +1,7 @@
 
 
 ---
+title: "Unbalanced Classes"
 output:
    tufte::tufte_html: default
 vignette: >
