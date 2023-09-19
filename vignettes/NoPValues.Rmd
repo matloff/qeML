@@ -20,6 +20,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+library(tufte)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
