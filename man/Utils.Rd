@@ -51,7 +51,7 @@ lsp <- function(pkg) {
    cmd <- paste('ls(package:',pkg,')')
    evalr(cmd)
 }
-lsp('parallel')
+lsp('regtools')
 # outputs 
 #  [1] "clusterApply"        "clusterApplyLB"      "clusterCall"        
 #  [4] "clusterEvalQ"        "clusterExport"       "clusterMap"         
