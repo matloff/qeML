@@ -60,14 +60,10 @@ probabilities may change.
 
 ## Introduction
 
-Illustrations of the (perceived) problems and
-offered remedies appear in numerous parts of the ML literature, ranging
-from [Web tutorials](https://www.datacamp.com/community/tutorials/diving-deep-imbalanced-data)
-to [the research literature](https://link.springer.com/article/10.1186/s40537-018-0151-6#Sec2).  Major packages, such as
-[caret](https://cran.r-project.org/package=caret),
-[parsnip](https://cran.r-project.org/package=parsnip),
-and
-[mlr3](https://cran.r-project.org/package=mlr3), also offer remedies.
+Illustrations of the (perceived) problems and offered remedies appear in
+numerous parts of the ML literature, ranging from Web tutorials to the
+research literature.  Major packages, such as caret, parsnip and mlr3,
+also offer remedies.
 
 All of these sources recommend that you artificially equalize the class
 counts in your data, via various resampling methods.  Say for instance
@@ -102,9 +98,7 @@ In other words:
 
 ### Credit card fraud data
 
-This is a 
-[Kaggle dataset](https://www.kaggle.com/mlg-ulb/creditcardfraud).
-Quoting from the Kaggle site,
+This is a Kaggle dataset.  Quoting from the Kaggle site,
 
 > The datasets contains transactions made by credit cards in September
 > 2013 by european cardholders. This dataset presents transactions that
@@ -116,15 +110,14 @@ Note the phrase, "highly unbalanced."
 
 ### Missed appointments data
 
-This is a 
-[Kaggle dataset](https://www.kaggle.com/joniarroba/noshowappointments)
-on whether patients keep their medical appointments.  The imbalance here
-is more mild, with about 20% of the patients being no-shows.
+This is a Kaggle dataset on whether patients keep their medical
+appointments.  The imbalance here is more mild, with about 20% of the
+patients being no-shows.
 
 ### Optical letter recognition data
 
-This is a well-known
-[UCI Machine Learning Repository dataset](https://archive.ics.uci.edu/ml/datasets/Letter+Recognition).  Again quoting from the site:
+This is a well-known UCI Machine Learning Repository dataset.  Again
+quoting from the site:
 
 > The objective is to identify each of a large number of black-and-white
 > rectangular pixel displays as one of the 26 capital letters in the
