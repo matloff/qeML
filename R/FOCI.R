@@ -6,7 +6,7 @@
 # by FOCI (and Y)
 
 qeFOCI <- function(data,yName,
-   numCores=parallel::detectCores(),parPlat="none",yesYLevel=NULL)
+   numCores=1,parPlat="none",yesYLevel=NULL)
 {
    getSuggestedLib('FOCI')
    ycol <- which(names(data) == yName)

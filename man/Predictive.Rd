@@ -108,11 +108,11 @@ qeUMAP(data,yName,qeName,opts=NULL,
    nComps=NULL,nNeighbors=NULL)
 qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
    holdout=floor(min(1000,0.1*nrow(data))))
-qeFOCI(data,yName,numCores=parallel::detectCores(),parPlat="none",
+qeFOCI(data,yName,numCores=1,parPlat="none",
    yesYLevel=NULL)
 qeFOCIrand(data,yName,xSetSize,nXSets)
 qeFOCIrand(data,yName,xSetSize,nXSets)
-qeFOCImult(data,yName,numCores=parallel::detectCores(),
+qeFOCImult(data,yName,numCores=1,
    parPlat="none",coalesce='union')
 qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
    expandVars=NULL,expandVals=NULL,
