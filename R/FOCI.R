@@ -65,7 +65,7 @@ qeFOCIrand <- function(data,yName,xSetSize,nXSets)
 # names per element, of the union of these vectors; the latter is
 # motivated by finding variables that predict SOME of Y
 
-qeFOCImult <- function (data,yName,numCores=parallel::detectCores(), 
+qeFOCImult <- function (data,yName,numCores=1,
    parPlat="none",coalesce='union')
 
 {
@@ -77,7 +77,7 @@ qeFOCImult <- function (data,yName,numCores=parallel::detectCores(),
    {
       newY <- as.factor(y == ylevel)
       data[,ycol] <- newY
-      fociout <- qeFOCI(data,yName,numCores=parallel::detectCores(), 
+      fociout <- qeFOCI(data,yName,numCores=1,
          parPlat="none",yesYLevel='TRUE')
       fociout$selectedVar$names
    }
