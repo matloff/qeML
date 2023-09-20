@@ -30,7 +30,8 @@ extractFromNAMESPACE <- function() {
    ls(package:qeML)
 }
 
-fl <- extractFromFtnList()
-ns <- extractFromNAMESPACE()
-setdiff(fl,ns)
+# commented out in case the CRAN process executes all R code
+# fl <- extractFromFtnList()
+# ns <- extractFromNAMESPACE()
+# setdiff(fl,ns)
 

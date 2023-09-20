@@ -25,5 +25,6 @@ dichotRegFtns <- c(
 
 source('CheckAll.R')
 
-checkAll(dichotRegFtns,'svc1000','gender',pause=TRUE) 
+# commented out in case the CRAN process executes all R code
+# checkAll(dichotRegFtns,'svc1000','gender',pause=TRUE) 
 

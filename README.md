@@ -6,7 +6,7 @@
 
 I am a professor of computer science, and a former professor of
 statistics, highly active in the areas of machine learning and
-statistical computing, [bio](heather.cs.ucdavis.edu/matloff.html).
+statistical computing, [bio](https://heather.cs.ucdavis.edu/matloff.html).
 
 # What this package is about
 

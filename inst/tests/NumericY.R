@@ -25,6 +25,7 @@ NumericRegFtns <- c(
    
 source('CheckAll.R')
 
-checkAll(NumericRegFtns,'svc1000','wageinc',pause=TRUE) 
+# commented out in case the CRAN process executes all R code
+# checkAll(NumericRegFtns,'svc1000','wageinc',pause=TRUE) 
 
 

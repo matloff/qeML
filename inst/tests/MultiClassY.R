@@ -25,7 +25,8 @@ multiclassRegFtns <- c(
    
 source('CheckAll.R')
 
-checkAll(multiclassRegFtns,'svc1000','occ',pause=TRUE) 
+# commented out in case the CRAN process executes all R code
+# checkAll(multiclassRegFtns,'svc1000','occ',pause=TRUE) 
 
       
 
