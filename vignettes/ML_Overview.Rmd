@@ -699,8 +699,7 @@ problems.
 
 ### Overview
 
-Some deep [mathematical theory due to James and
-Stein](https:en.wikipedia.org/wiki/Stein%27s_example) implies that in
+Some deep mathematical theory due to James and Stein implies that in
 linear models it may be advantageous to shrink the estimated
 b<sub>i</sub>.  *Ridge* regression and the *LASSO* do this in a
 mathematically rigorous manner.  Each of them minimizes the usual sum of
