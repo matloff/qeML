@@ -111,7 +111,6 @@ qeDT(data,yName,alpha=0.05,minsplit=20,minbucket=7,maxdepth=0,mtry=0,
 qeFOCI(data,yName,numCores=1,parPlat="none",
    yesYLevel=NULL)
 qeFOCIrand(data,yName,xSetSize,nXSets)
-qeFOCIrand(data,yName,xSetSize,nXSets)
 qeFOCImult(data,yName,numCores=1,
    parPlat="none",coalesce='union')
 qeLinKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,
@@ -129,7 +128,10 @@ qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
    holdout=floor(min(1000,0.1*nrow(data))))
 qeRpart(data,yName,minBucket=10,holdout=floor(min(1000,
    0.1*nrow(data)))) 
+qeParallel(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
+   libs=NULL,holdout=NULL)
 checkPkgLoaded(pkgName,whereObtain='CRAN') 
+\method{predict}{qeParallel}(object,newx,...)
 \method{predict}{qeLogit}(object,newx,...)
 \method{predict}{qeLin}(object,newx,useTrainRow1=TRUE,...)
 \method{predict}{qeKNN}(object,newx,newxK=1,...)
@@ -153,6 +155,12 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
 
 \arguments{
   \item{...}{Further arguments.}
+  \item{cls}{Cluster in the sense of \pkgName{parallel} package.  If not of 
+     class \code{cluster}, this is either a positive integer, indicating the
+     desired number of cores, or a character vector, indicating the
+     machines on which the cluster is to be formed.}
+  \item{libs}{Character vector listing libraries needed to be loaded for 
+     \code{qeFtnName}.}
   \item{hidden_dropout}{Drop out fraction for hidden layer.}
   \item{batchsize}{Batch size.}
   \item{numepochs}{Number of iterations to conduct.}

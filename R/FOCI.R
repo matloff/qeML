@@ -77,7 +77,7 @@ qeFOCImult <- function (data,yName,numCores=1,
    {
       newY <- as.factor(y == ylevel)
       data[,ycol] <- newY
-      fociout <- qeFOCI(data,yName,numCores=1,
+      fociout <- qeFOCI(data,yName,numCores=numCores,
          parPlat="none",yesYLevel='TRUE')
       fociout$selectedVar$names
    }

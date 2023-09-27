@@ -2641,7 +2641,7 @@ qencvregcv <- qeNCVregCV
 # duplication; e.g. if cls already exists, don't recreate it (the data
 # would also be distributed a new, unnecessarily)
 
-qeParallel <- function(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
+qeParallel <- function(data,yName,qeFtnName,dataName,opts=NULL,cls=1,
    libs=NULL,holdout=NULL) 
 {
    getSuggestedLib('partools')
