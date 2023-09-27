@@ -4,7 +4,7 @@ title: "Problems with P-values"
 subtitle: A case study
 author: 
   - Norman Matloff
-date: "9/4/2023"
+date: "9/28/2023"
 crossref:
    labels: roman i
    subref-labels: roman i
@@ -36,7 +36,7 @@ In 2016, the American Statistical Association released its first-ever
 position paper, to warn of the problems of significance testing and
 "p-values."  Though the issues had been well known for many years, it was
 "significant" that the ASA finally took a stand.  Let's use the **lsa**
-data to illustrate.
+data in this package to illustrate.
 
 # Law School Admissions Data
 
@@ -85,15 +85,15 @@ the income issue, look at the coefficient for family income, 0.3009.
 The p-value is essentially 0, which in an academic research journal
 would classically be heralded with much fanfare, termed "very highly
 significant," with a 3-star insignia.  Indeed, the latter is seen in the
-output above.  But actually, the impact of family income is not very
-large.  Here's why:
+output above.  But actually, the impact of family income is not 
+significant in practical terms.  Here's why:
 
 Family income in this dataset is measured by quintiles.  So
 ```{marginfigure}
 Mathematically, testing for a 0 effect is equivalent to checking
 whether the CI contains 0.  But this is missing the point of the CI,
 which is to (a) give us an idea of the effect *size*, and (b) to
-indicate how accurate our estimate is of that size.  Aspect (a) is given
+indicate *how accurate* our estimate is of that size.  Aspect (a) is given
 by the location of the center of the interval, while (b) is seen from
 the CI's radius.
 ```
@@ -114,6 +114,8 @@ Some who read the above may object, "Sure, there sometimes may be a
 difference between statistical significance and practical significance.
 But I just want to check whether my model fits the data."  Actually,
 it's the same problem.
+
+*"I just want to check whether my model fits the data"*`
 
 For instance, suppose we are considering adding an interaction term
 between race and undergraduate GPA to our above model.   Let's fit this
@@ -142,7 +144,17 @@ about 0.02 out of a 40.23 baseline.  So, while the test has validated
 our with-interaction model, we may well prefer the simpler,
 no-interaction model.
 
-Again, we must not take small p-values literally.
+*"I just want to know whether the effect is positive or negative"*
+
+Here we have a different problem, bias.  Our linear model is just that,
+a model, and its imperfection will induce a bias.  This could change the
+estimated effect from positive to negative or vice versa, **even with an
+infinite amount of data**.  With larger and larger dataset size n, the
+variance of estimated parameters goes to 0, but the bias won't go away.
+
+*Bottom line:*
+
+We must not take small p-values literally.
 
 # What Is the Underlying Problem, and Its Implications?
 
@@ -157,16 +169,9 @@ race and GPA is substantial enough to include it in our model, not
 whether there is any interaction at all, no matter how tiny.
 
 The question at hand in research studies is rarely, if ever, whether a
-```{marginfigure}
-The same concerns, e.g. bias in our data collection methods, also
-applies to settings in which we "just want to see whether the effect is
-positive or negative."  A "significant" but minuscule difference in one
-direction could be due to such inaccuracies,  So here too, it's
-important to restrict attention to substantial differences.
-```
-quantity is 0.000... to infinitely many decimal places.  Indeed, in most
-cases our measuring instrument is not this accurate in the first place;
-there will always be systemic bias or missingness, unobserved variables
+quantity is 0.000... to infinitely many decimal places.  And ask noted, 
+our measuring instrument is not this accurate in the first place;
+there will always be systemic bias, in our model, our dataset 
 and so on.
 
 Thus in almost all cases, significance tests don't address the issue of
