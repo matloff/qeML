@@ -128,7 +128,7 @@ qeDeepnet(data,yName,hidden=c(10),activationfun="sigm",
    holdout=floor(min(1000,0.1*nrow(data))))
 qeRpart(data,yName,minBucket=10,holdout=floor(min(1000,
    0.1*nrow(data)))) 
-qeParallel(data,yName,qeFtnName,dataName,opts=NULL,cls=NULL,
+qeParallel(data,yName,qeFtnName,dataName,opts=NULL,cls=1,
    libs=NULL,holdout=NULL)
 checkPkgLoaded(pkgName,whereObtain='CRAN') 
 \method{predict}{qeParallel}(object,newx,...)
@@ -155,7 +155,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
 
 \arguments{
   \item{...}{Further arguments.}
-  \item{cls}{Cluster in the sense of \pkgName{parallel} package.  If not of 
+  \item{cls}{Cluster in the sense of \pkg{parallel} package.  If not of 
      class \code{cluster}, this is either a positive integer, indicating the
      desired number of cores, or a character vector, indicating the
      machines on which the cluster is to be formed.}
@@ -181,6 +181,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{minBucket}{Minimum number of data points in a terminal node.}
   \item{maxdepth}{Maximum number of levels in a tree.}
   \item{qeName}{Name of qe-series predictive function.}
+  \item{qeFtnName}{Name of qe-series predictive function.}
   \item{conv}{R list specifying the convolutional layers, if any.}
   \item{deweightPars}{Values for de-emphasizing variables in a 
      tree node split, e.g. 'list(age=0.2,gender=0.5)'.}
