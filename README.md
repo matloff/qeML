@@ -31,7 +31,7 @@ learning (ML).
 
 * Special Features for Those Experienced in  ML 
 
-    * variety of functions for feeature selection and model development
+    * variety of functions for feature selection and model development
 
     * large variety of ML algorithms, including some novel/unusual ones
 
