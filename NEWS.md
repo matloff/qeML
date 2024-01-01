@@ -12,4 +12,5 @@ December 31, 2023
 
 * Name change to **qePlotCurves**.
 
+* Added quantile forest option to qeRFgrf.
 
