@@ -36,6 +36,8 @@ qePlotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
    if (!is.factor(curveData[,3])) 
       curveData[,3] <- as.factor(curveData[,3])
 
+   names(curveData) <- c('x','y','z')
+
    xlim <- c(min(curveData[,1]),max(curveData[,1]))
    tmp <- max(curveData[,2])
    # leave room at top for legend
