@@ -307,6 +307,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    x <- data[,-ycol]
+   if (is.null(ncol(x))) x <- matrix(x,ncol=1)
    origY <- y
 
    # housekeeping for classification case
@@ -783,8 +784,11 @@ predict.qeRFranger <- function(object,newx,...)
 qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    mtry=floor(sqrt(ncol(data)))+1,
    ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
+   quantls=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
+   if (!is.null(quantls) && !is.null(holdout))
+      stop('in quantile case, holdout should be NULL')
    yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
@@ -808,13 +812,20 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    y <- xyc$y
    if (!classif) {
       rfout <- 
-         if (!ll) 
-            grf::regression_forest(x,y,num.trees=nTree,min.node.size=minNodeSize,
-            mtry=mtry)
-         else 
-            grf::ll_regression_forest(x,y,
-            num.trees=nTree,min.node.size=minNodeSize,mtry=mtry,
-            ll.split.lambda=lambda,ll.split.cutoff=splitCutoff)
+         if (is.null(quantls)) {
+            if (!ll) 
+               grf::regression_forest(x,y,
+                  num.trees=nTree,min.node.size=minNodeSize,mtry=mtry)
+            else 
+               grf::ll_regression_forest(x,y,
+               num.trees=nTree,min.node.size=minNodeSize,mtry=mtry,
+               ll.split.lambda=lambda,ll.split.cutoff=splitCutoff)
+         } else {
+               grf::quantile_forest(x,y,
+                  num.trees=nTree,
+                  quantiles=quantls,
+                  min.node.size=minNodeSize,mtry=mtry)
+         }
    } else {
       lvls <- levels(y)
       ydumms <- regtools::factorToDummies(y,yName,omitLast=(length(lvls)==2))
@@ -835,7 +846,12 @@ qeRFgrf <- function(data,yName,nTree=2000,minNodeSize=5,
    rfout$classif <- classif
    rfout$trainRow1 <- getRow1(data,yName)
    rfout$factorsInfo <- factorsInfo
-   class(rfout) <- c('qeRFgrf','regression_forest')
+   rfout$quantls <- quantls
+   if (is.null(quantls)) {
+      class(rfout) <- c('qeRFgrf','regression_forest')
+   } else {
+      class(rfout) <- c('qeRFgrf','quantile_forest')
+   }
    if (!is.null(holdout)) {
       predictHoldout(rfout)
       rfout$holdIdxs <- holdIdxs
@@ -881,9 +897,15 @@ predict.qeRFgrf<- function(object,newx,...)
      ## probs <- predict(x,newx,type='prob')
      ## res <- collectForReturn(x,probs)
   } else {
-     class(object) <- 'regression_forest'
-     res <- predict(object,newx)
-     res <- as.matrix(res)[,1]
+     if (is.null(object$quantls)) {
+        class(object) <- 'regression_forest'
+        res <- predict(object,newx)
+        res <- as.matrix(res)[,1]
+     } else {
+        class(object) <- 'quantile_forest'
+        res <- predict(object,newx)
+        res <- res$predictions
+     }
   }
   res
 }
