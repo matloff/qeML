@@ -1,5 +1,5 @@
 
-###########################  plotCurves  #################################
+###########################  qePlotCurves  #################################
 
 # plot several curves having the same X domain; based on the inputted
 # (X,Y) data; that data can be smoothed into a curve via the 'loess' 
@@ -29,7 +29,7 @@
 
 #    none; this is purely a plotting routine
 
-plotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
+qePlotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
    legendSpace=1.1,legendPos='topright') 
 {
 
@@ -70,7 +70,7 @@ test1 <- function()
    y2 <- x^2
    outdf <- data.frame(x=c(x,x),y=c(y1,y2),
       z=c(rep('1',100),rep('2',100)))
-   plotCurves(outdf)
+   qePlotCurves(outdf)
 }
 
 # fit 4 qe* ftns on lsa data, plot; call form is 
@@ -78,7 +78,7 @@ test1 <- function()
 # zzz just a dummy for arg 1, not used; do
 #
 #    w <- test2(5)
-#    plotCurves(w)
+#    qePlotCurves(w)
 #
 # to run
 test2 <- defmacro(zzz,  
@@ -108,17 +108,13 @@ test2 <- defmacro(zzz,
    }
 )
 
-# generate data to go into plotCurves(); finds mean testAcc over nreps
+# generate data to go into qePlotCurves(); finds mean testAcc over nreps
 # runs, each with a different random training set
 
 # dataName and qeFtnName should be changed to data and qeFtn soon
 
 genQeAcc <- function(nreps,dataName,yName,qeFtnName,opts=NULL)
 {
-##    cmd <- buildQEcall(qeFtnName,dataName,yName,holdoutArg=T,holdout=1000,
-##       opts=opts)
-##    tmp <- sapply(1:nreps,function(i) 
-##       {cmdOut <- evalr(cmd); cmdOut$testAcc})
   # goal: set up do.call
    data <- get(dataName)
    qeFtn <- get(qeFtnName)
