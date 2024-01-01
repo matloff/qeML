@@ -19,7 +19,7 @@
 # arguments
 
 #    curveData: 3-column data frame, consisting of the (X,Y) coordinates
-#       and a quoted string for the name
+#       and a group ID (character, numeric etc.)
 #    xlab, ylab:  X,Y axis labels
 #    loess: if TRUE, plot the loess-fitted curve, not the points
 #    legendSpace: expand plot grid by this amount to fit in a legend
@@ -32,6 +32,9 @@
 qePlotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
    legendSpace=1.1,legendPos='topright') 
 {
+
+   if (!is.factor(curveData[,3])) 
+      curveData[,3] <- as.factor(curveData[,3])
 
    xlim <- c(min(curveData[,1]),max(curveData[,1]))
    tmp <- max(curveData[,2])
@@ -54,9 +57,6 @@ qePlotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
       cvsiOrdered <- cvsi[order(cvsi[,1]),]
       lines(cvsiOrdered,col=cols[i])
    }
-
-   ### cd3 <- curveData[,3]
-   ### if (!is.factor(cd3)) curveData[,3] <- as.factor(cd3)
 
    legend(legendPos,legend=levels(nms),col=cols,lty=rep(1,nCurves))
 
