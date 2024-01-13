@@ -66,4 +66,4 @@ export(
    levelCounts,dataToTopLevels,checkPkgLoaded,
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,
    cartesianFactor,newDFRow,qeRareLevels,
-   qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves)
+   qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves,replicMeansMatrix)
