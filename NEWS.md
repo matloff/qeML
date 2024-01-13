@@ -14,3 +14,8 @@ December 31, 2023
 
 * Added quantile forest option to qeRFgrf.
 
+January 12, 2024
+
+* Added **replicMeansMatrix**.
+
+
