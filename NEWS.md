@@ -18,4 +18,7 @@ January 12, 2024
 
 * Added **replicMeansMatrix**.
 
+January 20, 2024
+
+* Fixed **qePlotCurves** to accommodate negative max Y value.
 

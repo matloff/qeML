@@ -41,7 +41,8 @@ qePlotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
    xlim <- c(min(curveData[,1]),max(curveData[,1]))
    tmp <- max(curveData[,2])
    # leave room at top for legend
-   ylim <- c(min(curveData[,2]),legendSpace*tmp)
+   topY <- if (tmp > 0) legendSpace*tmp else tmp / legendSpace
+   ylim <- c(min(curveData[,2]),topY)
    plot(NULL,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab)
 
    curves <- split(curveData,curveData[,3])
