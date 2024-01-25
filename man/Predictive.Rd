@@ -74,7 +74,7 @@ for teaching.
 \usage{
 qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 qeLin(data,yName,noBeta0=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
-qeKNN(data,yName,k,scaleX=TRUE,smoothingFtn=mean,yesYVal=NULL,
+qeKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,yesYVal=NULL,
    expandVars=NULL,expandVals =NULL,holdout=floor(min(1000,0.1*nrow(data))))
 qeRF(data,yName,nTree=500,minNodeSize=10,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
@@ -82,7 +82,7 @@ qeRFranger(data,yName,nTree=500,minNodeSize=10,
    mtry=floor(sqrt(ncol(data)))+1,deweightPars=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),yesYVal="") 
 qeRFgrf(data,yName,nTree=2000,minNodeSize=5,mtry=floor(sqrt(ncol(data)))+1,
-   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),
+   ll=FALSE,lambda=0.1,splitCutoff=sqrt(nrow(data)),quantls=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeSVM(data,yName,gamma=1.0,cost=1.0,kernel='radial',degree=2,
    allDefaults=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
