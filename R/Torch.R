@@ -1,5 +1,4 @@
 
-
 # qeML wrapper for 'torch for r'
 
 # arguments:
@@ -9,8 +8,9 @@
 #    layers: list of lists; layers[[i]] specifies the layer type and any
 #       parameters for layer i
 
-qeNeuralTorchModel <- function(data,yName,layers,
-   learnRate=0.001,holdout=floor(min(1000,0.1*nrow(data))))
+qeNeuralTorch <- function(data,yName,layers,
+   learnRate=0.001,lossFtn=nn_mse_loss,nEpochs=100,
+   holdout=floor(min(1000,0.1*nrow(data))))
 {
 
    ### prep general
@@ -20,7 +20,7 @@ qeNeuralTorchModel <- function(data,yName,layers,
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    # for now: regression case only
-   if (!numeric(y)) stop('regression case only for now')
+   if (!is.numeric(y)) stop('regression case only for now')
    x <- data[,-ycol]
    yToAvg <- y
    nYcols <- 1
@@ -43,26 +43,44 @@ qeNeuralTorchModel <- function(data,yName,layers,
       tst <- as.data.frame(tst)
       trn <- cbind(x,yToAvg)
       ycol <- ncol(trn)
-      xT <- torch_tensor(x)
-      yT <- torch_tensor(yToAvg)
       nrX <- nrow(xT)
       ncX <- ncol(xT)
-   }
+   } 
+   xT <- torch_tensor(x)
+   yToAvg <- matrix(as.numeric(yToAvg,ncol=1))
+   yT <- torch_tensor(yToAvg)
 
    ### set up model
    nnSeqArgs <- list()
    for (i in 1:length(layers)) {
       layer <- layers[[i]]
-      nnSeqArgs[[i]] <- switch(layr[[1]],
-         'linear': nn_linear(layer[[2]],layer[[3]]),
-         'relu': nn_relu(inplace=FALSE)
-      )
-
+      nnSeqArgs[[i]] <- 
+         if(layer[[1]]=='linear') nn_linear(layer[[2]],layer[[3]]) else
+         nn_relu(inplace=FALSE)
    }
    model <- do.call(nn_sequential,nnSeqArgs)
 
-   ### training
+   # learning_rate <- learnRate
 
+   optimizer <- optim_adam(model$parameters, lr = learnRate)
+
+   # if (identical(lossFtn,nn_mse_loss))
+   #    loss <- nn_mse_loss()
+
+   ### training
+   for (i in 1:nEpochs) {
+      preds <- model(xT)
+      # currLoss <- loss(preds,yT)
+      loss <- nnf_mse_loss(preds,yT,reduction = "sum")
+      # model$zero_grad()
+      optimizer$zero_grad()
+      loss$backward()
+      # with_no_grad({ model$parameters %>%
+      #    purrr::walk(function(param) param$sub_(learning_rate * param$grad))
+      optimizer$step()
+   }
+
+   model(xT)
 
 }
 
