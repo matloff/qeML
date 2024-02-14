@@ -1,0 +1,86 @@
+
+
+# qeML wrapper for 'torch for r'
+
+# arguments:
+
+#    data: standard qeML
+#    yName: standard qeML
+#    layers: list of lists; layers[[i]] specifies the layer type and any
+#       parameters for layer i
+
+qeNeuralTorch <- function(data,yName,layers,
+   learnRate=0.001,lossFtn=nn_mse_loss,nEpochs=100,
+   holdout=floor(min(1000,0.1*nrow(data))))
+{
+
+   ### prep general
+   checkPkgLoaded('torch')
+   checkForNonDF(data)
+   trainRow1 <- getRow1(data,yName)
+   ycol <- which(names(data) == yName)
+   y <- data[,ycol]
+   # for now: regression case only
+   if (!is.numeric(y)) stop('regression case only for now')
+   x <- data[,-ycol]
+   yToAvg <- y
+   nYcols <- 1
+   # torch requires numeric data
+   if (!is.numeric(x)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo')
+   } else factorsInfo <- NULL
+
+   ### form holdout if requested
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) {
+      nHold <- holdout
+      holdIdxs <- sample(1:nrow(x),nHold)
+      xTst <- x[holdIdxs,]
+      x <- x[-holdIdxs,]
+      yTst <- yToAvg[holdIdxs,]
+      yToAvg <- yToAvg[-holdIdxs,]
+      tst <- cbind(xTst,yTst)
+      tst <- as.data.frame(tst)
+      trn <- cbind(x,yToAvg)
+      ycol <- ncol(trn)
+      nrX <- nrow(xT)
+      ncX <- ncol(xT)
+   } 
+   xT <- torch_tensor(x)
+   yToAvg <- matrix(as.numeric(yToAvg,ncol=1))
+   yT <- torch_tensor(yToAvg)
+
+   ### set up model
+   nnSeqArgs <- list()
+   for (i in 1:length(layers)) {
+      layer <- layers[[i]]
+      nnSeqArgs[[i]] <- 
+         if(layer[[1]]=='linear') nn_linear(layer[[2]],layer[[3]]) else
+         nn_relu(inplace=FALSE)
+   }
+   model <- do.call(nn_sequential,nnSeqArgs)
+
+   ## optimizer <- optim_adam(model$parameters, lr = learnRate)
+
+   if (identical(lossFtn,nn_mse_loss))
+      loss <- nn_mse_loss()
+
+   ### training
+   for (i in 1:nEpochs) {
+      preds <- model(xT)
+      ### currLoss <- loss(preds,yT)
+      currLoss <- (preds - yT)$pow(2)$sum()
+      ## loss <- nnf_mse_loss(preds,yT,reduction = "sum")
+      model$zero_grad()
+      ## optimizer$zero_grad()
+      currLoss$backward()
+      with_no_grad({model$parameters %>%
+         purrr::walk(function(param) param$sub_(learning_rate * param$grad))})
+      ## optimizer$step()
+   }
+
+   model(xT)
+
+}
+
