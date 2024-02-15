@@ -27,15 +27,16 @@ qeNeuralTorch <- function(data,yName,layers,
    yToAvg <- y
    nYcols <- 1
    # torch requires numeric data
-   if (!is.numeric(x)) {
-      x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      factorsInfo <- attr(x,'factorsInfo')
+   classes <- sapply(data,class)
+   if (sum(classes=='numeric') + sum(classes=='integer') < ncol(data)) {
+      stop('all features must be numeric; use factorsToDummies to fix')
+      # x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      # factorsInfo <- attr(x,'factorsInfo')
    } else factorsInfo <- NULL
 
    ### form holdout if requested
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
-      stop('for now, set holdout to NULL')
       nHold <- holdout
       holdIdxs <- sample(1:nrow(x),nHold)
       xTst <- x[holdIdxs,]
@@ -48,7 +49,8 @@ qeNeuralTorch <- function(data,yName,layers,
       ycol <- ncol(trn)
       nrX <- nrow(xT)
       ncX <- ncol(xT)
-   } 
+   }
+   x <- as.matrix(x)
    xT <- torch_tensor(x)
    yToAvg <- matrix(as.numeric(yToAvg,ncol=1))
    yT <- torch_tensor(yToAvg)
@@ -79,7 +81,6 @@ qeNeuralTorch <- function(data,yName,layers,
    torchout <- list()
    # torchout$classif <- classif
    # torchout$classNames <- classNames
-   torchout$factorsInfo <- factorsInfo
    torchout$x <- x
    torchout$xT <- xT
    torchout$yT <- yT
@@ -95,6 +96,37 @@ qeNeuralTorch <- function(data,yName,layers,
    torchout
 
 }
+
+predictHoldoutTorch <- defmacro(res,
+   expr={
+      ycol <- which(names(tst) == yName);
+      tstx <- tst[,-ycol,drop=FALSE];
+      trnx <- trn[,-ycol,drop=FALSE];
+      tsty <- tst[,ycol]
+      newLvls <- checkNewLevels(trnx,tstx)
+      if (length(newLvls) > 0) {
+         tstx <- tstx[-newLvls,,drop=FALSE]
+         tst <- tst[-newLvls,,drop=FALSE]
+         warning(paste(length(newLvls),
+            'rows removed from test set, due to new factor levels'))
+      }
+
+      preds <- predict(res,tstx);
+      listPreds <- is.list(preds)
+      res$holdoutPreds <- preds
+         
+      if (res$classif) {
+         stop('regression case only for now')
+      } else {  # regression case
+         res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
+         res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
+         predsTrn <- predict(res,trnx)
+         res$trainAcc <- mean(abs(predsTrn - trn[,ycol]),na.rm=TRUE)
+      }  
+   }  # end of expr= for the macro
+)        
+
+
 
 predict.qeNeuralTorch <- function(object,newx,...)
 {
