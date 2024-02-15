@@ -22,6 +22,7 @@ qeNeuralTorch <- function(data,yName,layers,
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
    # for now: regression case only
+   classif <- FALSE
    if (!is.numeric(y)) stop('regression case only for now')
    x <- data[,-ycol]
    yToAvg <- y
@@ -36,20 +37,7 @@ qeNeuralTorch <- function(data,yName,layers,
 
    ### form holdout if requested
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
-   if (!is.null(holdout)) {
-      nHold <- holdout
-      holdIdxs <- sample(1:nrow(x),nHold)
-      xTst <- x[holdIdxs,]
-      x <- x[-holdIdxs,]
-      yTst <- yToAvg[holdIdxs,]
-      yToAvg <- yToAvg[-holdIdxs,]
-      tst <- cbind(xTst,yTst)
-      tst <- as.data.frame(tst)
-      trn <- cbind(x,yToAvg)
-      ycol <- ncol(trn)
-      nrX <- nrow(xT)
-      ncX <- ncol(xT)
-   }
+   if (!is.null(holdout)) makeHoldout(0)
    x <- as.matrix(x)
    xT <- torch_tensor(x)
    yToAvg <- matrix(as.numeric(yToAvg,ncol=1))
@@ -78,8 +66,9 @@ qeNeuralTorch <- function(data,yName,layers,
       optimizer$step()
    }
 
+browser()
    torchout <- list()
-   # torchout$classif <- classif
+   torchout$classif <- classif
    # torchout$classNames <- classNames
    torchout$x <- x
    torchout$xT <- xT
@@ -89,7 +78,7 @@ qeNeuralTorch <- function(data,yName,layers,
    torchout$model <- model
    class(torchout) <- c('qeNeuralTorch','torch_tensor')
    if (!is.null(holdout)) {
-      predictHoldout(torchout)
+      predictHoldoutTorch(torchout)
       torchout$holdIdxs <- holdIdxs
    }
 
@@ -99,7 +88,7 @@ qeNeuralTorch <- function(data,yName,layers,
 
 predictHoldoutTorch <- defmacro(res,
    expr={
-      ycol <- which(names(tst) == yName);
+      ycol <- which(names(tst) == 'yTst');
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
       tsty <- tst[,ycol]
@@ -118,10 +107,10 @@ predictHoldoutTorch <- defmacro(res,
       if (res$classif) {
          stop('regression case only for now')
       } else {  # regression case
-         res$testAcc <- mean(abs(preds - tst[,ycol]),na.rm=TRUE)
+         res$testAcc <- mean(abs(preds - tst[,ycol]))
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
          predsTrn <- predict(res,trnx)
-         res$trainAcc <- mean(abs(predsTrn - trn[,ycol]),na.rm=TRUE)
+         res$trainAcc <- mean(abs(predsTrn - trn[,ycol]))
       }  
    }  # end of expr= for the macro
 )        
@@ -135,3 +124,19 @@ predict.qeNeuralTorch <- function(object,newx,...)
    object$model(newxT)
 }
 
+makeHoldout <- defmacro(placeholder,expr=
+   {
+      nHold <- holdout
+      holdIdxs <- sample(1:nrow(x),nHold)
+      xTst <- x[holdIdxs,]
+      x <- x[-holdIdxs,]
+      yTst <- yToAvg[holdIdxs]
+      yToAvg <- yToAvg[-holdIdxs]
+      tst <- cbind(xTst,yTst)
+      tst <- as.data.frame(tst)
+      trn <- cbind(x,yToAvg)
+      ycol <- ncol(trn)
+      nrX <- nrow(x)
+      ncX <- ncol(x)
+   }
+)
