@@ -8,6 +8,8 @@
 #    layers: list of lists; layers[[i]] specifies the layer type and any
 #       parameters for layer i
 
+# draws upon https://torch.mlverse.org/technical/modules/
+
 qeNeuralTorch <- function(data,yName,layers,
    learnRate=0.001,lossFtn=nn_mse_loss,nEpochs=100,
    holdout=floor(min(1000,0.1*nrow(data))))
@@ -33,6 +35,7 @@ qeNeuralTorch <- function(data,yName,layers,
    ### form holdout if requested
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
+      stop('for now, set holdout to NULL')
       nHold <- holdout
       holdIdxs <- sample(1:nrow(x),nHold)
       xTst <- x[holdIdxs,]
@@ -64,23 +67,39 @@ qeNeuralTorch <- function(data,yName,layers,
 
    optimizer <- optim_adam(model$parameters, lr = learnRate)
 
-   # if (identical(lossFtn,nn_mse_loss))
-   #    loss <- nn_mse_loss()
-
    ### training
    for (i in 1:nEpochs) {
       preds <- model(xT)
-      # currLoss <- loss(preds,yT)
       loss <- nnf_mse_loss(preds,yT,reduction = "sum")
-      # model$zero_grad()
       optimizer$zero_grad()
       loss$backward()
-      # with_no_grad({ model$parameters %>%
-      #    purrr::walk(function(param) param$sub_(learning_rate * param$grad))
       optimizer$step()
    }
 
-   model(xT)
+   torchout <- list()
+   # torchout$classif <- classif
+   # torchout$classNames <- classNames
+   torchout$factorsInfo <- factorsInfo
+   torchout$x <- x
+   torchout$xT <- xT
+   torchout$yT <- yT
+   # torchout$yFactor <- yFactor
+   torchout$trainRow1 <- getRow1(data,yName)
+   torchout$model <- model
+   class(torchout) <- c('qeNeuralTorch','torch_tensor')
+   if (!is.null(holdout)) {
+      predictHoldout(torchout)
+      torchout$holdIdxs <- holdIdxs
+   }
 
+   torchout
+
+}
+
+predict.qeNeuralTorch <- function(object,newx,...)
+{
+   newx <- as.matrix(newx)
+   newxT <- torch_tensor(newx)
+   object$model(newxT)
 }
 
