@@ -1,17 +1,24 @@
 
-# qeML wrapper for 'torch for r'
+# qeML wrapper for 'torch for r', alternative to qeNeural not needing
+# Python
 
 # arguments:
 
 #    data: standard qeML
 #    yName: standard qeML
 #    layers: list of lists; layers[[i]] specifies the layer type and any
-#       parameters for layer i
+#       parameters for layer 
+#    yesYVal: not used yet
+#    learnRate: learning rate, vital, might need to be even e-05 or 2
+#    wtDecay: weight decay, regularization
+#    nEpochs: number of iterations
+#    dropout fraction
+#    holdout: as in other QE functions
 
 # draws upon https://torch.mlverse.org/technical/modules/
 
-qeNeuralTorch <- function(data,yName,layers,
-   learnRate=0.001,lossFtn=nn_mse_loss,nEpochs=100,
+qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
+   learnRate=0.001,wtDecay=0,nEpochs=100,dropout=0,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
 
@@ -21,18 +28,20 @@ qeNeuralTorch <- function(data,yName,layers,
    trainRow1 <- getRow1(data,yName)
    ycol <- which(names(data) == yName)
    y <- data[,ycol]
-   # for now: regression case only
-   classif <- FALSE
-   if (!is.numeric(y)) stop('regression case only for now')
+   if (sum(y==1) + sum(y==0) == length(y)) {
+      classif <- TRUE
+      # maybe do data[y==0,ycol] <- -1
+   } else classif <- FALSE
    x <- data[,-ycol]
    yToAvg <- y
-   nYcols <- 1
+   nYcols <- 1  # in classif case, binary Y only
    # torch requires numeric data
    classes <- sapply(data,class)
    if (sum(classes=='numeric') + sum(classes=='integer') < ncol(data)) {
       stop('all features must be numeric; use factorsToDummies to fix')
-      # x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      # factorsInfo <- attr(x,'factorsInfo')
+      #### x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      #### factorsInfo <- attr(x,'factorsInfo')
+      #### yesYVal not used yet, need Y factor
    } else factorsInfo <- NULL
 
    ### form holdout if requested
@@ -49,24 +58,27 @@ qeNeuralTorch <- function(data,yName,layers,
       layer <- layers[[i]]
       nnSeqArgs[[i]] <- 
          if(layer[[1]]=='linear') nn_linear(layer[[2]],layer[[3]]) else
-         nn_relu(inplace=FALSE)
+         if(layer[[1]]=='relu') nn_relu(inplace=FALSE) else
+         if(layer[[1]]=='dropout') nn_dropout(dropout) else
+         nn_sigmoid()
    }
    model <- do.call(nn_sequential,nnSeqArgs)
 
    # learning_rate <- learnRate
 
-   optimizer <- optim_adam(model$parameters, lr = learnRate)
+   optimizer <- optim_adam(model$parameters, 
+      lr = learnRate,weight_decay=wtDecay)
 
    ### training
    for (i in 1:nEpochs) {
       preds <- model(xT)
       loss <- nnf_mse_loss(preds,yT,reduction = "sum")
+      # maybe nnf_binary_cross_entropy_with_logits
       optimizer$zero_grad()
       loss$backward()
       optimizer$step()
    }
 
-browser()
    torchout <- list()
    torchout$classif <- classif
    # torchout$classNames <- classNames
@@ -105,7 +117,9 @@ predictHoldoutTorch <- defmacro(res,
       res$holdoutPreds <- preds
          
       if (res$classif) {
-         stop('regression case only for now')
+         #### stop('regression case only for now')
+         preds <- round(as.numeric(preds[,1]))  
+         res$testAcc <- mean(preds!=tst[,ycol])
       } else {  # regression case
          res$testAcc <- mean(abs(preds - tst[,ycol]))
          res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
