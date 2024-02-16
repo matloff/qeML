@@ -64,8 +64,6 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
    }
    model <- do.call(nn_sequential,nnSeqArgs)
 
-   # learning_rate <- learnRate
-
    optimizer <- optim_adam(model$parameters, 
       lr = learnRate,weight_decay=wtDecay)
 
