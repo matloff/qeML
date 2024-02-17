@@ -167,3 +167,31 @@ makeHoldout <- defmacro(placeholder,expr=
       ncX <- ncol(x)
    }
 )
+
+# lyrsClass <- list( 
+#    list('linear',0,100), 
+#    list('relu'), 
+#    list('linear',100,100), 
+#    list('relu'), 
+#    list('linear',100,1), 
+#    list('sigmoid')) 
+
+# svcensus from qeML
+# qeNeuralTorch(svcensus,'gender',yesYVal='male',
+#    layers=lyrsClass,learnRate=0.008)$testAcc
+
+# WA phone churn data, from my ML book
+# qeNeuralTorch(tc,'Churn',yesYVal='Yes',layers=lyrsClass,
+#    learnRate=0.0035)$testAcc
+
+# from dsld package
+# qeNeuralTorch(mortgageSE,'deny',yesYVal='1',layers=lyrsClass,
+#    learnRate=0.003)$testAcc
+
+#lyrsReg <- list(
+#   list('linear',0,100),
+#   list('relu'),
+#   list('linear',100,1))
+#
+#qeNeuralTorch(svcensus,'wageinc',layers=lyrsReg,
+#   learnRate=0.05)$testAcc
