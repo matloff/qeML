@@ -7,7 +7,9 @@
 #    data: standard qeML
 #    yName: standard qeML
 #    layers: list of lists; layers[[i]] specifies the layer type and any
-#       parameters for layer 
+#       parameters for layer; the fan-in may be specified as 0 for the
+#       first layer, in which case it will be set the number of features
+#       (after factors, if any, are converted to dummies)
 #    yesYVal: not used yet
 #    learnRate: learning rate, vital, might need to be even e-05 or 2
 #    wtDecay: weight decay, regularization
@@ -23,28 +25,37 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
 {
 
    ### prep general
+
    checkPkgLoaded('torch')
    checkForNonDF(data)
    trainRow1 <- getRow1(data,yName)
    ycol <- which(names(data) == yName)
+   # y, yesYVal etc.
    y <- data[,ycol]
-   if (sum(y==1) + sum(y==0) == length(y)) {
-      classif <- TRUE
+   #### if (sum(y==1) + sum(y==0) == length(y)) {
+   if (is.factor(y)) {
       # maybe do data[y==0,ycol] <- -1
+      classif <- TRUE
+      yLevels <- levels(y)
+      if (length(yLevels) != 2) {
+         stop('presently classif case only for binary Y')
+      }
+      if (is.null(yesYVal)) yesYVal <- yLevels[1]
+
    } else classif <- FALSE
-   x <- data[,-ycol]
    yToAvg <- y
    nYcols <- 1  # in classif case, binary Y only
+   x <- data[,-ycol]
    # torch requires numeric data
    classes <- sapply(data,class)
    if (sum(classes=='numeric') + sum(classes=='integer') < ncol(data)) {
-      stop('all features must be numeric; use factorsToDummies to fix')
-      #### x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      #### factorsInfo <- attr(x,'factorsInfo')
-      #### yesYVal not used yet, need Y factor
+      #### stop('all features must be numeric; use factorsToDummies to fix')
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      factorsInfo <- attr(x,'factorsInfo')
    } else factorsInfo <- NULL
 
    ### form holdout if requested
+
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) makeHoldout(0)
    x <- as.matrix(x)
@@ -53,9 +64,11 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
    yT <- torch_tensor(yToAvg)
 
    ### set up model
+
    nnSeqArgs <- list()
    for (i in 1:length(layers)) {
       layer <- layers[[i]]
+      if (i == 1 && layer[[2]] == 0) layer[[2]] <- ncol(x)
       nnSeqArgs[[i]] <- 
          if(layer[[1]]=='linear') nn_linear(layer[[2]],layer[[3]]) else
          if(layer[[1]]=='relu') nn_relu(inplace=FALSE) else
@@ -68,6 +81,7 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
       lr = learnRate,weight_decay=wtDecay)
 
    ### training
+
    for (i in 1:nEpochs) {
       preds <- model(xT)
       loss <- nnf_mse_loss(preds,yT,reduction = "sum")
@@ -98,17 +112,20 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
 
 predictHoldoutTorch <- defmacro(res,
    expr={
+
       ycol <- which(names(tst) == 'yTst');
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
       tsty <- tst[,ycol]
-      newLvls <- checkNewLevels(trnx,tstx)
-      if (length(newLvls) > 0) {
-         tstx <- tstx[-newLvls,,drop=FALSE]
-         tst <- tst[-newLvls,,drop=FALSE]
-         warning(paste(length(newLvls),
-            'rows removed from test set, due to new factor levels'))
-      }
+
+# probably should move this to, e.g. makeHoldout
+#       newLvls <- checkNewLevels(trnx,tstx)
+#       if (length(newLvls) > 0) {
+#          tstx <- tstx[-newLvls,,drop=FALSE]
+#          tst <- tst[-newLvls,,drop=FALSE]
+#          warning(paste(length(newLvls),
+#             'rows removed from test set, due to new factor levels'))
+#       }
 
       preds <- predict(res,tstx);
       listPreds <- is.list(preds)
@@ -120,17 +137,19 @@ predictHoldoutTorch <- defmacro(res,
          res$testAcc <- mean(preds!=tst[,ycol])
       } else {  # regression case
          res$testAcc <- mean(abs(preds - tst[,ycol]))
-         res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
+         ### res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
          predsTrn <- predict(res,trnx)
          res$trainAcc <- mean(abs(predsTrn - trn[,ycol]))
       }  
    }  # end of expr= for the macro
 )        
 
-
-
 predict.qeNeuralTorch <- function(object,newx,...)
 {
+   finfo <- object$factorsInfo
+   if(!is.null(finfo)) {
+      newx <- factorsToDummies(newx,omitLast=TRUE,factorsInfo=finfo)
+   }
    newx <- as.matrix(newx)
    newxT <- torch_tensor(newx)
    object$model(newxT)
