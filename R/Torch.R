@@ -1,6 +1,6 @@
 
 # qeML wrapper for 'torch for r', alternative to qeNeural not needing
-# Python
+# Python; see also the 'cito' package
 
 # arguments:
 
@@ -10,14 +10,14 @@
 #       parameters for layer; the fan-in may be specified as 0 for the
 #       first layer, in which case it will be set the number of features
 #       (after factors, if any, are converted to dummies)
-#    yesYVal: not used yet
+#    yesYVal: for factor Y, which level is to be considered Y = 1 not 0
 #    learnRate: learning rate, vital, might need to be even e-05 or 2
 #    wtDecay: weight decay, regularization
 #    nEpochs: number of iterations
 #    dropout fraction
 #    holdout: as in other QE functions
 
-# draws upon https://torch.mlverse.org/technical/modules/
+# see examples at the end of this file
 
 qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
    learnRate=0.001,wtDecay=0,nEpochs=100,dropout=0,
@@ -34,14 +34,14 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
    y <- data[,ycol]
    #### if (sum(y==1) + sum(y==0) == length(y)) {
    if (is.factor(y)) {
-      # maybe do data[y==0,ycol] <- -1
+      # maybe later do data[y==0,ycol] <- -1
       classif <- TRUE
       yLevels <- levels(y)
       if (length(yLevels) != 2) {
          stop('presently classif case only for binary Y')
       }
       if (is.null(yesYVal)) yesYVal <- yLevels[1]
-
+      y <- as.numeric(y == yesYVal)  # 0s and 1s noww
    } else classif <- FALSE
    yToAvg <- y
    nYcols <- 1  # in classif case, binary Y only
@@ -62,6 +62,11 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
    xT <- torch_tensor(x)
    yToAvg <- matrix(as.numeric(yToAvg,ncol=1))
    yT <- torch_tensor(yToAvg)
+   # at this point, our training data, whether we have holdout or not,
+   # is the above, i.e. x, xT, yToAvg and yT (the 'T' versions are
+   # tensors for Torch); in the with-holdout case, we also have the
+   # analogous entities xTst, yTst; the cbind-ed xT and yToAvg are in
+   # trn, with the analogous tst
 
    ### set up model
 
@@ -116,16 +121,7 @@ predictHoldoutTorch <- defmacro(res,
       ycol <- which(names(tst) == 'yTst');
       tstx <- tst[,-ycol,drop=FALSE];
       trnx <- trn[,-ycol,drop=FALSE];
-      tsty <- tst[,ycol]
-
-# probably should move this to, e.g. makeHoldout
-#       newLvls <- checkNewLevels(trnx,tstx)
-#       if (length(newLvls) > 0) {
-#          tstx <- tstx[-newLvls,,drop=FALSE]
-#          tst <- tst[-newLvls,,drop=FALSE]
-#          warning(paste(length(newLvls),
-#             'rows removed from test set, due to new factor levels'))
-#       }
+      # tsty <- tst[,ycol]
 
       preds <- predict(res,tstx);
       listPreds <- is.list(preds)
