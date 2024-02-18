@@ -54,6 +54,7 @@ S3method(predict,qeNCVregCV)
 S3method(predict,qeLinMV)
 S3method(predict,qeLogitMV)
 S3method(predict,qeKNNMV)
+S3method(predict,qeNeuralTorch)
 
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeDT,
@@ -66,4 +67,5 @@ export(
    levelCounts,dataToTopLevels,checkPkgLoaded,
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,
    cartesianFactor,newDFRow,qeRareLevels,
-   qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves,replicMeansMatrix)
+   qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves,replicMeansMatrix,
+   qeNeuralTorch)

@@ -83,7 +83,7 @@ qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
    model <- do.call(nn_sequential,nnSeqArgs)
 
    optimizer <- optim_adam(model$parameters, 
-      lr = learnRate,weight_decay=wtDecay)
+      lr=learnRate,weight_decay=wtDecay)
 
    ### training
 
@@ -188,10 +188,10 @@ makeHoldout <- defmacro(placeholder,expr=
 # qeNeuralTorch(mortgageSE,'deny',yesYVal='1',layers=lyrsClass,
 #    learnRate=0.003)$testAcc
 
-#lyrsReg <- list(
+# lyrsReg <- list(
 #   list('linear',0,100),
 #   list('relu'),
 #   list('linear',100,1))
 #
-#qeNeuralTorch(svcensus,'wageinc',layers=lyrsReg,
+# qeNeuralTorch(svcensus,'wageinc',layers=lyrsReg,
 #   learnRate=0.05)$testAcc
