@@ -18,8 +18,10 @@
 
 # arguments
 
-#    curveData: 3-column data frame, consisting of the (X,Y) coordinates
-#       and a group ID (character, numeric etc.)
+#    curveData: column data frame or equivalent
+#    xCol,yCol,grpCol: column numbers in curveData of
+#       the X and Y axes data, and the group membership data
+#       (a group ID, character, numeric etc.)
 #    xlab, ylab:  X,Y axis labels
 #    loess: if TRUE, plot the loess-fitted curve, not the points
 #    legendSpace: expand plot grid by this amount to fit in a legend
@@ -29,10 +31,12 @@
 
 #    none; this is purely a plotting routine
 
-qePlotCurves <- function(curveData,xlab='',ylab='',loess=TRUE,
-   legendSpace=1.1,legendPos='topright') 
+qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
+   xlab='',ylab='',loess=TRUE,legendSpace=1.1,legendPos='topright') 
 {
 
+   tmpDF <- curveData[,c(xCol,yCol,grpCol)]
+   curveData <- tmpDF
    if (!is.factor(curveData[,3])) 
       curveData[,3] <- as.factor(curveData[,3])
 
