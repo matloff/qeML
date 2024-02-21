@@ -14,8 +14,9 @@ Miscellaneous specialized plots.
 plotPairedResids(data,qeOut) 
 plotClassesUMAP(data,classVar) 
 qeFreqParcoord(dataName,k=25,opts=NULL)
-qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,xlab="",
-   ylab="",loess=TRUE,legendSpace=1.1,legendPos="topright")
+qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
+   xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
+   loess=TRUE,legendSpace=1.1,legendPos='topright')
 }
 
 \arguments{
@@ -65,9 +66,7 @@ plotPairedResids(pef,linout)
 data(lsa)
 # plot LSAT score against undergradute GPA, for each law school cluster
 # (reputed quality of the law school)
-qePlotCurves(lsa[,c(6,5,9)],xlab='Ugrad GPA',ylab='LSAT',legendSpace=1.35)
-}
-
+qePlotCurves(lsa,6,5,9,legendSpace=1.35)
 }
 
 \author{

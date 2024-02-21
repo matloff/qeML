@@ -33,16 +33,13 @@
 
 qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
-   loess=TRUE,loessXrange=cbind(rep(-Inf,3),rep(Inf,3)),
-   legendSpace=1.1,legendPos='topright') 
+   loess=TRUE,legendSpace=1.1,legendPos='topright') 
 {
 
    tmpDF <- curveData[,c(xCol,yCol,grpCol)]
    curveData <- tmpDF
    if (!is.factor(curveData[,3])) 
       curveData[,3] <- as.factor(curveData[,3])
-
-   names(curveData) <- c('x','y','z')
 
    xlim <- c(min(curveData[,1]),max(curveData[,1]))
    tmp <- max(curveData[,2])
@@ -60,7 +57,9 @@ qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
    for (i in 1:nCurves) {
       cvsi <- curves[[i]]
       if (loess) {
-         tmp <- loess(y ~ x,cvsi)
+         toExec <- 
+            sprintf('loess(%s ~ %s,cvsi)',names(cvsi)[2],names(cvsi)[1])
+         tmp <- evalr(toExec)
          cvsi[,2] <- predict(tmp,cvsi[,1])
       }
       cvsiOrdered <- cvsi[order(cvsi[,1]),]
