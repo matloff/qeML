@@ -1,5 +1,5 @@
 
-# macros
+# macros, etc.
 
 # requireNamespace(gtools)
 
@@ -589,3 +589,15 @@ newDFRow <- function(dta,yName,x,dtaRowNum=1)
    }
    tmp
 }
+
+# use instead of 'data'; loads dataset, auto prints glimpse via 'str';
+# 'datasetName' must be a quoted string
+
+Data <- function(datasetName)
+{
+   toExec <- paste0('data(',datasetName,')')
+   evalr(toExec)
+   toExec <- paste0('str(',datasetName,')')
+   evalr(toExec)
+}
+
