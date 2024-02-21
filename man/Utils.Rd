@@ -3,6 +3,7 @@
 \alias{evalr}
 \alias{newDFRow}
 \alias{replicMeansMatrix}
+\alias{Data}
 
 \title{Utilities}
 
@@ -16,6 +17,7 @@ buildQEcall(qeFtnName,dataName,yName=NULL,opts=NULL,holdout=NULL,
 evalr(toexec) 
 newDFRow(dta,yName,x,dtaRowNum=1)
 replicMeansMatrix(nReps,cmd,nCols=NULL)
+Data(datasetName)
 }
 
 \arguments{
@@ -35,6 +37,7 @@ replicMeansMatrix(nReps,cmd,nCols=NULL)
   \item{dta}{A data frame.}
   \item{x}{An R list specifying fields to be set.}
   \item{dtaRowNum}{Row number in 'dta' to be used as a basis.}
+  \item{datasetName}{Quoted string of dataset to be loaded.}
 }
 
 \details{
@@ -52,6 +55,9 @@ The function \code{replicMeansMatrix} will eventually replace
 \code{regtools::replicMeans}.  It runs the specified code many times,
 with the code assumed to have some random component such as in
 simulation or in investigation of a random algorithm.
+
+The function \code{Data} is a convenience function that combines calls
+to \code{data} and \code{str}.
 
 }
 
