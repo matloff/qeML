@@ -32,7 +32,9 @@
 #    none; this is purely a plotting routine
 
 qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
-   xlab='',ylab='',loess=TRUE,legendSpace=1.1,legendPos='topright') 
+   xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
+   loess=TRUE,loessXrange=cbind(rep(-Inf,3),rep(Inf,3)),
+   legendSpace=1.1,legendPos='topright') 
 {
 
    tmpDF <- curveData[,c(xCol,yCol,grpCol)]
