@@ -69,6 +69,8 @@ data(lsa)
 qePlotCurves(lsa,6,5,9,legendSpace=1.35)
 }
 
+}
+
 \author{
 Norm Matloff
 }
