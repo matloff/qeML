@@ -94,9 +94,15 @@ qeLogit <-
    classif <- is.factor(dataY)
    if (!classif) {print('for classification problems only'); return(NA)}
    yLevels <- levels(dataY)
-   if (classif && length(yLevels == 2))
-      if (is.null(yesYVal)) 
+   # might make a macro of this, but different ftns seem to need
+   # different treatment
+   if (classif && length(yLevels == 2)) {
+      if (is.null(yesYVal)) {
          yesYVal <- yLevels[1]
+         warning(paste0(
+            'no value specified for yesYVal, default used: ',yesYVal)) 
+      }
+   }
    yLevels <- levels(dataY)
    if(length(yLevels) == 2) {
       whichYes <- which(yLevels == yesYVal)
@@ -316,11 +322,13 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       yLevels <- levels(y)
       classif2 <- length(yLevels) == 2
       if (classif2) {
-         if (is.null(yesYVal)) 
+         if (is.null(yesYVal)) {
             yesYVal <- yLevels[1]
+            warning(paste0(
+               'no value specified for yesYVal, default used: ',yesYVal)) 
+         }
          whichYes <- which(yLevels == yesYVal)
          noYVal <- yLevels[3 - whichYes]
-         ### y <- as.integer(y == yesYVal)
       } else noYVal <- NULL
    } else {
       noYVal <- NULL
@@ -707,9 +715,12 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    # in binary Y case, change to 0,1
    ycol <- which(names(data) == yName)
    yvec <- data[,ycol]
-   if (is.factor(yvec)) {
-      if (length(levels(yvec)) == 2) {
-         if (is.null(yesYVal)) yesYVal <- levels(yvec)[1]
+   if (is.factor(yvec) && length(levels(yvec)) == 2) {
+         if (is.null(yesYVal)) {
+            yesYVal <- levels(yvec)[1]
+            warning(paste0(
+               'no value specified for yesYVal, default used: ',yesYVal)) 
+         }
          if (length(yesYVal) > 0) {
             whichYes <- which(yvec == yesYVal)
             yvec <- as.character(yvec)
@@ -718,7 +729,6 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
             yvec <- as.factor(yvec)
             data[,ycol] <- yvec
          }
-      }
    }
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
@@ -2842,5 +2852,4 @@ print.qeDT <- function(x,...)
 {
    print(x$ctout)
 }
-
 
