@@ -720,8 +720,6 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
             yesYVal <- levels(yvec)[1]
             warning(paste0(
                'no value specified for yesYVal, default used: ',yesYVal)) 
-         }
-         if (length(yesYVal) > 0) {
             whichYes <- which(yvec == yesYVal)
             yvec <- as.character(yvec)
             yvec[whichYes] <- '1'
