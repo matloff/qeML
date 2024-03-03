@@ -2561,6 +2561,8 @@ qeNCVregCV <- function(data,yName,
             yesYVal <- yLevels[1]
             noYVal <- yLevels[2]
          }
+         warning(paste0(
+            'no value specified for yesYVal, default used: ',yesYVal)) 
       } else {
          yesyval <- which(yLevels == yesYVal)
          noYVal <- yLevels[3-yesyval]
