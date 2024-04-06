@@ -712,12 +712,12 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
    yNameSave <- yName
    checkForNonDF(data)
    classif <- is.factor(data[[yName]])
-   # in binary Y case, change to 0,1
    ycol <- which(names(data) == yName)
    yvec <- data[,ycol]
+   yLevels <- levels(yvec)
    if (is.factor(yvec) && length(levels(yvec)) == 2) {
          if (is.null(yesYVal)) {
-            yesYVal <- levels(yvec)[1]
+            yesYVal <- yLevels[1]
             warning(paste0(
                'no value specified for yesYVal, default used: ',yesYVal)) 
             whichYes <- which(yvec == yesYVal)
@@ -726,6 +726,8 @@ qeRFranger <- function(data,yName,nTree=500,minNodeSize=10,
             yvec[-whichYes] <- '0'
             yvec <- as.factor(yvec)
             data[,ycol] <- yvec
+         } else {
+            if (!(yesYVal %in% yLevels)) stop('invalid yesYVal')
          }
    }
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
