@@ -20,8 +20,6 @@ qeHAL <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    qeML:::checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    if (classif) stop('not covered yet')
-   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
-   if (!is.null(holdout)) qeML:::splitData(holdout,data)
 
    xy <- data
    yNames <- yName
@@ -34,8 +32,14 @@ qeHAL <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
       factorsInfo <- attr(xnum,'factorsInfo')
       xsave <- x
       x <- xnum
+      data <- factorsToDummies(data,TRUE,factorsInfo)
    } else factorsInfo <- NULL
    trainRow1 <- x[1,]
+
+   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
+   if (!is.null(holdout)) qeML:::splitData(holdout,data)
+   trn <- as.data.frame(trn)
+   tst <- as.data.frame(tst)
 
    halout <- fit_hal(x,y)
    halout$classif <- classif 
@@ -55,7 +59,7 @@ qeHAL <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    halout
 }
 
-predict.qeHAL <- function(object,newx,useTrainRow1=TRUE,...) {
+predict.qeHAL <- function(object,newx,useTrainRow1=FALSE,...) {
    class(object) <- class(object)[-1]
    if (!is.null(object$factorsInfo)) 
       newx <- factorsToDummies(newx,TRUE,object$factorsInfo)
