@@ -16,7 +16,7 @@ plotClassesUMAP(data,classVar)
 qeFreqParcoord(dataName,k=25,opts=NULL)
 qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
-   loess=TRUE,legendSpace=1.1,legendPos='topright')
+   loess=TRUE,legendTitle,legendSpace=1.1,legendPos='topright')
 }
 
 \arguments{
@@ -36,6 +36,7 @@ qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
   \item{xlab}{X-axis label.}
   \item{ylab}{Y-axis label.}
   \item{loess}{If TRUE, do loess smoothing within each group.}
+  \item{legendTitle}{Legend title.}
   \item{legendSpace}{Factor by which to expand vertical space, to
      accommodate a top-situated legend.}
   \item{legendPos}{Position of legend within plot.}
