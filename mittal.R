@@ -13,6 +13,10 @@
 #  variable at min X; it is presumed that the sequence is sorted in
 #  ascending order, with the first element corresponding to X = 0
 
+# example:
+
+#    w <- data.frame(x=c(3:5,2),y1=c(5:7,4),y2=c(4,12,15,5),y3=10:7)
+#    qeMittalGraph(w)
 
 qeMittalGraph <- function(data) 
 {
