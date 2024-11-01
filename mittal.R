@@ -1,30 +1,28 @@
 
 
-# plots several curves, against a common X-axis, as in qePlotCurves, but
-# showing the change in each variable, relative to the variable's value
-# at min X
+# plots several curves, one for each gorup, against a common X-axis, as
+# in qePlotCurves, but showing the change in each variable, relative to
+# the variable's value at min X
 
-# 'data' must be a data frame or equivalent, with this structure
+# X is typically input in ascending numerical order, but need not be
 
-#  column 1 is the "X" variable to serve in the output plot
+# X is required to be in col 1; col 2 is for Y of group 1, etc.
 
-#  the remaining columns will serve as "Y" columns, one for each curve
-#  to be plotted,  divided by the value of this
-#  variable at min X; it is presumed that the sequence is sorted in
-#  ascending order, with the first element corresponding to X = 0
+# 'data' must be a data frame or equivalent, in which for each X value
+# there is exactly one Y value for each group; format is wide, e.g.
 
-# example:
+#    x y1 y2 y3
 
 #    w <- data.frame(x=c(3:5,2),y1=c(5:7,4),y2=c(4,12,15,5),y3=10:7)
 #    qeMittalGraph(w)
 
-qeMittalGraph <- function(data) 
+qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve')
 {
 
    x <- data[,1]
    nc <- ncol(data)
-   # reshape, esp. including the curve number
    argMinX <- which.min(data$x)
+
    z <- lapply(1:(nc-1),
       function(i) {
          tmp <- data[,i+1] / data[argMinX,i+1]
@@ -33,6 +31,7 @@ qeMittalGraph <- function(data)
       }
    )
    zz <- do.call(rbind,z)
-   qePlotCurves(zz,1,3,2)
+
+   qePlotCurves(zz,1,3,2,xlab=xlab,ylab=ylab,legendTitle=legendTitle)
 }
 
