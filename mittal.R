@@ -22,11 +22,12 @@ qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve')
    x <- data[,1]
    nc <- ncol(data)
    argMinX <- which.min(data$x)
+   nms <- names(data)[-1]
 
    z <- lapply(1:(nc-1),
       function(i) {
          tmp <- data[,i+1] / data[argMinX,i+1]
-         tmpDF <- data.frame(x=x,curveNum=i,y=tmp)
+         tmpDF <- data.frame(x=x,curveNum=nms[i],y=tmp)
          tmpDF
       }
    )
