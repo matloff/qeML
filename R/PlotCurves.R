@@ -254,7 +254,7 @@ qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve')
 
    x <- data[,1]
    nc <- ncol(data)
-   argMinX <- which.min(data$x)
+   argMinX <- which.min(x)
    nms <- names(data)[-1]
 
    z <- lapply(1:(nc-1),
