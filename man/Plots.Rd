@@ -18,7 +18,7 @@ qeFreqParcoord(dataName,k=25,opts=NULL)
 qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
    loess=TRUE,legendTitle,legendSpace=1.1,legendPos='topright')
-qeMittalGraph(data,xlab="x",ylab="y",legendTitle="curve") 
+qeMittalGraph(data,xlab="x",ylab="y",legendTitle="curve",loess=TRUE) 
 }
 
 \arguments{
@@ -63,10 +63,10 @@ pairs according to X, so that \code{\link{loess}} smoothing makes sense.
 
 The function \code{qeMittalGraph} is similar to \code{qePlotCurves},
 except that it displays multiplicative change over the X-axis. All
-curves start at height 1.0. The X-axis could be time or some model
-parameter, say in graphing prediction accuracy against number of nearest
-neighbors for different datasets.
-}
+curves start at height 1.0. (There may be some exceptions to this if
+\code{loess} is TRUE.) The X-axis could be time or some model parameter,
+say in graphing prediction accuracy against number of nearest neighbors
+for different datasets.  }
 
 \examples{
 
