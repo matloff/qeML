@@ -31,10 +31,10 @@ qeMittalGraph(data,xlab="x",ylab="y",legendTitle="curve",loess=TRUE)
   \item{k}{Number of nearest neighbors.}
   \item{opts}{Options to be passed to \code{discparcoord}.}
   \item{curveData}{Data to be plotted.}
-  \item{xCol}{Column containing "X".}
-  \item{yCol}{Column containing "Y".}
-  \item{grpCol}{Column containing group name, a character vector or
-     factor.}
+  \item{xCol}{Column name or number containing "X".}
+  \item{yCol}{Column name or number containing "Y".}
+  \item{grpCol}{Column name or number containing group name, 
+    a character vector or factor.}
   \item{xlab}{X-axis label.}
   \item{ylab}{Y-axis label.}
   \item{loess}{If TRUE, do loess smoothing within each group.}
@@ -79,7 +79,6 @@ data(lsa)
 # plot LSAT score against undergradute GPA, for each law school cluster
 # (reputed quality of the law school)
 qePlotCurves(lsa,6,5,9,legendSpace=1.35)
-}
 
 data(currency)
 curr <- cbind(1:nrow(currency),currency)
@@ -87,6 +86,7 @@ names(curr)[1] <- 'weeknum'
 qeMittalGraph(curr,'weeknum','rate','country')
 # Canadian dollar and pound in one cluster, and franc, mark and
 # yen in another
+}
 
 }
 
