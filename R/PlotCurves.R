@@ -249,7 +249,8 @@ replicMeans1old <- function (n, charExpr, simplify = "array") {
 #    w <- data.frame(x=c(3:5,2),y1=c(5:7,4),y2=c(4,12,15,5),y3=10:7)
 #    qeMittalGraph(w)
 
-qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve')
+qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve',
+   loess=TRUE)
 {
 
    x <- data[,1]
@@ -266,6 +267,7 @@ qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve')
    )
    zz <- do.call(rbind,z)
 
-   qePlotCurves(zz,1,3,2,xlab=xlab,ylab=ylab,legendTitle=legendTitle)
+   qePlotCurves(zz,1,3,2,xlab=xlab,ylab=ylab,legendTitle=legendTitle,
+      loess=loess)
 }
 
