@@ -68,4 +68,4 @@ export(
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,
    cartesianFactor,newDFRow,qeRareLevels,
    qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves,replicMeansMatrix,
-   qeNeuralTorch,Data)
+   qeNeuralTorch,Data,qeMittalGraph)
