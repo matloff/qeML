@@ -11,7 +11,7 @@
 #       m,m+n,m+2n,m+3n,...
 
 wideToLongWithTime <- function(data,timeColName,timeColPresent=TRUE,
-   timeColSeq=c(1,1)) 
+   timeColSeq=c(1,1),grpColName=NULL,valueColName=NULL) 
 {
    qeML:::getSuggestedLib('reshape2')
 
@@ -24,7 +24,10 @@ wideToLongWithTime <- function(data,timeColName,timeColPresent=TRUE,
       names(newdata)[1] <- timeColName
    }
 
-   return(reshape2::melt(newdata,id.vars=timeColName))
+   longData <- reshape2::melt(newdata,id.vars=timeColName)
+   if (!is.null(grpColName)) names(longData)[2] <- grpColName
+   if (!is.null(valueColName)) names(longData)[3] <- valueColName
+   return(longData)
 
 }
 
