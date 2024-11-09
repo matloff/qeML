@@ -66,17 +66,29 @@ wideToLongWithTime <- function(data,timeColName,timeColPresent=TRUE,
 
 #    none; this is purely a plotting routine
 
+# examples
+
+#    data(lsa)
+#    qePlotCurves(lsa,6,5,9,legendSpace=1.35)
+#    
+#    data(currency)
+#    curr <- currency
+#    qePlotCurves(curr,1,3,2,wide=T,wideTimeColName='weeknum',
+#       wideTimeColPresent=F,wideGrpColName='country')
+
 qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
    loess=TRUE,legendTitle=names(curveData)[grpCol],
    legendSpace=1.1,legendPos='topright',
    wide=FALSE,wideTimeColName=NULL,wideTimeColPresent=NULL,
-   wideTimeColSeq=c(1,1)) 
+   wideTimeColSeq=c(1,1),wideGrpColName=NULL,wideValueColName=NULL) 
 {
 
    if(wide) {
       tmp <- wideToLongWithTime(curveData,wideTimeColName,
-         wideTimeColPresent,wideTimeColSeq)
+         wideTimeColPresent,wideTimeColSeq,
+         grpColName=wideGrpColName,
+         valueColName=wideValueColName)
       curveData <- tmp
       xCol <- 1; yCol <- 3; grpCol <- 2
    }
