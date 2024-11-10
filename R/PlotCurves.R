@@ -38,6 +38,11 @@ qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
    legendSpace=1.1,legendPos='topright') 
 {
 
+   nms <- names(curveData)
+   if (is.character(xCol)) xCol <- which(nms == xCol)
+   if (is.character(yCol)) yCol <- which(nms == yCol)
+   if (is.character(grpCol)) grpCol <- which(nms == grpCol)
+
    tmpDF <- curveData[,c(xCol,yCol,grpCol)]
    briefCurveData <- tmpDF
    if (!is.factor(briefCurveData[,3])) 
@@ -241,7 +246,7 @@ replicMeans1old <- function (n, charExpr, simplify = "array") {
 
 # X is required to be in col 1; col 2 is for Y of group 1, etc.
 
-# 'data' must be a data frame or equivalent, in which for each X value
+# 'dataMitt' must be a data frame or equivalent, in which for each X value
 # there is exactly one Y value for each group; format is wide, e.g.
 
 #    x y1 y2 y3
@@ -249,9 +254,10 @@ replicMeans1old <- function (n, charExpr, simplify = "array") {
 #    w <- data.frame(x=c(3:5,2),y1=c(5:7,4),y2=c(4,12,15,5),y3=10:7)
 #    qeMittalGraph(w)
 
-qeMittalGraph <- function(data,xlab='x',ylab='y',legendTitle='curve',
+qeMittalGraph <- function(dataMitt,xlab='x',ylab='y',legendTitle='curve',
    loess=TRUE)
 {
+   data <- dataMitt
 
    x <- data[,1]
    nc <- ncol(data)

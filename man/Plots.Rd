@@ -18,11 +18,12 @@ qeFreqParcoord(dataName,k=25,opts=NULL)
 qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
    loess=TRUE,legendTitle,legendSpace=1.1,legendPos='topright')
-qeMittalGraph(data,xlab="x",ylab="y",legendTitle="curve",loess=TRUE) 
+qeMittalGraph(dataMitt,xlab="x",ylab="y",legendTitle="curve",loess=TRUE) 
 }
 
 \arguments{
-  \item{data}{A data frame or equivalent.  "X" and "Y" columns, followed
+  \item{data}{A data frame or equivalent..}
+  \item{dataMitt}{A data frame or equivalent.  "X" and "Y" columns, followed
      by a group column, an R factor.}
   \item{qeOut}{An object returned from one of the qe-series
      predictive functions..}
