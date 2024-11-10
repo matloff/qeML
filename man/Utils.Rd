@@ -4,6 +4,7 @@
 \alias{newDFRow}
 \alias{replicMeansMatrix}
 \alias{Data}
+\alias{wideToLongWithTime}
 
 \title{Utilities}
 
@@ -18,9 +19,14 @@ evalr(toexec)
 newDFRow(dta,yName,x,dtaRowNum=1)
 replicMeansMatrix(nReps,cmd,nCols=NULL)
 Data(datasetName)
+wideToLongWithTime(data,timeColName,timeColPresent=TRUE,
+   timeColSeq=c(1,1),grpColName=NULL,valueColName=NULL)
 }
 
 \arguments{
+  \item{data}{Data frame or equivalent. Other than a "time" column,
+     all columns must be numeric, one column per
+     group (see below).}
   \item{qeFtnName}{Quoted name of a \pkg{qeML} predictive function.}
   \item{dataName}{Quoted name of a data frame.}
   \item{yName}{Quoted name of a column to be predicted.}
@@ -59,6 +65,11 @@ simulation or in investigation of a random algorithm.
 The function \code{Data} is a convenience function that combines calls
 to \code{data} and \code{str}.
 
+The function \code{wideToLongWithTime} plot "Y" versus "X" for different
+groups, one per column in \code{data} other than "X", if present. "X" is
+typically time but can be any ordered numeric quantity. If "X" is not
+present, the arguments specify how the user wants one created.
+
 }
 
 \examples{
@@ -69,7 +80,7 @@ lsp <- function(pkg) {
    evalr(cmd)
 }
 lsp('regtools')
-# outputs 
+# outputs
 #  [1] "clusterApply"        "clusterApplyLB"      "clusterCall"        
 #  [4] "clusterEvalQ"        "clusterExport"       "clusterMap"         
 # ...
@@ -81,6 +92,10 @@ replicMeansMatrix(1000,'c(rnorm(1),rnorm(1)^2)',2)
 # mean of matrix quantity
 replicMeansMatrix(1000,
    '{z1=rnorm(1); z2=rnorm(1); x=z1; y=z1+z2; rbind(c(x,x^2),c(y,y^2))}',2) 
+
+data(currency)
+zLong <- wideToLongWithTime(currency,'weeknum',timeColPresent=FALSE,
+   grpColName='country',valueColName='rate')
 
 }
 

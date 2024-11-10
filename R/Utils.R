@@ -601,3 +601,37 @@ Data <- function(datasetName)
    evalr(toExec)
 }
 
+
+# basically a wide-to-long reshape, but with various options for a time
+# column
+
+# arguments:
+
+#    data: data frame or equivalent
+#    timeColName: name of time column, including if not yet formed
+#    timeColPresent: TRUE means column already in 'data'
+#    timeColBase:  
+
+wideToLongWithTime <- function(data,timeColName,timeColPresent=TRUE,
+   timeColBase=1:nrow(data),grpColName=NULL,valueColName=NULL) 
+{
+   qeML:::getSuggestedLib('reshape2')
+
+   if (!timeColPresent) {
+      tmp <- 1:nrow(data)
+      if (!identical(tmp,timeColBase)) {
+         timecol <- rep(timeColBase,ncol(data))
+      } else {
+         timecol <- 1:nrow(data)
+      }
+      newdata <- cbind(timecol,data)
+      names(newdata)[1] <- timeColName
+   }
+
+   longData <- reshape2::melt(newdata,id.vars=timeColName)
+   if (!is.null(grpColName)) names(longData)[2] <- grpColName
+   if (!is.null(valueColName)) names(longData)[3] <- valueColName
+   return(longData)
+
+}
+
