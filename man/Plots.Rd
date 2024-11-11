@@ -18,6 +18,13 @@ qeFreqParcoord(dataName,k=25,opts=NULL)
 qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
    loess=TRUE,legendTitle,legendSpace=1.1,legendPos='topright')
+
+qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
+   xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],loess=TRUE,
+   legendTitle=names(curveData)[grpCol],legendSpace=1.1,legendPos="topright",
+   wide=FALSE,wideTimeColName=NULL,wideTimeColPresent=NULL,
+      wideTimeColBase=1:nrow(curveData),wideGrpColName=NULL,
+      wideValueColName=NULL)
 qeMittalGraph(dataMitt,xlab="x",ylab="y",legendTitle="curve",loess=TRUE) 
 }
 
@@ -46,6 +53,12 @@ qeMittalGraph(dataMitt,xlab="x",ylab="y",legendTitle="curve",loess=TRUE)
   \item{curveData}{A data frame, "X" values in column 1.}
   \item{xlab}{Label for X-axis.}
   \item{ylab}{Label for Y-axis.}
+  \item{wide}{TRUE if \code{curveData} is in wide format.}
+  \item{wideTimeColName}{Name to be used for "X"-axis.}
+  \item{wideTimeColPresent}{If TRUE, a time column already exists.}
+  \item{wideTimeColBase}{"Time" values for each group.}
+  \item{wideGrpColName}{Group name.}
+  \item{wideGrpValueName}{"Y" value name.}
 }
 
 \details{
@@ -59,8 +72,8 @@ The function \code{qeFreqParcoord} is a \code{qeML} interface to the
 
 The function \code{qePlotCurves} plots X-Y curves for one or more
 groups.  Within each group, the (X,Y) pairs are plotted, possibly with
-\code{\link{loess}} smoothing.  Note that the function will sort the
-pairs according to X, so that \code{\link{loess}} smoothing makes sense.
+\code{\link{loess}} smoothing. Input data format long by default, but
+can be wide.
 
 The function \code{qeMittalGraph} is similar to \code{qePlotCurves},
 except that it displays multiplicative change over the X-axis. All
@@ -72,6 +85,7 @@ for different datasets.  }
 \examples{
 
 \dontrun{
+
 data(pef)
 linout <- qeLin(pef,'wageinc')
 plotPairedResids(pef,linout)
@@ -84,9 +98,13 @@ qePlotCurves(lsa,6,5,9,legendSpace=1.35)
 data(currency)
 curr <- cbind(1:nrow(currency),currency)
 names(curr)[1] <- 'weeknum'
+qePlotCurves(currency,wide=TRUE,wideTimeColName='weeknum',
+   wideTimeColPresent=FALSE,wideGrpColName='country',wideValueColName='rate')
 qeMittalGraph(curr,'weeknum','rate','country')
 # Canadian dollar and pound in one cluster, and franc, mark and
 # yen in another
+
+
 }
 
 }
