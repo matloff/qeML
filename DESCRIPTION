@@ -1,5 +1,5 @@
 Package: qeML
-Version: 1.2
+Version: 1.2.1
 Title: Quick and Easy Machine Learning Tools 
 Authors@R: c(person("Norm", "Matloff", email = "nsmatloff@ucdavis.edu",
    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")))
