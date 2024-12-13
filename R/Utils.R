@@ -635,3 +635,13 @@ wideToLongWithTime <- function(data,timeColName,timeColPresent=TRUE,
 
 }
 
+# many R packages refuse to accept data of type 'integer', so change to
+# 'numeric'
+
+intToNum <- defmacro(d,
+   expr={
+      for (i in 1:ncol(d)) if (inherits(d[,i],'integer'))
+         d[,i] <- as.numeric(d[,i])
+   }
+)
+
