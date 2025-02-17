@@ -19,100 +19,91 @@
 
 # see examples at the end of this file
 
-qeNeuralTorch <- function(data,yName,layers,yesYVal=NULL,
-   learnRate=0.001,wtDecay=0,nEpochs=100,dropout=0,
-   holdout=floor(min(1000,0.1*nrow(data))))
+qeNeuralTorch <- function (data, yName, layer, yesYVal = NULL, 
+    learnRate = 0.001, wtDecay = 0, nEpochs = 100, dropout = 0, 
+    holdout = floor(min(1000, 0.1 * nrow(data)))) 
 {
+    checkPkgLoaded("torch")
+    qeML:::checkForNonDF(data)
+    trainRow1 <- qeML:::getRow1(data, yName)
+    ycol <- which(names(data) == yName)
+    y <- data[, ycol]
+    if (is.factor(y)) {
+        classif <- TRUE
+        yLevels <- levels(y)
+        if (length(yLevels) != 2) {
+            stop("presently classif case only for binary Y")
+        }
+        if (is.null(yesYVal)) 
+            yesYVal <- yLevels[1]
+        y <- as.numeric(y == yesYVal)
+    }
+    else classif <- FALSE
+    yToAvg <- y
+    nYcols <- 1
+    x <- data[, -ycol]
+    classes <- sapply(data, class)
+    if (sum(classes == "numeric") + sum(classes == "integer") < 
+        ncol(data)) {
+        x <- regtools::factorsToDummies(x, omitLast = TRUE)
+        factorsInfo <- attr(x, "factorsInfo")
+    }
+    else factorsInfo <- NULL
+    holdIdxs <- tst <- trn <- NULL
+    if (!is.null(holdout)) 
+        qeML:::makeHoldout(0)
+    x <- as.matrix(x)
+    xT <- torch_tensor(x)
+    yToAvg <- matrix(as.numeric(yToAvg, ncol = 1))
+    yT <- torch_tensor(yToAvg)
 
-   ### prep general
+    # prep to create model
+    nnSeqArgs <- list(); nsa <- 0
+    i <- 1
+    while (i <= length(layer)) {
+       nsa <- nsa + 1
+       if (layer[[i]] == "linear") {
+           nnSeqArgs[[nsa]] <- nn_linear(layer[[i+1]], layer[[i+2]])
+           i <- i + 3
+       } else if (layer[[i]] == "relu") {
+           nnSeqArgs[[nsa]] <- nn_relu(inplace = FALSE)
+           i <- i + 1
+       }
+       else if (layer[[i]] == "dropout") {
+         nnSeqArgs[[nsa]] <- nn_dropout(dropout)
+           i <- i + 1
+       }
+       else {
+          nnSeqArgs[[nsa]] <- nn_sigmoid()
+          i <- i + 1
+       }
+    }
 
-   checkPkgLoaded('torch')
-   checkForNonDF(data)
-   trainRow1 <- getRow1(data,yName)
-   ycol <- which(names(data) == yName)
-   # y, yesYVal etc.
-   y <- data[,ycol]
-   #### if (sum(y==1) + sum(y==0) == length(y)) {
-   if (is.factor(y)) {
-      # maybe later do data[y==0,ycol] <- -1
-      classif <- TRUE
-      yLevels <- levels(y)
-      if (length(yLevels) != 2) {
-         stop('presently classif case only for binary Y')
-      }
-      if (is.null(yesYVal)) yesYVal <- yLevels[1]
-      y <- as.numeric(y == yesYVal)  # 0s and 1s noww
-   } else classif <- FALSE
-   yToAvg <- y
-   nYcols <- 1  # in classif case, binary Y only
-   x <- data[,-ycol]
-   # torch requires numeric data
-   classes <- sapply(data,class)
-   if (sum(classes=='numeric') + sum(classes=='integer') < ncol(data)) {
-      #### stop('all features must be numeric; use factorsToDummies to fix')
-      x <- regtools::factorsToDummies(x,omitLast=TRUE)
-      factorsInfo <- attr(x,'factorsInfo')
-   } else factorsInfo <- NULL
-
-   ### form holdout if requested
-
-   holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
-   if (!is.null(holdout)) makeHoldout(0)
-   x <- as.matrix(x)
-   xT <- torch_tensor(x)
-   yToAvg <- matrix(as.numeric(yToAvg,ncol=1))
-   yT <- torch_tensor(yToAvg)
-   # at this point, our training data, whether we have holdout or not,
-   # is the above, i.e. x, xT, yToAvg and yT (the 'T' versions are
-   # tensors for Torch); in the with-holdout case, we also have the
-   # analogous entities xTst, yTst; the cbind-ed xT and yToAvg are in
-   # trn, with the analogous tst
-
-   ### set up model
-
-   nnSeqArgs <- list()
-   for (i in 1:length(layers)) {
-      layer <- layers[[i]]
-      if (i == 1 && layer[[2]] == 0) layer[[2]] <- ncol(x)
-      nnSeqArgs[[i]] <- 
-         if(layer[[1]]=='linear') nn_linear(layer[[2]],layer[[3]]) else
-         if(layer[[1]]=='relu') nn_relu(inplace=FALSE) else
-         if(layer[[1]]=='dropout') nn_dropout(dropout) else
-         nn_sigmoid()
-   }
-   model <- do.call(nn_sequential,nnSeqArgs)
-
-   optimizer <- optim_adam(model$parameters, 
-      lr=learnRate,weight_decay=wtDecay)
-
-   ### training
-
-   for (i in 1:nEpochs) {
-      preds <- model(xT)
-      loss <- nnf_mse_loss(preds,yT,reduction = "sum")
-      # maybe nnf_binary_cross_entropy_with_logits
-      optimizer$zero_grad()
-      loss$backward()
-      optimizer$step()
-   }
-
-   torchout <- list()
-   torchout$classif <- classif
-   # torchout$classNames <- classNames
-   torchout$x <- x
-   torchout$xT <- xT
-   torchout$yT <- yT
-   # torchout$yFactor <- yFactor
-   torchout$trainRow1 <- getRow1(data,yName)
-   torchout$model <- model
-   class(torchout) <- c('qeNeuralTorch','torch_tensor')
-   if (!is.null(holdout)) {
-      predictHoldoutTorch(torchout)
-      torchout$holdIdxs <- holdIdxs
-   }
-
-   torchout
-
+    model <- do.call(nn_sequential, nnSeqArgs)
+    optimizer <- optim_adam(model$parameters, lr = learnRate, 
+        weight_decay = wtDecay)
+    for (i in 1:nEpochs) {
+        preds <- model(xT)
+        loss <- nnf_mse_loss(preds, yT, reduction = "sum")
+        optimizer$zero_grad()
+        loss$backward()
+        optimizer$step()
+    }
+    torchout <- list()
+    torchout$classif <- classif
+    torchout$x <- x
+    torchout$xT <- xT
+    torchout$yT <- yT
+    torchout$trainRow1 <- qeML:::getRow1(data, yName)
+    torchout$model <- model
+    class(torchout) <- c("qeNeuralTorch", "torch_tensor")
+    ## if (!is.null(holdout)) {
+    ##     ## predictHoldoutTorch(torchout)
+    ##     preds <- model(
+    ##     torchout$holdIdxs <- holdIdxs
+    ## }
+    torchout$preds <- preds
+    torchout
 }
 
 predictHoldoutTorch <- defmacro(res,
