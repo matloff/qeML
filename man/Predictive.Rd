@@ -204,7 +204,7 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      \code{qeKNN} for which this is an argument, it is the number of 
      neighbors to use in finding conditional probabilities via 
      \code{knnCalib}.} 
-  \item{smoothingFtn}{As in \code{kNN}.}
+  \item{smoothingFtn}{As in \code{regtools::kNN}.}
   \item{scaleX}{Scale the features.} 
   \item{nTree}{Number of trees.} 
   \item{minNodeSize}{Minimum number of data points in a tree node.} 
