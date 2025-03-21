@@ -1,5 +1,5 @@
-\name{mlens}
-\alias{mlens}
+\name{mlensSideInfo}
+\alias{mlensSideInfo}
 
 \title{
 MovieLens User Summary Data
