@@ -2278,28 +2278,36 @@ print.qeDT <- function(x,...)
 #    nReps: number of repetetions per qe*() function
 #    opts: R list, giving optional arguments for the qe*()
 #    seed: random number seed, applied to each qe*() function
+#    confLevel: confidence level for the computed confidence interval 
 
 # compare several qe*(data,yName,qeFtnList,nReps)!
 
-qeCompare <- function(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
+qeCompare <- function(data,yName,qeFtnList,nReps,opts=NULL,seed=9999,confLevel=0.95) 
 {
-   nQe <- length(qeFtnList)
-   meanAcc <- vector(length=nQe)
-   for (i in 1:length(qeFtnList)) {
-      ftn <- qeFtnList[i]
-      cmd <- paste0(ftn,'(data,yName')
-      if (!is.null(opts)) {
-         opt <- opts[[ftn]]
-         if (!is.null(opt)) 
-            cmd <- paste0(cmd,',',opt)
-      }
-      cmd <- paste0(cmd,')')
-      cmd <- paste0(cmd,'$testAcc')
-      set.seed(seed)
-      ma <- replicate(nReps,eval(parse(text=cmd)))
-      meanAcc[i] <- mean(ma,na.rm=TRUE)
-   }
-   data.frame(qeFtn=qeFtnList,meanAcc=meanAcc)
+  nQe <- length(qeFtnList)
+  meanAcc <- vector(length=nQe)
+  lowerCI <- numeric(nQe)
+  upperCI <- numeric(nQe)
+  z <- qnorm(1 - (1 - confLevel) / 2) 
+  
+  for (i in seq_along(qeFtnList)) {
+    ftn <- qeFtnList[i]
+    cmd <- paste0(ftn, "(data, yName")
+    if (!is.null(opts)) {
+      opt <- opts[[ftn]]
+      if (!is.null(opt)) 
+        cmd <- paste0(cmd, ",", opt)
+    }
+    cmd <- paste0(cmd, ")$testAcc")
+    set.seed(seed)
+    ma <- replicate(nReps, eval(parse(text = cmd)))
+    meanAcc[i] <- mean(ma, na.rm = TRUE)
+    sdAcc <- sd(ma, na.rm = TRUE)
+    seAcc <- sdAcc / sqrt(nReps)
+    lowerCI[i] <- meanAcc[i] - z * seAcc
+    upperCI[i] <- meanAcc[i] + z * seAcc
+  }
+  data.frame(qeFtn = qeFtnList, meanAcc = meanAcc, lowerCI = lowerCI, upperCI = upperCI)
 }
 
 ######################  qeROC()  #############################
