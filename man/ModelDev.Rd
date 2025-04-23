@@ -42,7 +42,8 @@ qeTS(lag,data,qeName,opts=NULL,holdout=floor(min(1000,0.1*length(data))))
   \item{qeFtnList}{Character vector of \code{qe*} function names.}
   \item{nReps}{Number of holdout sets to generate.}
   \item{opts}{R list of optional arguments for none, some or all of th
-     functions in \code{qeFtnList}.}
+     functions in \code{qeFtnList}, one element per function (NULL is
+     all right). See example.}
   \item{seed}{Seed for random number generation.}
   \item{qeftn}{Quoted string, specifying the name of a qe-series
      machine learning method.}
@@ -82,6 +83,9 @@ data(mlb1)
 # with 10 cross-validations
 qeFT(mlb1,'Weight','qeKNN',list(k=c(5,25)),nTst=100,nXval=10)
 
+data(svcensus)
+qeCompare(svcensus,'wageinc',c('qeLin','qeKNN'),10,
+   list(NULL,qeKNN=(list(k=10))))
 
 }
 
