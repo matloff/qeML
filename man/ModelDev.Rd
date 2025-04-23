@@ -84,9 +84,7 @@ data(mlb1)
 qeFT(mlb1,'Weight','qeKNN',list(k=c(5,25)),nTst=100,nXval=10)
 
 data(svcensus)
-qeCompare(svcensus,'wageinc',c('qeLin','qeKNN'),10,
-   list(NULL,qeKNN=(list(k=10))))
-
+qeCompare(svcensus,'wageinc',c('qeLin','qeKNN'),10,list(qeKNN=list(k=100)))
 }
 
 
