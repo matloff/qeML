@@ -2275,7 +2275,7 @@ print.qeDT <- function(x,...)
 #    data: as in qe*()
 #    yName: as in qe*()
 #    qeFtnList: character vector of qe*() functions to be run
-#    nReps: number of repetetions per qe*() function
+#    nReps: number of repetitions per qe*() function
 #    opts: R list, giving optional arguments for the qe*()
 #    seed: random number seed, applied to each qe*() function
 
