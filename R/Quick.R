@@ -2285,6 +2285,7 @@ qeCompare <- function(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
 {
    nQe <- length(qeFtnList)
    meanAcc <- vector(length=nQe)
+   seAcc <- vector(length=nQe)
    for (i in 1:length(qeFtnList)) {
       ftn <- qeFtnList[i]
       cmd <- paste0(ftn,'(data,yName')
@@ -2298,8 +2299,9 @@ qeCompare <- function(data,yName,qeFtnList,nReps,opts=NULL,seed=9999)
       set.seed(seed)
       ma <- replicate(nReps,eval(parse(text=cmd)))
       meanAcc[i] <- mean(ma,na.rm=TRUE)
+      seAcc[i] <- sd(ma,na.rm=TRUE) / nQe
    }
-   data.frame(qeFtn=qeFtnList,meanAcc=meanAcc)
+   data.frame(qeFtn=qeFtnList,meanAcc=meanAcc,seAcc=seAcc)
 }
 
 ######################  qeROC()  #############################
