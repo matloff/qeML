@@ -75,7 +75,8 @@ for teaching.
 qeLogit(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL)
 qeLin(data,yName,noBeta0=FALSE,holdout=floor(min(1000,0.1*nrow(data))))
 qeKNN(data,yName,k=25,scaleX=TRUE,smoothingFtn=mean,yesYVal=NULL,
-   expandVars=NULL,expandVals =NULL,holdout=floor(min(1000,0.1*nrow(data))))
+   expandVars=NULL,expandVals=NULL,holdout=floor(min(1000,0.1*nrow(data))),
+   saveNhbrs=FALSE,savedNhbrs=NULL)
 qeRF(data,yName,nTree=500,minNodeSize=10,mtry=floor(sqrt(ncol(data)))+1,
    holdout=floor(min(1000,0.1*nrow(data))))
 qeRFranger(data,yName,nTree=500,minNodeSize=10,
@@ -205,6 +206,11 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      neighbors to use in finding conditional probabilities via 
      \code{knnCalib}.} 
   \item{smoothingFtn}{As in \code{regtools::kNN}.}
+  \item{saveNhbrs}{If TRUE, save the indices of nearest neighbors, in
+     order to reduce subsequent computation for other (smaller) values of
+     \code{k}.}
+  \item(savedNhbrs}{If non-null, name of the matrix of nearest neighbors, 
+     computed and saved in a previous call.}
   \item{scaleX}{Scale the features.} 
   \item{nTree}{Number of trees.} 
   \item{minNodeSize}{Minimum number of data points in a tree node.} 

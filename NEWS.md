@@ -22,3 +22,8 @@ January 20, 2024
 
 * Fixed **qePlotCurves** to accommodate negative max Y value.
 
+Version 1.3 
+
+* Extended **qeKNN** to save indices of nearest neighbors for subsequent
+  use with other (smaller) values of **k**.
+

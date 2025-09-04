@@ -305,7 +305,7 @@ predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
  
 qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))))
+   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL)
 {
    yNameSave <- yName
    checkForNonDF(data)
@@ -412,7 +412,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
 
    # set scaleX to FALSE; scaling, if any, has already been done
    knnout <- regtools::kNN(xm,yToAvg,newx=NULL,k,scaleX=FALSE,classif=classif,
-      smoothingFtn=smoothingFtn)
+      smoothingFtn=smoothingFtn,saveNhbrs=FALSE,savedNhbrs=NULL)
    knnout$classif <- classif
    knnout$classif2 <- classif2
    knnout$yesYVal <- yesYVal
