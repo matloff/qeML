@@ -209,14 +209,14 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
   \item{saveNhbrs}{If TRUE, save the indices of nearest neighbors, in
      order to reduce subsequent computation for other (smaller) values of
      \code{k}.}
-  \item(savedNhbrs}{If non-null, name of the matrix of nearest neighbors, 
+  \item{savedNhbrs}{If non-null, name of the matrix of nearest neighbors, 
      computed and saved in a previous call.}
   \item{scaleX}{Scale the features.} 
   \item{nTree}{Number of trees.} 
   \item{minNodeSize}{Minimum number of data points in a tree node.} 
   \item{learnRate}{Learning rate.} 
   \item{hidden}{Vector of units per hidden layer.  Fractional values
-     indicated dropout proportions.  Can be specified as a string, e.g.
+     indicate dropout proportions.  Can be specified as a string, e.g.
      '100,50', for use with \code{qeFT}.} 
   \item{nEpoch}{Number of iterations in neural net.}
   \item{acts}{Vector of names of the activation functions, one per

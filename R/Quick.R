@@ -412,7 +412,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
 
    # set scaleX to FALSE; scaling, if any, has already been done
    knnout <- regtools::kNN(xm,yToAvg,newx=NULL,k,scaleX=FALSE,classif=classif,
-      smoothingFtn=smoothingFtn,saveNhbrs=FALSE,savedNhbrs=NULL)
+      smoothingFtn=smoothingFtn,saveNhbrs=saveNhbrs,savedNhbrs=savedNhbrs)
    knnout$classif <- classif
    knnout$classif2 <- classif2
    knnout$yesYVal <- yesYVal
