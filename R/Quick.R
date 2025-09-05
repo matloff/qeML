@@ -410,6 +410,10 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
       xm <- newMultCols(xm,expandVars,expandVals)
    }
 
+   if (!is.null(savedNhbrs)) {
+      savedNhbrs <- list(nn.index=savedNhbrs,nn.dist)
+   }
+
    # set scaleX to FALSE; scaling, if any, has already been done
    knnout <- regtools::kNN(xm,yToAvg,newx=NULL,k,scaleX=FALSE,classif=classif,
       smoothingFtn=smoothingFtn,saveNhbrs=saveNhbrs,savedNhbrs=savedNhbrs)
