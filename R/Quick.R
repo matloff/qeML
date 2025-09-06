@@ -96,7 +96,7 @@ qeLogit <-
    yLevels <- levels(dataY)
    # might make a macro of this, but different ftns seem to need
    # different treatment
-   if (classif && length(yLevels == 2)) {
+   if (classif && length(yLevels) == 2) {
       if (is.null(yesYVal)) {
          yesYVal <- yLevels[1]
          warning(paste0(
