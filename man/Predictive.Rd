@@ -198,7 +198,9 @@ checkPkgLoaded(pkgName,whereObtain='CRAN')
      via labels column being an R factor.}
   \item{dataIn}{See \code{data}.}
   \item{qeOut}{Output from a qe-series function.}
-  \item{yName}{Name of the class labels column.}
+  \item{yName}{Name of the class labels column, which must be a factor. If 
+     this factor has more than 2 levels, it is treated as a multiclass
+     problem.}
   \item{holdout}{If not NULL, form a holdout set of the specified size.
      After fitting to the remaining data, evaluate accuracy on the test set.}
   \item{k}{Number of nearest neighbors. In functions other than
