@@ -282,26 +282,6 @@ predict.qeLin <- function(object,newx,useTrainRow1=TRUE,...) {
    list(predClasses=predClasses,probs=probs)
 }
 
-#########################  qeKNNtmp()  #################################
-
-# will be revised qeKNN
-
-# seems to work in all 3 cases: regression, classif binary Y, classif
-# categorical Y; need to revise predict()
-
-# arguments:  see above, plus
-
-#     k: number of nearest neighbors
-#     scaleX: if TRUE, features will be centered and scaled; note that
-#        this means the features must be numeric
-#     smoothingFtn: as in kNN(); 'mean' or 'loclin'
-#     expandVars,expandVals:  e.g. expandVars element = 3 and
-#        expandVals = 0.2 means give variable 3 a weight of 0.2
-#        instead of 1.0 in the distance function
-
-# value:  see above
-
-# see note in kNN() man pg
  
 qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
@@ -411,7 +391,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    }
 
    if (!is.null(savedNhbrs)) {
-      savedNhbrs <- list(nn.index=savedNhbrs,nn.dist)
+      savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
    }
 
    # set scaleX to FALSE; scaling, if any, has already been done
@@ -487,6 +467,53 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
    predClassIdxs <- apply(preds,1,which.max) 
    predClasses <- colnames(preds)[predClassIdxs]
    list(predClasses=predClasses,probs=preds)
+
+}
+ 
+# does qeKNN for multiple values of k, exploiting the fact that we can
+# save the indices of nearest neighbors
+
+qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
+   smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
+   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL)
+{
+   if (length(k) == 1) stop('use qeKNN')
+
+   knnOuts <- list()
+
+   if (is.null(savedNhbrs)) {
+      newSavedNhbrs <- TRUE
+      tmp <- qeKNN(data,yName,max(k),scaleX,smoothingFtn,yesYVal,expandVars,
+         expandVals,holdout,saveNhbrs=TRUE,savedNhbrs=NULL);
+      knnOuts <- c(knnOuts,tmp)
+      savedNhbrs <- list(nn.index=tmp$whichClosest,nn.dist=0)
+   } else {
+      newSavedNhbrs <- FALSE
+      savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
+   }
+
+   for (i in (1+newSavedNhbrs):n) {
+      tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
+         expandVals,holdout,saveNhbrs=FALSE,savedNhbrs=savedNhbrs);
+      knnOuts <- c(knnOuts,tmp)
+   }
+
+   qeKNNmultKout <- list()
+   qeKNNmultKout$knnOuts <- knnOuts
+   class(qeKNNmultKout) <- 'qeKNNmultK'
+   qeKNNmultKout
+
+}
+
+predict.qeKNNmultK <- function(object,newx)
+{
+
+   predictOneK <- function(oneQeKNNmultKout)
+   {
+      predict(oneQeKNNmultKout,newx)
+   }
+
+   lapply(object$knnOuts,predictOneK)
 
 }
 
