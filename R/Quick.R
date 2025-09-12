@@ -476,7 +476,7 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL,
-   sameSeed=NULL,nReps=NULL)
+   sameSeed=NULL)
 {
    if (length(k) == 1) stop('use qeKNN')
 
@@ -529,7 +529,7 @@ qeKNNmultKtestAccs <- function(qeKNNmultKout)
    knnOuts <- qeKNNmultKout$knnOuts
    k <- qeKNNmultKout$k
    testAccs <- sapply(knnOuts,function(ko) ko$testAcc)
-   data.frame(kvals=k,testAcc=testAccs)
+   data.frame(kval=k,testAcc=testAccs)
 }
  
 # does qeKNN for multiple values of k, exploiting the fact that we can
