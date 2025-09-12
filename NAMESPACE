@@ -70,5 +70,5 @@ export(
    cartesianFactor,newDFRow,qeRareLevels,
    qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves,replicMeansMatrix,
    qeNeuralTorch,Data,qeMittalGraph,wideToLongWithTime,intToNum, 
-   qeKNNmultK,qeKNNmultKtestAccs
+   qeKNNmultK,qeKNNmultKtestAccs,checkForNonDF
 )

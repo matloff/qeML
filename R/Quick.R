@@ -475,7 +475,8 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 
 qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL)
+   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL,
+   sameSeed=NULL,nReps=NULL)
 {
    if (length(k) == 1) stop('use qeKNN')
 
@@ -485,6 +486,7 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
 
    if (is.null(savedNhbrs)) {
       newSavedNhbrs <- TRUE
+      if (!is.null(sameSeed)) set.seed(sameSeed)
       tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
          expandVals,holdout,saveNhbrs=TRUE,savedNhbrs=NULL);
       knnOuts[[length(k)]] <- tmp
@@ -496,6 +498,7 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
 
    for (i in (length(k)-newSavedNhbrs):1) {
       q <- savedNhbrs$nn.index[,1:k[i]]
+      if (!is.null(sameSeed)) set.seed(sameSeed)
       tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
          expandVals,holdout,saveNhbrs=FALSE,savedNhbrs=q)
       knnOuts[[i]] <- tmp
