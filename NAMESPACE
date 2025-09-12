@@ -55,6 +55,7 @@ S3method(predict,qeLinMV)
 S3method(predict,qeLogitMV)
 S3method(predict,qeKNNMV)
 S3method(predict,qeNeuralTorch)
+S3method(predict,predict,qeKNNmultK)
 
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeDT,
@@ -68,5 +69,6 @@ export(
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,
    cartesianFactor,newDFRow,qeRareLevels,
    qeFreqParcoord,buildQEcall,evalr,qeFOCImult,qePlotCurves,replicMeansMatrix,
-   qeNeuralTorch,Data,qeMittalGraph,wideToLongWithTime,intToNum
+   qeNeuralTorch,Data,qeMittalGraph,wideToLongWithTime,intToNum, 
+   qeKNNmultK,qeKNNmultKtestAccs
 )

@@ -481,25 +481,29 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
 
    knnOuts <- list()
 
+   maxk <- max(k)
+
    if (is.null(savedNhbrs)) {
       newSavedNhbrs <- TRUE
-      tmp <- qeKNN(data,yName,max(k),scaleX,smoothingFtn,yesYVal,expandVars,
+      tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
          expandVals,holdout,saveNhbrs=TRUE,savedNhbrs=NULL);
-      knnOuts <- c(knnOuts,tmp)
+      knnOuts[[length(k)]] <- tmp
       savedNhbrs <- list(nn.index=tmp$whichClosest,nn.dist=0)
    } else {
       newSavedNhbrs <- FALSE
       savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
    }
 
-   for (i in (1+newSavedNhbrs):n) {
+   for (i in (length(k)-newSavedNhbrs):1) {
+      q <- savedNhbrs$nn.index[,1:k[i]]
       tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
-         expandVals,holdout,saveNhbrs=FALSE,savedNhbrs=savedNhbrs);
-      knnOuts <- c(knnOuts,tmp)
+         expandVals,holdout,saveNhbrs=FALSE,savedNhbrs=q)
+      knnOuts[[i]] <- tmp
    }
 
    qeKNNmultKout <- list()
    qeKNNmultKout$knnOuts <- knnOuts
+   qeKNNmultKout$k <- k
    class(qeKNNmultKout) <- 'qeKNNmultK'
    qeKNNmultKout
 
@@ -516,6 +520,17 @@ predict.qeKNNmultK <- function(object,newx)
    lapply(object$knnOuts,predictOneK)
 
 }
+
+qeKNNmultKtestAccs <- function(qeKNNmultKout) 
+{
+   knnOuts <- qeKNNmultKout$knnOuts
+   k <- qeKNNmultKout$k
+   testAccs <- sapply(knnOuts,function(ko) ko$testAcc)
+   data.frame(kvals=rev(k),testAcc=testAccs)
+}
+ 
+# does qeKNN for multiple values of k, exploiting the fact that we can
+# save the indices of nearest neighbors
 
 ### #########################  qeKNN()  #################################
 ### 
