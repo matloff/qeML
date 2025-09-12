@@ -526,7 +526,7 @@ qeKNNmultKtestAccs <- function(qeKNNmultKout)
    knnOuts <- qeKNNmultKout$knnOuts
    k <- qeKNNmultKout$k
    testAccs <- sapply(knnOuts,function(ko) ko$testAcc)
-   data.frame(kvals=rev(k),testAcc=testAccs)
+   data.frame(kvals=k,testAcc=testAccs)
 }
  
 # does qeKNN for multiple values of k, exploiting the fact that we can
