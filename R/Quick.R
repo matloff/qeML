@@ -479,6 +479,12 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
    sameSeed=NULL)
 {
    if (length(k) == 1) stop('use qeKNN')
+   if (!is.null(sameSeed)) {
+      scs <- sys.calls()
+      parentCalls <- sapply(scs,function(scsi) as.character(scsi)[1])
+      if ('replicate' %in% parentCalls)
+         stop('use of sameSeed antithetical to replicate()')
+   }
 
    knnOuts <- list()
 
