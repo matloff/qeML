@@ -338,9 +338,15 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) {
       # splitData(holdout,newData); no, write separate code for qeKNN
-      nHold <- holdout
-      # cat('holdout set has ',nHold, 'rows\n')
-      holdIdxs <- sample(1:nrow(x),nHold)
+      # *** new: allow 'holdout' to specfy indices of the test set
+      if (length(holdout) > 1) {
+         nHold <- length(holdout)
+         holdIdxs <- holdout
+      } else {
+         nHold <- holdout
+         # cat('holdout set has ',nHold, 'rows\n')
+         holdIdxs <- sample(1:nrow(x),nHold)
+      }
 
       xTst <- x[holdIdxs,]
       x <- x[-holdIdxs,]
@@ -475,16 +481,9 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 
 qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL,
-   sameSeed=NULL)
+   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL)
 {
    if (length(k) == 1) stop('use qeKNN')
-   if (!is.null(sameSeed)) {
-      scs <- sys.calls()
-      parentCalls <- sapply(scs,function(scsi) as.character(scsi)[1])
-      if ('replicate' %in% parentCalls)
-         stop('use of sameSeed antithetical to replicate()')
-   }
 
    knnOuts <- list()
 
@@ -492,7 +491,6 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
 
    if (is.null(savedNhbrs)) {
       newSavedNhbrs <- TRUE
-      if (!is.null(sameSeed)) set.seed(sameSeed)
       tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
          expandVals,holdout,saveNhbrs=TRUE,savedNhbrs=NULL);
       knnOuts[[length(k)]] <- tmp
@@ -504,7 +502,6 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
 
    for (i in (length(k)-newSavedNhbrs):1) {
       q <- savedNhbrs$nn.index[,1:k[i]]
-      if (!is.null(sameSeed)) set.seed(sameSeed)
       tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
          expandVals,holdout,saveNhbrs=FALSE,savedNhbrs=q)
       knnOuts[[i]] <- tmp
@@ -530,12 +527,16 @@ predict.qeKNNmultK <- function(object,newx)
 
 }
 
-qeKNNmultKtestAccs <- function(qeKNNmultKout) 
+qeKNNmultKtestAccs <- function(qeKNNmultKout,outDF=TRUE) 
 {
    knnOuts <- qeKNNmultKout$knnOuts
    k <- qeKNNmultKout$k
    testAccs <- sapply(knnOuts,function(ko) ko$testAcc)
-   data.frame(kval=k,testAcc=testAccs)
+   tmp <- data.frame(kval=k,testAcc=testAccs)
+   if (outDF) return(tmp)
+   tas <- tmp$testAcc
+   names(tas) <- tmp$kval
+   tas
 }
  
 # does qeKNN for multiple values of k, exploiting the fact that we can
