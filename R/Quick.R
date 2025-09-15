@@ -481,33 +481,41 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 
 qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
-   holdout=floor(min(1000,0.1*nrow(data))),saveNhbrs=FALSE,savedNhbrs=NULL)
+   holdout=floor(min(1000,0.1*nrow(data))))
 {
-   if (length(k) == 1) stop('use qeKNN')
+   if (length(k) == 1) stop('use qeKNN for single-k case')
 
    knnOuts <- list()
 
    maxk <- max(k)
 
-   if (is.null(savedNhbrs)) {
-      newSavedNhbrs <- TRUE
-      tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
-         expandVals,holdout,saveNhbrs=TRUE,savedNhbrs=NULL);
-      knnOuts[[length(k)]] <- tmp
-      savedNhbrs <- list(nn.index=tmp$whichClosest,nn.dist=0)
-   } else {
-      newSavedNhbrs <- FALSE
-      savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
-   }
+#    if (is.null(savedNhbrs)) {
+#       newSavedNhbrs <- TRUE
+#       tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
+#          expandVals,holdout,saveNhbrs=TRUE,savedNhbrs=NULL);
+#       knnOuts[[length(k)]] <- tmp
+#       savedNhbrs <- list(nn.index=tmp$whichClosest,nn.dist=0)
+#       holdIdxs <- tmp$holdIdxs
+#    } else {
+#       newSavedNhbrs <- FALSE
+#       savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
+#    }
 
-   for (i in (length(k)-newSavedNhbrs):1) {
-      q <- savedNhbrs$nn.index[,1:k[i]]
+   qeKNNmultKout <- list()
+   lastKi <- length(k)
+   for (i in lastKi:1) {
+      if (i == lastKi) {
+         tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
+            expandVals,holdout)
+         qeKNNmultKout$holdIdxs <- tmp$holdIdxs
+         qeKNNmultKout$whichClosest <- tmp$whichClosest
+      }
+      q <- tmp$whichClosest
       tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
-         expandVals,holdout,saveNhbrs=FALSE,savedNhbrs=q)
+         expandVals,holdout=holdIdxs,saveNhbrs=FALSE,savedNhbrs=q)
       knnOuts[[i]] <- tmp
    }
 
-   qeKNNmultKout <- list()
    qeKNNmultKout$knnOuts <- knnOuts
    qeKNNmultKout$k <- k
    class(qeKNNmultKout) <- 'qeKNNmultK'
