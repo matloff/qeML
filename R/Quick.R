@@ -507,8 +507,8 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
       if (i == lastKi) {
          tmp <- qeKNN(data,yName,maxk,scaleX,smoothingFtn,yesYVal,expandVars,
             expandVals,holdout)
-         qeKNNmultKout$holdIdxs <- tmp$holdIdxs
-         qeKNNmultKout$whichClosest <- tmp$whichClosest
+         holdIdxs <- tmp$holdIdxs
+         whichClosest <- tmp$whichClosest
       }
       q <- tmp$whichClosest
       tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
