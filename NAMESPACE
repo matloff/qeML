@@ -55,7 +55,7 @@ S3method(predict,qeLinMV)
 S3method(predict,qeLogitMV)
 S3method(predict,qeKNNMV)
 S3method(predict,qeNeuralTorch)
-S3method(predict,predict,qeKNNmultK)
+S3method(predict,qeKNNmultK)
 
 export(
    qePCA,qeUMAP,qeRF,qeRFgrf,qeRFranger,qeDT,
