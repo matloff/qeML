@@ -479,7 +479,7 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 # does qeKNN for multiple values of k, exploiting the fact that we can
 # save the indices of nearest neighbors
 
-qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
+qeKNNmltK <- function(data,yName,k,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
@@ -501,7 +501,7 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
 #       savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
 #    }
 
-   qeKNNmultKout <- list()
+   qeKNNmltKout <- list()
    lastKi <- length(k)
    for (i in lastKi:1) {
       if (i == lastKi) {
@@ -509,36 +509,37 @@ qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
             expandVals,holdout)
          holdIdxs <- tmp$holdIdxs
          whichClosest <- tmp$whichClosest
+      } else {
+         q <- tmp$whichClosest
+         tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
+            expandVals,holdout=holdIdxs,saveNhbrs=FALSE,savedNhbrs=q)
       }
-      q <- tmp$whichClosest
-      tmp <- qeKNN(data,yName,k[i],scaleX,smoothingFtn,yesYVal,expandVars,
-         expandVals,holdout=holdIdxs,saveNhbrs=FALSE,savedNhbrs=q)
       knnOuts[[i]] <- tmp
    }
 
-   qeKNNmultKout$knnOuts <- knnOuts
-   qeKNNmultKout$k <- k
-   class(qeKNNmultKout) <- 'qeKNNmultK'
-   qeKNNmultKout
+   qeKNNmltKout$knnOuts <- knnOuts
+   qeKNNmltKout$k <- k
+   class(qeKNNmltKout) <- 'qeKNNmltK'
+   qeKNNmltKout
 
 }
 
-predict.qeKNNmultK <- function(object,newx)
+predict.qeKNNmltK <- function(object,newx)
 {
 
-   predictOneK <- function(oneQeKNNmultKout)
+   predictOneK <- function(oneQeKNNmltKout)
    {
-      predict(oneQeKNNmultKout,newx)
+      predict(oneQeKNNmltKout,newx)
    }
 
    lapply(object$knnOuts,predictOneK)
 
 }
 
-qeKNNmultKtestAccs <- function(qeKNNmultKout,outDF=TRUE) 
+qeKNNmltKtestAccs <- function(qeKNNmltKout,outDF=TRUE) 
 {
-   knnOuts <- qeKNNmultKout$knnOuts
-   k <- qeKNNmultKout$k
+   knnOuts <- qeKNNmltKout$knnOuts
+   k <- qeKNNmltKout$k
    testAccs <- sapply(knnOuts,function(ko) ko$testAcc)
    tmp <- data.frame(kval=k,testAcc=testAccs)
    if (outDF) return(tmp)
@@ -2920,4 +2921,6 @@ print.qeDT <- function(x,...)
 {
    print(x$ctout)
 }
+
+qrs <- function(x) {x^2+1}
 
