@@ -547,6 +547,14 @@ qeKNNmltKtestAccs <- function(qeKNNmltKout,outDF=TRUE)
    names(tas) <- tmp$kval
    tas
 }
+
+qeKNNmltKtestAccsPlot <- function(testAccs)
+{
+   v <- apply(testAccs,1,mean)
+   v1 <- cbind(as.numeric(names(v)),v)
+   plot(v1,xlab='k',ylab='testAcc',cex=0.5,pch=19)
+}
+
  
 # does qeKNN for multiple values of k, exploiting the fact that we can
 # save the indices of nearest neighbors
