@@ -2930,5 +2930,56 @@ print.qeDT <- function(x,...)
    print(x$ctout)
 }
 
-qrs <- function(x) {x^2+1}
+qeRFrfsrc <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL,...)
+{
+    require(randomForestSRC)
+    yNameSave <- yName
+    checkForNonDF(data)
+    classif <- is.factor(data[[yName]])
+    ycol <- which(names(data) == yName)
+    yvec <- data[, ycol]
+    yLevels <- levels(yvec)
+    if (is.factor(yvec) && length(levels(yvec)) == 2) {
+        if (is.null(yesYVal)) {
+            yesYVal <- yLevels[1]
+            warning(paste0("no value specified for yesYVal, default used: ",
+                yesYVal))
+            whichYes <- which(yvec == yesYVal)
+            yvec <- as.character(yvec)
+            yvec[whichYes] <- "1"
+            yvec[-whichYes] <- "0"
+            yvec <- as.factor(yvec)
+            data[, ycol] <- yvec
+        }
+        else {
+            if (!(yesYVal %in% yLevels))
+                stop("invalid yesYVal")
+        }
+    }
+    holdIdxs <- tst <- trn <- NULL
+    if (!is.null(holdout))
+        splitData(holdout, data)
+    # requireNamespace("randomForestSRC")
+    xyc <- getXY(data, yName, xMustNumeric = FALSE, classif = classif)
+    frml <- stats::as.formula(paste(yName, "~ ."))
+    split.select.weights <- NULL
+    rfsrcOut <- rfsrc(frml,data=data,...)
+    rfsrcOut$classNames <- xyc$classNames
+    rfsrcOut$classif <- classif
+    rfsrcOut$trainRow1 <- getRow1(data, yName)
+    rfsrcOut$yesYVal <- yesYVal
+    class(rfsrcOut) <- c("qeRFrfsrcOut", "rfsrc",'grow')
+    if (!is.null(holdout)) {
+        predictHoldout(rfsrcOut)
+        rfsrcOut$holdIdxs <- holdIdxs
+    }
+    rfsrcOut$yName <- yNameSave
+    rfsrcOut
+}
+
+predict.qeRFrfsrcOut <- function(obj,newx)
+{
+   class(obj) <- c('rfsrc','grow')
+   predict.rfsrc(obj,newx)$predicted
+}
 
