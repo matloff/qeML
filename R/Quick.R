@@ -2980,6 +2980,8 @@ qeRFrfsrc <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal
 predict.qeRFrfsrcOut <- function(obj,newx)
 {
    class(obj) <- c('rfsrc','grow')
-   predict.rfsrc(obj,newx)$predicted
+   tmp <- predict.rfsrc(obj,newx)$predicted
+   if (obj$classif && ncol(tmp) == 2) tmp <- tmp[,2]
+   tmp
 }
 
