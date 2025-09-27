@@ -178,6 +178,7 @@ Thus in almost all cases, significance tests don't address the issue of
 interest, which is whether some population quantity is substantial
 enough to be considered important.  Analysts should not be misled by
 words like "significant." [Modern statistical
-practice](https://tinyurl.com/2s7x6h2v) places reduced value, or in the
-view of many, no value at all, on significance testing.
+practice](https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf)
+places reduced value, or in the view of many, no value at all, on
+significance testing.
 

@@ -89,40 +89,6 @@ test1 <- function()
    qePlotCurves(outdf)
 }
 
-# fit 4 qe* ftns on lsa data, plot; call form is 
-# test2(5), or put anything else instead of 5;
-# zzz just a dummy for arg 1, not used; do
-#
-#    w <- test2(5)
-#    qePlotCurves(w)
-#
-# to run
-test2 <- defmacro(zzz,  
-   expr = {
-     data(lsa)
-     lsa1 <- lsa[sample(1:nrow(lsa),1000),]
-     data(svcensus)
-     svc <- svcensus[sample(1:nrow(lsa),1000),]
-     svc <- na.exclude(svc)
-     xvals <- seq(5,75,5)
-     outDF <- data.frame(x=NULL,y=NULL,z=NULL)
-     for (i in 1:15) {
-        tmp <- replicMeans(25,"qeXGBoost(svc,'wageinc',
-           params=list(max_depth=i))$testAcc")
-        outDF <- rbind(outDF,data.frame(x=i,y=tmp,z='XGB'))
-        tmp <- replicMeans(25,"qeKNN(svc,'wageinc',k=xvals[i])$testAcc")
-        outDF <- rbind(outDF,data.frame(x=i,y=tmp,z='KNN'))
-        tmp <- replicMeans(25,"qeRFranger(svc,'wageinc',
-           minNodeSize=xvals[i])$testAcc")
-        outDF <- rbind(outDF,data.frame(x=i,y=tmp,z='RF'))
-        tmp <- replicMeans(25,"qePolyLin(svc,'wageinc',
-           deg=i,maxInteractDeg=2)$testAcc")
-        outDF <- rbind(outDF,data.frame(x=i,y=tmp,z='polyLin'))
-     }
-     outDF$z <- as.factor(outDF$z)
-     outDF
-   }
-)
 
 # generate data to go into qePlotCurves(); finds mean testAcc over nreps
 # runs, each with a different random training set

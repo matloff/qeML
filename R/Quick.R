@@ -2932,7 +2932,7 @@ print.qeDT <- function(x,...)
 
 qeRFrfsrc <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal=NULL,...)
 {
-    require(randomForestSRC)
+    # require(randomForestSRC)
     yNameSave <- yName
     checkForNonDF(data)
     classif <- is.factor(data[[yName]])
@@ -2959,7 +2959,7 @@ qeRFrfsrc <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal
     holdIdxs <- tst <- trn <- NULL
     if (!is.null(holdout))
         splitData(holdout, data)
-    # requireNamespace("randomForestSRC")
+    requireNamespace("randomForestSRC")
     xyc <- getXY(data, yName, xMustNumeric = FALSE, classif = classif)
     frml <- stats::as.formula(paste(yName, "~ ."))
     split.select.weights <- NULL

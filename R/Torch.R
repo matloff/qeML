@@ -24,8 +24,8 @@ qeNeuralTorch <- function (data, yName, layer, yesYVal = NULL,
     holdout = floor(min(1000, 0.1 * nrow(data)))) 
 {
     checkPkgLoaded("torch")
-    qeML:::checkForNonDF(data)
-    trainRow1 <- qeML:::getRow1(data, yName)
+    checkForNonDF(data)
+    trainRow1 <- getRow1(data, yName)
     ycol <- which(names(data) == yName)
     y <- data[, ycol]
     if (is.factor(y)) {
@@ -51,7 +51,7 @@ qeNeuralTorch <- function (data, yName, layer, yesYVal = NULL,
     else factorsInfo <- NULL
     holdIdxs <- tst <- trn <- NULL
     if (!is.null(holdout)) 
-        qeML:::makeHoldout(0)
+        makeHoldout(0)
     x <- as.matrix(x)
     xT <- torch_tensor(x)
     yToAvg <- matrix(as.numeric(yToAvg, ncol = 1))
@@ -94,7 +94,7 @@ qeNeuralTorch <- function (data, yName, layer, yesYVal = NULL,
     torchout$x <- x
     torchout$xT <- xT
     torchout$yT <- yT
-    torchout$trainRow1 <- qeML:::getRow1(data, yName)
+    torchout$trainRow1 <- getRow1(data, yName)
     torchout$model <- model
     class(torchout) <- c("qeNeuralTorch", "torch_tensor")
     ## if (!is.null(holdout)) {
@@ -135,7 +135,7 @@ predict.qeNeuralTorch <- function(object,newx,...)
 {
    finfo <- object$factorsInfo
    if(!is.null(finfo)) {
-      newx <- factorsToDummies(newx,omitLast=TRUE,factorsInfo=finfo)
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,factorsInfo=finfo)
    }
    newx <- as.matrix(newx)
    newxT <- torch_tensor(newx)

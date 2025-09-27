@@ -17,7 +17,7 @@ qeHAL <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 {
    requireNamespace('hal9001')
    yNameSave <- yName
-   qeML:::checkForNonDF(data)
+   checkForNonDF(data)
    classif <- is.factor(data[[yName]])
    if (classif) stop('not covered yet')
 
@@ -28,26 +28,26 @@ qeHAL <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
    y <- xy[,yCol]
    isF <- sapply(x,is.factor)
    if (any(isF)) {
-      xnum <- factorsToDummies(x,omitLast=TRUE)
+      xnum <- regtools::factorsToDummies(x,omitLast=TRUE)
       factorsInfo <- attr(xnum,'factorsInfo')
       xsave <- x
       x <- xnum
-      data <- factorsToDummies(data,TRUE,factorsInfo)
+      data <- regtools::factorsToDummies(data,TRUE,factorsInfo)
    } else factorsInfo <- NULL
    trainRow1 <- x[1,]
 
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
-   if (!is.null(holdout)) qeML:::splitData(holdout,data)
+   if (!is.null(holdout)) splitData(holdout,data)
    trn <- as.data.frame(trn)
    tst <- as.data.frame(tst)
 
    halout <- fit_hal(x,y)
    halout$classif <- classif 
-   halout$trainRow1 <- qeML:::getRow1(data,yName)
+   halout$trainRow1 <- getRow1(data,yName)
    class(halout) <- c('qeHAL',class(halout))
    if (!is.null(holdout)) {
       ycol <- preds <- NULL  # for CRAN "unbound globals" complaint
-      qeML:::predictHoldout(halout)
+      predictHoldout(halout)
       halout$holdIdxs <- holdIdxs
       if (!classif) {
          summ <- summary(halout)
@@ -62,8 +62,8 @@ qeHAL <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))))
 predict.qeHAL <- function(object,newx,useTrainRow1=FALSE,...) {
    class(object) <- class(object)[-1]
    if (!is.null(object$factorsInfo)) 
-      newx <- factorsToDummies(newx,TRUE,object$factorsInfo)
-   if (useTrainRow1) newx <- qeML:::setTrainFactors(object,newx)
+      newx <- regtools::factorsToDummies(newx,TRUE,object$factorsInfo)
+   if (useTrainRow1) newx <- setTrainFactors(object,newx)
 
    preds <- predict(object,newx)
    if (!object$classif) return(preds)
