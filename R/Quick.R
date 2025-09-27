@@ -479,7 +479,7 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
 # does qeKNN for multiple values of k, exploiting the fact that we can
 # save the indices of nearest neighbors
 
-qeKNNmltK <- function(data,yName,k,scaleX=TRUE,
+qeKNNmultK <- function(data,yName,k,scaleX=TRUE,
    smoothingFtn=mean,yesYVal=NULL,expandVars=NULL,expandVals=NULL,
    holdout=floor(min(1000,0.1*nrow(data))))
 {
@@ -501,7 +501,7 @@ qeKNNmltK <- function(data,yName,k,scaleX=TRUE,
 #       savedNhbrs <- list(nn.index=savedNhbrs,nn.dist=0)
 #    }
 
-   qeKNNmltKout <- list()
+   qeKNNmultKout <- list()
    lastKi <- length(k)
    for (i in lastKi:1) {
       if (i == lastKi) {
@@ -517,29 +517,29 @@ qeKNNmltK <- function(data,yName,k,scaleX=TRUE,
       knnOuts[[i]] <- tmp
    }
 
-   qeKNNmltKout$knnOuts <- knnOuts
-   qeKNNmltKout$k <- k
-   class(qeKNNmltKout) <- 'qeKNNmltK'
-   qeKNNmltKout
+   qeKNNmultKout$knnOuts <- knnOuts
+   qeKNNmultKout$k <- k
+   class(qeKNNmultKout) <- 'qeKNNmultK'
+   qeKNNmultKout
 
 }
 
-predict.qeKNNmltK <- function(object,newx)
+predict.qeKNNmultK <- function(object,newx)
 {
 
-   predictOneK <- function(oneQeKNNmltKout)
+   predictOneK <- function(oneQeKNNmultKout)
    {
-      predict(oneQeKNNmltKout,newx)
+      predict(oneQeKNNmultKout,newx)
    }
 
    lapply(object$knnOuts,predictOneK)
 
 }
 
-qeKNNmltKtestAccs <- function(qeKNNmltKout,outDF=TRUE) 
+qeKNNmultKtestAccs <- function(qeKNNmultKout,outDF=TRUE) 
 {
-   knnOuts <- qeKNNmltKout$knnOuts
-   k <- qeKNNmltKout$k
+   knnOuts <- qeKNNmultKout$knnOuts
+   k <- qeKNNmultKout$k
    testAccs <- sapply(knnOuts,function(ko) ko$testAcc)
    tmp <- data.frame(kval=k,testAcc=testAccs)
    if (outDF) return(tmp)
@@ -548,7 +548,7 @@ qeKNNmltKtestAccs <- function(qeKNNmltKout,outDF=TRUE)
    tas
 }
 
-qeKNNmltKtestAccsPlot <- function(testAccs)
+qeKNNmultKtestAccsPlot <- function(testAccs)
 {
    v <- apply(testAccs,1,mean)
    v1 <- cbind(as.numeric(names(v)),v)
@@ -2963,7 +2963,7 @@ qeRFrfsrc <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal
     xyc <- getXY(data, yName, xMustNumeric = FALSE, classif = classif)
     frml <- stats::as.formula(paste(yName, "~ ."))
     split.select.weights <- NULL
-    rfsrcOut <- rfsrc(frml,data=data,...)
+    rfsrcOut <- randomForestSRC::rfsrc(frml,data=data,...)
     rfsrcOut$classNames <- xyc$classNames
     rfsrcOut$classif <- classif
     rfsrcOut$trainRow1 <- getRow1(data, yName)
@@ -2980,7 +2980,7 @@ qeRFrfsrc <- function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),yesYVal
 predict.qeRFrfsrcOut <- function(obj,newx)
 {
    class(obj) <- c('rfsrc','grow')
-   tmp <- predict.rfsrc(obj,newx)$predicted
+   tmp <- randomForestSRC::predict.rfsrc(obj,newx)$predicted
    if (obj$classif && ncol(tmp) == 2) tmp <- tmp[,2]
    tmp
 }
