@@ -2237,7 +2237,7 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
    {
       cmbiNames <- names(cmbi)
       qecall <- qeftn
-      qecall <- paste0(qecall,'(data=data,yName=yName')
+      qecall <- paste0(qecall,'(data=dtrn,yName=yName')
       for (i in 1:length(cmbi)) {
          tmp <- unlist(cmbi[i])
          if (!is.numeric(tmp)) {
