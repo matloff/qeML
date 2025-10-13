@@ -1392,6 +1392,7 @@ qeNeural <- function(data,yName,hidden=c(100,100),nEpoch=30,
 
    classif <- is.factor(data[[yName]])
    requireNamespace('keras')
+   py_require_legacy_keras()     
    holdIdxs <- tst <- trn <- NULL  # for CRAN "unbound globals" complaint
    if (!is.null(holdout)) splitData(holdout,data)
    ycol <- which(names(data) == yName)
