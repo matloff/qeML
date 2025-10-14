@@ -2261,7 +2261,6 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
          prederr <- abs(tstY - preds)
          return(mean(prederr))
       } else {  # classification case
-browser()
          preds <- predict(qeout,tstX)$predClasses
          tmp <- grep('dfr',preds[1],value=TRUE)
          if (length(tmp) > 0) {
