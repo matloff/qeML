@@ -407,6 +407,7 @@ qeKNN <- function(data,yName,k=25,scaleX=TRUE,
    knnout$classif2 <- classif2
    knnout$yesYVal <- yesYVal
    knnout$noYVal <- noYVal
+   if (classif) knnout$yFactorLevels <- levels(y)
    knnout$scalePars <- scalePars
    knnout$factorsInfo <- factorsInfo
    knnout$trainRow1 <- trainRow1
@@ -472,6 +473,10 @@ predict.qeKNN <- function(object,newx,newxK=1,...)
    # multiclass case
    predClassIdxs <- apply(preds,1,which.max) 
    predClasses <- colnames(preds)[predClassIdxs]
+   #   pcs <- predClasses
+   #   pcs <- gsub('dfr.','',pcs)
+   #   predClasses <- as.factor(pcs)
+   #   levels(predClasses) <- object$yFactorLevels
    list(predClasses=predClasses,probs=preds)
 
 }
@@ -2257,12 +2262,13 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
          return(mean(prederr))
       } else {  # classification case
          preds <- predict(qeout,tstX)$predClasses
-         return(mean(preds != tstY))
+         return(mean(preds != paste0('dfr.',tstY)))
       }
    }
 
    z <- regtools::fineTuning(data,pars,theCall,
       nCombs=nCombs,nTst=nTst,nXval=nXval,showProgress=showProgress)
+
    class(z) <- c('qeFT','tuner')
    z
 }
