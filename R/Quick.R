@@ -2262,7 +2262,11 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
          return(mean(prederr))
       } else {  # classification case
          preds <- predict(qeout,tstX)$predClasses
-         return(mean(preds != paste0('dfr.',tstY)))
+         tmp <- grep('dfr',preds[1],value=TRUE)
+         if (length(tmp) > 0) {
+            return(mean(preds != paste0('dfr.',tstY)))
+         }
+         return(mean(preds != tstY))
       }
    }
 
