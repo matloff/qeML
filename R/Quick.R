@@ -2273,6 +2273,7 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
    z <- regtools::fineTuning(data,pars,theCall,
       nCombs=nCombs,nTst=nTst,nXval=nXval,showProgress=showProgress)
 
+   z$numVars <- length(pars)  # how many quantities are crossed
    class(z) <- c('qeFT','tuner')
    z
 }
@@ -2281,7 +2282,7 @@ plot.qeFT <- function(x,...)
 {
    # plot.tuner(x)
    checkPkgLoaded('cdparcoord')
-   odf <- ftout$outdf[,1:4]
+   odf <- x$outdf[,1:(x$numVars+1)]
    discparcoord(odf,k=min(15,nrow(odf)))
 }
 
