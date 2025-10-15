@@ -2279,7 +2279,10 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
 
 plot.qeFT <- function(x,...) 
 {
-   plot.tuner(x)
+   # plot.tuner(x)
+   checkPkgLoaded('cdparcoord')
+   odf <- ftout$outdf[,1:4]
+   discparcoord(odf,k=min(15,nrow(odf)))
 }
 
 #########################  qeDT()  #################################
