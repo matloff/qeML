@@ -2281,9 +2281,13 @@ qeFT <- function(data,yName,qeftn,pars,nCombs=NULL,nTst,nXval,showProgress=TRUE)
 plot.qeFT <- function(x,...) 
 {
    # plot.tuner(x)
-   checkPkgLoaded('cdparcoord')
+   # checkPkgLoaded('cdparcoord')
+   # discparcoord(odf,k=min(15,nrow(odf)))
    odf <- x$outdf[,1:(x$numVars+1)]
-   discparcoord(odf,k=min(15,nrow(odf)))
+   nLines <- nrow(odf)
+   colors <- 1 + (0:(nLines-1))
+      # %/% round(nLines / 2) # 2 groups
+   MASS::parcoord(odf[,1:4,],col=colors,var.label=TRUE)
 }
 
 #########################  qeDT()  #################################
