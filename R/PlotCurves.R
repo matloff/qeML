@@ -27,6 +27,7 @@
 ### #    loess: if TRUE, plot the loess-fitted curve, not the points
 ### #    legendSpace: expand plot grid by this amount to fit in a legend
 ### #    legendPos: as in R plot()
+### #    added later: prePost,prePostChangePt
 ### 
 ### # value
 ### 
@@ -323,62 +324,68 @@ wideToLongWithTime <- function(data,timeColName,timeColPresent=TRUE,
 #    wideTimeColPresent=F,wideGrpColName='group')
 
 
-qePlotCurves <- function(curveData,xCol=1,yCol=2,grpCol=3,
-   xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
-   loess=TRUE,legendTitle=names(curveData)[grpCol],
-   legendSpace=1.1,legendPos='topright',
-   wide=FALSE,wideTimeColName=NULL,wideTimeColPresent=NULL,
-   wideTimeColBase=1:nrow(curveData),wideGrpColName=NULL,
-      wideValueColName=NULL) 
+qePlotCurves <- function (curveData, xCol = 1, yCol = 2, grpCol = 3, 
+    xlab = names(curveData)[xCol], ylab = names(curveData)[yCol], loess = TRUE, 
+    legendTitle=names(curveData)[grpCol],legendSpace=1.1,legendPos="topright",
+    prePost=FALSE,prePostChangePt=NULL,
+    wide = FALSE, wideTimeColName = NULL, wideTimeColPresent = NULL,
+       wideTimeColBase = 1:nrow(curveData),
+       wideGrpColName = NULL, wideValueColName = NULL)
 {
-
-   if(wide) {
-      tmp <- wideToLongWithTime(curveData,wideTimeColName,
-         wideTimeColPresent,wideTimeColBase,
-         grpColName=wideGrpColName,
-         valueColName=wideValueColName)
-      curveData <- tmp
-      xCol <- 1; yCol <- 3; grpCol <- 2
-   }
-
-   nms <- names(curveData)
-   if (is.character(xCol)) xCol <- which(nms == xCol)
-   if (is.character(yCol)) yCol <- which(nms == yCol)
-   if (is.character(grpCol)) grpCol <- which(nms == grpCol)
-
-   tmpDF <- curveData[,c(xCol,yCol,grpCol)]
-   briefCurveData <- tmpDF
-   if (!is.factor(briefCurveData[,3])) 
-      briefCurveData[,3] <- as.factor(briefCurveData[,3])
-
-   xlim <- c(min(briefCurveData[,1]),max(briefCurveData[,1]))
-   tmp <- max(briefCurveData[,2])
-   # leave room at top for legend
-   topY <- if (tmp > 0) legendSpace*tmp else tmp / legendSpace
-   ylim <- c(min(briefCurveData[,2]),topY)
-   plot(NULL,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab)
-
-   curves <- split(briefCurveData,briefCurveData[,3])
-   nCurves <- length(curves)
-
-   cols <- rainbow(nCurves)
-
-   nms <- as.factor(names(curves))
-   for (i in 1:nCurves) {
-      cvsi <- curves[[i]]
-      if (loess) {
-         toExec <- 
-            sprintf('loess(%s ~ %s,cvsi)',names(cvsi)[2],names(cvsi)[1])
-         tmp <- evalr(toExec)
-         cvsi[,2] <- predict(tmp,cvsi[,1])
-      }
-      cvsiOrdered <- cvsi[order(cvsi[,1]),]
-      lines(cvsiOrdered,col=cols[i])
-   }
-
-   legend(legendPos,title=legendTitle,
-      legend=levels(nms),col=cols,lty=rep(1,nCurves))
-
+    if (wide) {
+        tmp <- wideToLongWithTime(curveData, wideTimeColName,
+            wideTimeColPresent, wideTimeColBase, grpColName = wideGrpColName,
+            valueColName = wideValueColName)
+        curveData <- tmp
+        xCol <- 1
+        yCol <- 3
+        grpCol <- 2
+    }
+    nms <- names(curveData)
+    if (is.character(xCol))
+        xCol <- which(nms == xCol)
+    if (is.character(yCol))
+        yCol <- which(nms == yCol)
+    if (is.character(grpCol))
+        grpCol <- which(nms == grpCol)
+    tmpDF <- curveData[, c(xCol, yCol, grpCol)]
+    briefCurveData <- tmpDF
+    if (!is.factor(briefCurveData[, 3]))
+        briefCurveData[, 3] <- as.factor(briefCurveData[, 3])
+    xlim <- c(min(briefCurveData[, 1]), max(briefCurveData[,
+        1]))
+    tmp <- max(briefCurveData[, 2])
+    topY <- if (tmp > 0)
+        legendSpace * tmp
+    else tmp/legendSpace
+    ylim <- c(min(briefCurveData[, 2]), topY)
+    plot(NULL, xlim = xlim, ylim = ylim, xlab = xlab, ylab = ylab,bg='white')
+    curves <- split(briefCurveData, briefCurveData[, 3])
+    nCurves <- length(curves)
+    cols <- rainbow(nCurves)
+    nms <- as.factor(names(curves))
+    for (i in 1:nCurves) {
+        cvsi <- curves[[i]]
+        if (loess) {
+            toExec <- sprintf("loess(%s ~ %s,cvsi)", names(cvsi)[2],
+                names(cvsi)[1])
+            tmp <- evalr(toExec)
+            # cvsi[, 2] <- predict(tmp, cvsi[, 1])
+            cvsi[,2] <- tmp$fitted
+        }
+        cvsiOrdered <- cvsi[order(cvsi[, 1]), ]
+        if (!prePost) lines(cvsiOrdered, col = cols[i])
+        else {
+           xOrdering <- order(cvsi[, 1])
+           orderedXs <- cvsi[,1][xOrdering]
+           preXlast <- max(which(orderedXs < prePostChangePt))
+           lines(cvsiOrdered[1:preXlast,],col=cols[i])
+           lines(cvsiOrdered[(preXlast+1):length(orderedXs),],col='gray')
+        }
+    }
+    if (prePost) abline(v=prePostChangePt)
+    legend(legendPos, title = legendTitle, legend = levels(nms),
+        col = cols, lty = rep(1, nCurves))
 }
 
 # generate data for f(x) = x and g(x) = x^, plot

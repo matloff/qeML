@@ -16,12 +16,9 @@ plotPairedResids(data,qeOut)
 plotClassesUMAP(data,classVar) 
 qeFreqParcoord(dataName,k=25,opts=NULL)
 qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
-   xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],
-   loess=TRUE,legendTitle,legendSpace=1.1,legendPos='topright')
-
-qePlotCurves(curveData,xCol=1,yCol=2,grpCol=3,
    xlab=names(curveData)[xCol],ylab=names(curveData)[yCol],loess=TRUE,
    legendTitle=names(curveData)[grpCol],legendSpace=1.1,legendPos="topright",
+   prePost=FALSE,prePostChangePt=NULL,
    wide=FALSE,wideTimeColName=NULL,wideTimeColPresent=NULL,
       wideTimeColBase=1:nrow(curveData),wideGrpColName=NULL,
       wideValueColName=NULL)
@@ -53,6 +50,8 @@ qeMittalGraph(dataMitt,xlab="x",ylab="y",legendTitle="curve",loess=TRUE)
   \item{curveData}{A data frame, "X" values in column 1.}
   \item{xlab}{Label for X-axis.}
   \item{ylab}{Label for Y-axis.}
+  \item{prePost}{If TRUE, change to gray color after \code{prePostChangePt=}}
+  \item{yprePostChangePt}{Color change, vertical line drawn.}
   \item{wide}{TRUE if \code{curveData} is in wide format.}
   \item{wideTimeColName}{Name to be used for "X"-axis.}
   \item{wideTimeColPresent}{If TRUE, a time column already exists.}
@@ -95,6 +94,13 @@ data(lsa)
 # (reputed quality of the law school)
 qePlotCurves(lsa,6,5,9,legendSpace=1.35)
 
+data(svcensus)
+rich <- which(svcensus$wageinc > 200000)  # census topcoding ugly, avoid
+qePlotCurves(svcensus[-rich,],'age','wageinc','occ',
+   prePost=T,prePostChangePt=40)
+# US federal age discrimination law starts at age 40, highlighting
+# age-income trends in this data
+
 data(currency)
 curr <- cbind(1:nrow(currency),currency)
 names(curr)[1] <- 'weeknum'
@@ -103,7 +109,6 @@ qePlotCurves(currency,wide=TRUE,wideTimeColName='weeknum',
 qeMittalGraph(curr,'weeknum','rate','country')
 # Canadian dollar and pound in one cluster, and franc, mark and
 # yen in another
-
 
 }
 
