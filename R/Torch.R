@@ -6,10 +6,7 @@
 
 #    data: standard qeML
 #    yName: standard qeML
-#    layers: list of lists; layers[[i]] specifies the layer type and any
-#       parameters for layer; the fan-in may be specified as 0 for the
-#       first layer, in which case it will be set the number of features
-#       (after factors, if any, are converted to dummies)
+#    layers: the usual "c(100,100)" spec for neurons and layers
 #    yesYVal: for factor Y, which level is to be considered Y = 1 not 0
 #    learnRate: learning rate, vital, might need to be even e-05 or 2
 #    wtDecay: weight decay, regularization
@@ -19,13 +16,13 @@
 
 # see examples at the end of this file
 
-qeNeuralTorch <- function (data, yName, layer, yesYVal = NULL, 
+qeNNtorch <- function (data, yName, layers = c(100, 100), yesYVal = NULL, 
     learnRate = 0.001, wtDecay = 0, nEpochs = 100, dropout = 0, 
     holdout = floor(min(1000, 0.1 * nrow(data)))) 
 {
     checkPkgLoaded("torch")
     checkForNonDF(data)
-    trainRow1 <- getRow1(data, yName)
+    trainRow1 <- qeML:::getRow1(data, yName)
     ycol <- which(names(data) == yName)
     y <- data[, ycol]
     if (is.factor(y)) {
@@ -39,150 +36,69 @@ qeNeuralTorch <- function (data, yName, layer, yesYVal = NULL,
         y <- as.numeric(y == yesYVal)
     }
     else classif <- FALSE
-    yToAvg <- y
+if (classif) stop('not set up yet for classification problems')
     nYcols <- 1
     x <- data[, -ycol]
     classes <- sapply(data, class)
     if (sum(classes == "numeric") + sum(classes == "integer") < 
         ncol(data)) {
-        x <- regtools::factorsToDummies(x, omitLast = TRUE)
+        x <- regtools::factorsToDummies(x, omitLast = FALSE, 
+            dfOut = FALSE)
         factorsInfo <- attr(x, "factorsInfo")
     }
     else factorsInfo <- NULL
     holdIdxs <- tst <- trn <- NULL
-    if (!is.null(holdout)) 
-        makeHoldout(0)
-    x <- as.matrix(x)
-    xT <- torch_tensor(x)
-    yToAvg <- matrix(as.numeric(yToAvg, ncol = 1))
-    yT <- torch_tensor(yToAvg)
-
-    # prep to create model
-    nnSeqArgs <- list(); nsa <- 0
-    i <- 1
-    while (i <= length(layer)) {
-       nsa <- nsa + 1
-       if (layer[[i]] == "linear") {
-           nnSeqArgs[[nsa]] <- nn_linear(layer[[i+1]], layer[[i+2]])
-           i <- i + 3
-       } else if (layer[[i]] == "relu") {
-           nnSeqArgs[[nsa]] <- nn_relu(inplace = FALSE)
-           i <- i + 1
-       }
-       else if (layer[[i]] == "dropout") {
-         nnSeqArgs[[nsa]] <- nn_dropout(dropout)
-           i <- i + 1
-       }
-       else {
-          nnSeqArgs[[nsa]] <- nn_sigmoid()
-          i <- i + 1
-       }
+    if (!is.null(holdout)) {
+        nHold <- holdout
+        holdIdxs <- sample(1:nrow(x), nHold)
+        xTst <- x[holdIdxs, ]
+        xTrn <- x[-holdIdxs, ]
+        xTrn <- as.matrix(xTrn)
+        xTst <- as.matrix(xTst)
+        yTst <- y[holdIdxs]
+        yTrn <- y[-holdIdxs]
+        tst <- cbind(xTst, yTst)
+        trn <- cbind(xTrn, yTrn)
+        ycol <- ncol(trn)
     }
-
-    model <- do.call(nn_sequential, nnSeqArgs)
+    xTrnTensor <- torch_tensor(xTrn, dtype = torch_float())
+    yTrnTensor <- torch_tensor(yTrn, dtype = torch_float())
+    xTstTensor <- torch_tensor(xTst, dtype = torch_float())
+    yTstTensor <- torch_tensor(yTst, dtype = torch_float())
+    nLayers <- length(layers)
+    modelCall <- "model <- nn_sequential("
+    for (i in 1:nLayers) {
+        if (i == 1) 
+            modelCall <- paste(modelCall, "nn_linear(ncol(x),layers[i]),")
+        else modelCall <- paste(modelCall, "nn_linear(layers[i-1],layers[i]),")
+        modelCall <- paste(modelCall, "nn_relu(),")
+    }
+    modelCall <- paste(modelCall, "nn_linear(layers[nLayers],1))")
+    eval(parse(text = modelCall))
+    model(xTrnTensor)
     optimizer <- optim_adam(model$parameters, lr = learnRate, 
         weight_decay = wtDecay)
     for (i in 1:nEpochs) {
-        preds <- model(xT)
-        loss <- nnf_mse_loss(preds, yT, reduction = "sum")
+        preds <- model(xTrnTensor)
+        loss <- nnf_mse_loss(preds, yTrnTensor, reduction = "sum")
         optimizer$zero_grad()
         loss$backward()
         optimizer$step()
     }
+    if (!is.null(holdout)) {
+        preds <- model(xTstTensor)
+        testAcc <- mean(abs(yTst - preds))
+    }
     torchout <- list()
     torchout$classif <- classif
-    torchout$x <- x
-    torchout$xT <- xT
-    torchout$yT <- yT
-    torchout$trainRow1 <- getRow1(data, yName)
+    torchout$trainRow1 <- qeML:::getRow1(data, yName)
     torchout$model <- model
-    class(torchout) <- c("qeNeuralTorch", "torch_tensor")
-    ## if (!is.null(holdout)) {
-    ##     ## predictHoldoutTorch(torchout)
-    ##     preds <- model(
-    ##     torchout$holdIdxs <- holdIdxs
-    ## }
-    torchout$preds <- preds
+    class(torchout) <- c("qeNNTorch", "torch_tensor")
+    torchout$testAcc <- testAcc
     torchout
 }
 
-predictHoldoutTorch <- defmacro(res,
-   expr={
+# examples
 
-      ycol <- which(names(tst) == 'yTst');
-      tstx <- tst[,-ycol,drop=FALSE];
-      trnx <- trn[,-ycol,drop=FALSE];
-      # tsty <- tst[,ycol]
-
-      preds <- predict(res,tstx);
-      listPreds <- is.list(preds)
-      res$holdoutPreds <- preds
-         
-      if (res$classif) {
-         #### stop('regression case only for now')
-         preds <- round(as.numeric(preds[,1]))  
-         res$testAcc <- mean(preds!=tst[,ycol])
-      } else {  # regression case
-         res$testAcc <- mean(abs(preds - tst[,ycol]))
-         ### res$baseAcc <-  mean(abs(tst[,ycol] - mean(data[,ycol])))
-         predsTrn <- predict(res,trnx)
-         res$trainAcc <- mean(abs(predsTrn - trn[,ycol]))
-      }  
-   }  # end of expr= for the macro
-)        
-
-predict.qeNeuralTorch <- function(object,newx,...)
-{
-   finfo <- object$factorsInfo
-   if(!is.null(finfo)) {
-      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,factorsInfo=finfo)
-   }
-   newx <- as.matrix(newx)
-   newxT <- torch_tensor(newx)
-   object$model(newxT)
-}
-
-makeHoldout <- defmacro(placeholder,expr=
-   {
-      nHold <- holdout
-      holdIdxs <- sample(1:nrow(x),nHold)
-      xTst <- x[holdIdxs,]
-      x <- x[-holdIdxs,]
-      yTst <- yToAvg[holdIdxs]
-      yToAvg <- yToAvg[-holdIdxs]
-      tst <- cbind(xTst,yTst)
-      tst <- as.data.frame(tst)
-      trn <- cbind(x,yToAvg)
-      ycol <- ncol(trn)
-      nrX <- nrow(x)
-      ncX <- ncol(x)
-   }
-)
-
-# lyrsClass <- list( 
-#    list('linear',0,100), 
-#    list('relu'), 
-#    list('linear',100,100), 
-#    list('relu'), 
-#    list('linear',100,1), 
-#    list('sigmoid')) 
-
-# svcensus from qeML
-# qeNeuralTorch(svcensus,'gender',yesYVal='male',
-#    layers=lyrsClass,learnRate=0.008)$testAcc
-
-# WA phone churn data, from my ML book
-# qeNeuralTorch(tc,'Churn',yesYVal='Yes',layers=lyrsClass,
-#    learnRate=0.0035)$testAcc
-
-# from dsld package
-# qeNeuralTorch(mortgageSE,'deny',yesYVal='1',layers=lyrsClass,
-#    learnRate=0.003)$testAcc
-
-# lyrsReg <- list(
-#   list('linear',0,100),
-#   list('relu'),
-#   list('linear',100,1))
-#
-# qeNeuralTorch(svcensus,'wageinc',layers=lyrsReg,
-#   learnRate=0.05)$testAcc
+# data(mlb1)
+# qeNNtorch(mlb1[, -1], "Weight",layers=c(200,200),nEpochs=500)$testAcc
