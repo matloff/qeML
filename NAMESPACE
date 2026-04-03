@@ -31,7 +31,7 @@ S3method(predict,qePolyLog)
 S3method(predict,qeLASSO)
 S3method(predict,qeDT)
 S3method(predict,qeParallel)
-S3method(predict,qeDeepnet)
+S3method(predict,qeNNdeepnet)
 S3method(plot,qeLASSO)
 S3method(plot,qeRF)
 S3method(plot,qeDT)
@@ -54,7 +54,7 @@ S3method(predict,qeNCVregCV)
 S3method(predict,qeLinMV)
 S3method(predict,qeLogitMV)
 S3method(predict,qeKNNMV)
-S3method(predict,qeNeuralTorch)
+S3method(predict,qeNNTorch)
 S3method(predict,qeKNNmultK)
 S3method(predict,qeRFrfsrcOut)
 
@@ -64,7 +64,7 @@ export(
    qeNeural,qeLASSO,qeCompare,qeFT,qeROC,qeNCVregCV,
    qePolyLin,qePolyLog,qePolyLASSO,qePolyLinKNN,
    qeParallel,qeTS,qeText,qeLightGBoost,qeXGBoost,
-   doubleD,qeFOCI,qeFOCIrand,qeLinKNN,qeDeepnet,
+   doubleD,qeFOCI,qeFOCIrand,qeLinKNN,qeNNdeepnet,
    plotClassesUMAP,plotPairedResids,factorToTopLevels,
    levelCounts,dataToTopLevels,checkPkgLoaded,
    qeLinMV,qeLogitMV,qeKNNMV,qeLeaveOut1Var,qeRpart,

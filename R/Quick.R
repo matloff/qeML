@@ -2537,10 +2537,10 @@ predict.qeXGBoost <- function(object,x,...)
    preds
 }
 
-#######################  qeDeepnet()()  ##############################
+#######################  qeNNdeepnet()()  ##############################
 
 
-qeDeepnet <- function (data, yName, hidden = c(100,100), 
+qeNNdeepnet <- function (data, yName, hidden = c(100,100), 
    activationfun="sigm",learningrate=0.001,momentum=0.5,
    learningrate_scale=1,numepochs=100,batchsize=25,
    hidden_dropout=0,yesYVal=NULL,
@@ -2579,7 +2579,7 @@ qeDeepnet <- function (data, yName, hidden = c(100,100),
         momentum = momentum, learningrate_scale = learningrate_scale, 
         output = output, numepochs = numepochs, batchsize = batchsize, 
         hidden_dropout = hidden_dropout)
-    class(nnOut) <- c("qeDeepnet")
+    class(nnOut) <- c("qeNNdeepnet")
     nnOut$classif <- classif
     nnOut$factorsInfo <- factorsInfo
     nnOut$yLevels <- yLevels
@@ -2594,7 +2594,7 @@ qeDeepnet <- function (data, yName, hidden = c(100,100),
     nnOut
 }
 
-predict.qeDeepnet <- function (object, newx, ...) 
+predict.qeNNdeepnet <- function (object, newx, ...) 
 {
     if (!allNumeric(newx)) 
         newx <- regtools::factorsToDummies(newx, omitLast = TRUE, 
