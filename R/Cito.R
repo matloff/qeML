@@ -60,7 +60,6 @@ qeNNtorchcito<-function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),
     ## dnnout$factorsInfo <- factorsInfo
     dnnout$yLevels <- yLevels
     if (!is.null(holdout)) {
-browser()
         preds <- predict(dnnout, tstData[,-ycol],device=device)
         dnnout$testAcc <- if (classif) 
             mean(preds != data[holdIdxs,ycol])
