@@ -51,10 +51,10 @@ qeNNtorchcito<-function(data,yName,holdout=floor(min(1000,0.1*nrow(data))),
        else if (classif=='binary') 'softmax'
        else 'cross-entropy'
     dnnout <- dnn(formula=frml,
-       data=data,hidden=hidden,activation=activation, 
+       data=trnData,hidden=hidden,activation=activation, 
        bias=bias,dropout=dropout,loss=lossFtn,lambda=lambda,
        batchsize=batchsize,epochs=epochs,device=device,lr=lr,
-       ,optimizer=optimizer)
+       optimizer=optimizer)
     class(dnnout) <- c("qeNNtorchcito","citodnn")
     dnnout$classif <- classif
     ## dnnout$factorsInfo <- factorsInfo
